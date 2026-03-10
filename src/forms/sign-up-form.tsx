@@ -2,6 +2,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Link, useNavigate } from "react-router-dom"
 import { z } from "zod"
+import { Building2, Hash, Mail, User, Lock } from "lucide-react";
 import { useRegister } from "../api/auth/hooks";
 import { toast } from "sonner";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
@@ -59,93 +60,105 @@ export function SignUpForm() {
     })
 
     return (
-        <div className="flex flex-col gap-10">
-            <div className="flex flex-col gap-1">
-                <h1 className="text-2xl font-bold">Transformando dias em conquistas.</h1>
-                <p className="text-muted-foreground text-sm text-balance">Insira seus dados para iniciar sua jornada.</p>
+        <div className="flex flex-col gap-10 w-full animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="flex flex-col gap-2">
+                <h1 className="text-4xl font-black tracking-tight text-zinc-950 leading-[1.1]">
+                    O seu bairro na <br />
+                    <span className="text-[#008EFF]">palma da mão</span>
+                </h1>
+                <p className="text-zinc-500 text-lg leading-relaxed mt-1">
+                    Crie sua conta em poucos segundos e conecte sua voz à cidade.
+                </p>
             </div>
 
-            <form onSubmit={onSubmit}>
-                <FieldGroup>
+            <form onSubmit={onSubmit} className="space-y-6">
+                <FieldGroup className="">
                     <Field>
-                        <FieldLabel htmlFor="cabinetName">Nome do gabinete</FieldLabel>
+                        <FieldLabel className="text-zinc-600 font-medium mb-1.5 block">Nome do gabinete</FieldLabel>
                         <InputForm
                             type="text"
                             name="cabinetName"
                             control={control}
-                            autoComplete="organization"
-                            placeholder="Nome do gabinete aqui"
+                            icon={Building2}
+                            placeholder="Ex: Gabinete do Povo"
                             disabled={isFormSubmittingOrIsPending}
                         />
                     </Field>
 
                     <Field>
-                        <FieldLabel htmlFor="cabinetSlug">Slug do cabinete</FieldLabel>
+                        <FieldLabel className="text-zinc-600 font-medium mb-1.5 block">Slug do gabinete</FieldLabel>
                         <InputForm
                             type="text"
                             name="cabinetSlug"
                             control={control}
-                            autoComplete="off"
-                            placeholder="Seu slug aqui"
+                            icon={Hash}
+                            placeholder="ex: gabinete-povo"
                             disabled={isFormSubmittingOrIsPending}
                         />
                     </Field>
 
                     <Field>
-                        <FieldLabel htmlFor="ownerName">Seu nome</FieldLabel>
+                        <FieldLabel className="text-zinc-600 font-medium mb-1.5 block">Seu nome completo</FieldLabel>
                         <InputForm
                             type="text"
                             name="ownerName"
                             control={control}
-                            autoComplete="name"
-                            placeholder="Seu nome aqui"
+                            icon={User}
+                            placeholder="Digite seu nome"
                             disabled={isFormSubmittingOrIsPending}
                         />
                     </Field>
 
                     <Field>
-                        <FieldLabel htmlFor="ownerEmail">Seu email</FieldLabel>
+                        <FieldLabel className="text-zinc-600 font-medium mb-1.5 block">Seu melhor e-mail</FieldLabel>
                         <InputForm
                             type="email"
                             name="ownerEmail"
                             control={control}
-                            autoComplete="email"
-                            placeholder="Seu email aqui"
+                            icon={Mail}
+                            placeholder="nome@exemplo.com"
                             disabled={isFormSubmittingOrIsPending}
                         />
                     </Field>
 
                     <Field>
-                        <div className="flex items-center">
-                            <FieldLabel htmlFor="ownerPassword">Sua senha</FieldLabel>
-                        </div>
+                        <FieldLabel className="text-zinc-600 font-medium mb-1.5 block">Sua senha de acesso</FieldLabel>
                         <InputForm
                             control={control}
                             name="ownerPassword"
                             id="password"
                             type="password"
-                            placeholder="Sua senha aqui"
+                            icon={Lock}
+                            placeholder="Crie uma senha forte"
                             autoComplete="new-password"
                             disabled={isFormSubmittingOrIsPending}
                         />
                     </Field>
 
-                    <Button type="submit" size="lg" disabled={isFormSubmittingOrIsPending}>
-                        Cadastrar
-                        {isFormSubmittingOrIsPending && (
-                            <Loading />
-                        )}
-                    </Button>
-                    <Field>
-                        <div className="flex gap-1 items-center justify-center">
-                            <p>
-                                Já tem uma conta?
-                            </p>
-                            <Link className="text-center text-primary hover:underline transition-all duration-200" to="/signIn">
-                                Entrar
-                            </Link>
-                        </div>
-                    </Field>
+                    <div className="pt-4">
+                        <Button
+                            type="submit"
+                            size="lg"
+                            disabled={isFormSubmittingOrIsPending}
+                            className="w-full h-14 bg-[#008EFF] hover:bg-[#007cdb] text-white rounded-xl text-lg font-semibold transition-all active:scale-[0.98] cursor-pointer"
+                        >
+                            {isFormSubmittingOrIsPending ? (
+                                <div className="flex items-center gap-2">
+                                    <Loading />
+                                    <span>Criando conta...</span>
+                                </div>
+                            ) : (
+                                "Criar minha conta"
+                            )}
+                        </Button>
+                    </div>
+
+                    <p className="text-center text-zinc-500 text-sm mt-6">
+                        Já possui uma conta?{" "}
+                        <Link to="/signIn" className="text-[#008EFF] font-bold hover:underline">
+                            Fazer login
+                        </Link>
+                    </p>
                 </FieldGroup>
             </form>
         </div>
