@@ -1,9 +1,13 @@
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { z } from "zod"
 import { useRegister } from "../api/auth/hooks";
 import { toast } from "sonner";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { InputForm } from "@/components/ui/form/input-form";
+import { Button } from "@/components/ui/button";
+import { Loading } from "@/components/loading";
 
 const registerFormSchema = z.object({
     cabinetName: z.string({ error: "Campo obrigatório." })
@@ -40,14 +44,109 @@ export function SignUpForm() {
         formState: { isSubmitting },
     } = form;
 
-    const isFormSubmittingOrIsPending = isPendingRegisterCabinet | isSubmitting;
+    const isFormSubmittingOrIsPending = isPendingRegisterCabinet || isSubmitting;
 
     const onSubmit = handleSubmit(async (data: RegisterFormData) => {
+        console.log('Dataaaaaaa', data);
         try {
             await registerCabinet(data);
-            toast
+            toast.success("Cadastro realizado com sucesso! Você já pode fazer login.");
+            await new Promise(resolve => setTimeout(resolve, 2000));
         } catch {
-
+            toast.error("Erro ao realizar cadastro. Tente novamente");
         }
     })
+
+    return (
+        <div className="flex flex-col gap-10">
+            <div className="flex flex-col gap-1">
+                <h1 className="text-2xl font-bold">Transformando dias em conquistas.</h1>
+                <p className="text-muted-foreground text-sm text-balance">Insira seus dados para iniciar sua jornada.</p>
+            </div>
+
+            <form onSubmit={onSubmit}>
+                <FieldGroup>
+                    <Field>
+                        <FieldLabel htmlFor="cabinetName">Nome do gabinete</FieldLabel>
+                        <InputForm
+                            type="text"
+                            name="cabinetName"
+                            control={control}
+                            autoComplete="given-name"
+                            placeholder="Nome do gabinete aqui"
+                            disabled={isFormSubmittingOrIsPending}
+                        />
+                    </Field>
+
+                    <Field>
+                        <FieldLabel htmlFor="cabinetSlug">Slug do cabinete</FieldLabel>
+                        <InputForm
+                            type="text"
+                            name="cabinetSlug"
+                            control={control}
+                            autoComplete="given-slug"
+                            placeholder="Seu slug aqui"
+                            disabled={isFormSubmittingOrIsPending}
+                        />
+                    </Field>
+
+                    <Field>
+                        <FieldLabel htmlFor="ownerName">Seu nome</FieldLabel>
+                        <InputForm
+                            type="text"
+                            name="ownerName"
+                            control={control}
+                            autoComplete="given-ownerName"
+                            placeholder="Seu nome aqui"
+                            disabled={isFormSubmittingOrIsPending}
+                        />
+                    </Field>
+
+                    <Field>
+                        <FieldLabel htmlFor="ownerEmail">Seu email</FieldLabel>
+                        <InputForm
+                            type="email"
+                            name="ownerEmail"
+                            control={control}
+                            autoComplete="given-ownerEmail"
+                            placeholder="Seu email aqui"
+                            disabled={isFormSubmittingOrIsPending}
+                        />
+                    </Field>
+
+                    <Field>
+                        <div className="flex items-center">
+                            <FieldLabel htmlFor="ownerPassword">Sua senha</FieldLabel>
+                        </div>
+                        <InputForm
+                            control={control}
+                            name="ownerPassword"
+                            id="password"
+                            type="password"
+                            placeholder="Sua senha aqui"
+                            autoComplete="new-password"
+                            disabled={isFormSubmittingOrIsPending}
+                        />
+                    </Field>
+
+                    <Button type="submit" size="lg" disabled={isFormSubmittingOrIsPending}>
+                        Cadastrar
+                        {isFormSubmittingOrIsPending && (
+                            <Loading />
+                        )}
+                    </Button>
+                    <Field>
+                        <div className="flex gap-1 items-center justify-center">
+                            <p>
+                                Já tem uma conta?
+                            </p>
+                            <Link className="text-center text-primary hover:underline transition-all duration-200" to="../login">
+                                Entrar
+                            </Link>
+                        </div>
+                    </Field>
+                </FieldGroup>
+            </form>
+        </div>
+    )
 }
