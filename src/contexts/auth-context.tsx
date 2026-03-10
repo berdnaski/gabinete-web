@@ -1,13 +1,15 @@
 import { createContext, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthApi, type RegisterRequest } from "../api/auth";
+import { AuthApi, type AuthResponse, type RegisterRequest, type SignInRequest } from "../api/auth";
 import type { User } from "../types/auth-types";
+import { toast } from "sonner";
 
 interface AuthContextType {
     user: User | null;
     isLoading: boolean;
     isAuthenticated: boolean;
-    signup: (data: RegisterRequest) => Promise<void>;
+    signUp: (data: RegisterRequest) => Promise<void>;
+    signIn: (data: SignInRequest) => Promise<void>;
     logout: () => void;
     token: string | null;
 }
@@ -49,16 +51,39 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     const navigate = useNavigate();
 
-    const signup = async (data: RegisterRequest) => {
+    const signIn = async (data: SignInRequest) => {
+        setIsLoading(true)
+        try {
+            const response = await AuthApi.signIn(data)
+            const {
+                access_token, ...userData
+            }: AuthResponse = response
+
+            setToken(access_token)
+            setUser(userData as User)
+            localStorage.setItem(TOKEN_KEY, access_token)
+            localStorage.setItem(USER_KEY, JSON.stringify(userData))
+
+            toast.success("SignIn realizado com sucesso!")
+
+            await new Promise(resolve => setTimeout(resolve, 3000))
+
+            navigate("/home")
+        } catch (error) {
+            toast.error("Erro ao realizar login. Verifique suas credenciais.")
+            throw error
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    const signUp = async (data: RegisterRequest) => {
         setIsLoading(true);
         try {
             const response = await AuthApi.register(data);
-
-            console.log("Signup success:", response);
-
             navigate("/");
         } catch (error) {
-            console.error("Signup error:", error);
+            toast.error("Erro ao realizar cadastro. Verifique suas credenciais.")
             throw error;
         } finally {
             setIsLoading(false);
@@ -70,7 +95,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         localStorage.removeItem(USER_KEY);
         setUser(null);
         setToken(null);
-        navigate("/login");
+        navigate("/signin");
     }
 
     return (
@@ -79,7 +104,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 user,
                 isLoading,
                 isAuthenticated: !!token,
-                signup,
+                signUp,
+                signIn,
                 logout,
                 token
             }}

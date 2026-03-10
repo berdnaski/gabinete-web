@@ -52,6 +52,7 @@ export function SignUpForm() {
             await registerCabinet(data);
             toast.success("Cadastro realizado com sucesso! Você já pode fazer login.");
             await new Promise(resolve => setTimeout(resolve, 2000));
+            navigate("/signIn");
         } catch {
             toast.error("Erro ao realizar cadastro. Tente novamente");
         }
@@ -72,7 +73,7 @@ export function SignUpForm() {
                             type="text"
                             name="cabinetName"
                             control={control}
-                            autoComplete="given-name"
+                            autoComplete="organization"
                             placeholder="Nome do gabinete aqui"
                             disabled={isFormSubmittingOrIsPending}
                         />
@@ -84,7 +85,7 @@ export function SignUpForm() {
                             type="text"
                             name="cabinetSlug"
                             control={control}
-                            autoComplete="given-slug"
+                            autoComplete="off"
                             placeholder="Seu slug aqui"
                             disabled={isFormSubmittingOrIsPending}
                         />
@@ -96,7 +97,7 @@ export function SignUpForm() {
                             type="text"
                             name="ownerName"
                             control={control}
-                            autoComplete="given-ownerName"
+                            autoComplete="name"
                             placeholder="Seu nome aqui"
                             disabled={isFormSubmittingOrIsPending}
                         />
@@ -108,7 +109,7 @@ export function SignUpForm() {
                             type="email"
                             name="ownerEmail"
                             control={control}
-                            autoComplete="given-ownerEmail"
+                            autoComplete="email"
                             placeholder="Seu email aqui"
                             disabled={isFormSubmittingOrIsPending}
                         />
@@ -140,7 +141,7 @@ export function SignUpForm() {
                             <p>
                                 Já tem uma conta?
                             </p>
-                            <Link className="text-center text-primary hover:underline transition-all duration-200" to="../login">
+                            <Link className="text-center text-primary hover:underline transition-all duration-200" to="/signIn">
                                 Entrar
                             </Link>
                         </div>

@@ -9,8 +9,8 @@ export interface User {
     id: string;
     name: string;
     email: string;
-    role: string;
-    cabinetId: string;
+    role?: string;
+    cabinetId?: string;
 }
 
 export interface RegisterCabinetRequest {
