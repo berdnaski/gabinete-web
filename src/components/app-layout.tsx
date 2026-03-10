@@ -1,0 +1,29 @@
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import { AppSidebar } from "@/components/app-sidebar"
+import { TooltipProvider } from "@/components/ui/tooltip"
+
+interface AppLayoutProps {
+    children: React.ReactNode
+}
+
+export function AppLayout({ children }: AppLayoutProps) {
+    return (
+        <TooltipProvider>
+            <SidebarProvider className="bg-zinc-100">
+                <AppSidebar />
+                <SidebarInset className="bg-white border-l border-zinc-200/50 shadow-sm ml-0 md:ml-0 overflow-hidden">
+                    <header className="flex h-16 shrink-0 items-center px-6 border-b border-zinc-100/80 bg-white/80 backdrop-blur-md sticky top-0 z-10">
+                        <SidebarTrigger className="-ml-1 text-zinc-500 hover:text-zinc-900" />
+                        <div className="h-4 w-px bg-zinc-200 mx-2" />
+                        <h2 className="text-sm font-semibold text-zinc-500 uppercase tracking-wider">Gabinete</h2>
+                    </header>
+                    <main className="flex flex-1 flex-col gap-4 p-6 md:p-10 bg-zinc-50/20 justify-center items-center">
+                        <div className="mx-auto w-full max-w-7xl">
+                            {children}
+                        </div>
+                    </main>
+                </SidebarInset>
+            </SidebarProvider>
+        </TooltipProvider>
+    )
+}

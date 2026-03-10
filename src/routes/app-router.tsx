@@ -4,6 +4,7 @@ import { SignUp } from "@/pages/public/auth/signup";
 import { Home } from "@/pages/private/home";
 import { PrivateRoute } from "@/components/private-route";
 import { PublicRoute } from "@/components/public-route";
+import { AppLayout } from "@/components/app-layout";
 
 export function AppRouter() {
   return (
@@ -24,7 +25,9 @@ export function AppRouter() {
 
       <Route path="/home" element={
         <PrivateRoute>
-          <Home />
+          <AppLayout>
+            <Home />
+          </AppLayout>
         </PrivateRoute>
       } />
 
