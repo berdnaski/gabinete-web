@@ -5,6 +5,7 @@ import { Home } from "@/pages/private/home";
 import { PrivateRoute } from "@/components/private-route";
 import { PublicRoute } from "@/components/public-route";
 import { AppLayout } from "@/components/app-layout";
+import { Demands } from "@/pages/private/demands";
 
 export function AppRouter() {
   return (
@@ -25,8 +26,16 @@ export function AppRouter() {
 
       <Route path="/home" element={
         <PrivateRoute>
-          <AppLayout>
+          <AppLayout title="Dashboard" description="Visão geral do gabinete">
             <Home />
+          </AppLayout>
+        </PrivateRoute>
+      } />
+
+      <Route path="/demands" element={
+        <PrivateRoute>
+          <AppLayout title="Gestão de Demandas" description="Visualize e gerencie todas as solicitações operacionais.">
+            <Demands />
           </AppLayout>
         </PrivateRoute>
       } />
