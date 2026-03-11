@@ -62,13 +62,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
     return (
         <Sidebar collapsible="icon" variant="inset" {...props} className="bg-zinc-50 border-r border-zinc-200/50">
-            <SidebarHeader>
+            <SidebarHeader className="group-data-[collapsible=icon]:p-0">
                 <TeamSwitcher teams={data.teams} />
             </SidebarHeader>
             <SidebarContent>
                 <NavMain items={data.navMain} />
             </SidebarContent>
-            <SidebarFooter>
+            <SidebarFooter className="group-data-[collapsible=icon]:p-0">
                 <NavUser user={data.user} />
             </SidebarFooter>
             <SidebarRail />

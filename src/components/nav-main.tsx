@@ -26,7 +26,7 @@ export function NavMain({
       <SidebarGroupLabel className="px-4 text-zinc-400 font-bold uppercase tracking-widest text-[10px] mb-4">
         Navegação
       </SidebarGroupLabel>
-      <SidebarMenu className="gap-1">
+      <SidebarMenu className="gap-1 group-data-[collapsible=icon]:gap-4">
         {items.map((item) => (
           <SidebarMenuItem key={item.title}>
             <SidebarMenuButton
