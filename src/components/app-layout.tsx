@@ -22,8 +22,8 @@ export function AppLayout({ children, title, description }: AppLayoutProps) {
                             {description && <p className="text-xs text-zinc-400 leading-tight">{description}</p>}
                         </div>
                     </header>
-                    <main className="flex flex-1 flex-col gap-4 p-6 md:p-10 bg-zinc-50/20 justify-center items-center">
-                        <div className="mx-auto w-full max-w-7xl">
+                    <main className="flex flex-1 flex-col gap-4 p-6 md:p-10 bg-zinc-50/20 items-center">
+                        <div className="mx-auto w-full">
                             {children}
                         </div>
                     </main>

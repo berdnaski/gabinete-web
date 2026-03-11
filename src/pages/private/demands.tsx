@@ -1,5 +1,9 @@
+import { DemandsTable } from "@/components/demands/demands-table"
+
 export function Demands() {
     return (
-        <h1>Demands</h1>
+        <div className="flex flex-col gap-6">
+            <DemandsTable />
+        </div>
     )
 }
