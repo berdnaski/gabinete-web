@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { DataTable } from "@/components/data-table";
 import { demandsColumns } from "./demands-columns";
-import { Button } from "@/components/ui/button";
-import { PlusIcon, Loader2Icon } from "lucide-react";
 import type { DateRange } from "react-day-picker";
 import { useGetDemands } from "@/api/demands/hooks";
 import { DemandPriority, type DemandStatus } from "@/types/demand-types";
 import { useDebounce } from "@/hooks/use-debounce";
 import type { PaginationState } from "@tanstack/react-table";
 import { DemandsFilter } from "./demands-filter";
+import { DemandsForm } from "@/pages/private/demands/components/demands-form";
+import { Loader2Icon } from "lucide-react";
 
 export function DemandsTable() {
   const [search, setSearch] = useState("");
@@ -74,15 +74,7 @@ export function DemandsTable() {
             onClearAll={clearAll}
           />
         }
-        toolbarButton={
-          <Button
-            size="sm"
-            className="h-9 gap-1.5 bg-[#008EFF] hover:bg-[#007AE0] text-white font-semibold shadow-sm shrink-0"
-          >
-            <PlusIcon className="size-4" />
-            Nova Demanda
-          </Button>
-        }
+        toolbarButton={<DemandsForm />}
         onBulkDelete={(rows) => console.log("Deletar:", rows)}
         manualPagination
         pageCount={demands?.lastPage || 0}
