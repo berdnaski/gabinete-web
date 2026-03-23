@@ -47,6 +47,15 @@ export interface Demand {
     updatedAt: string;
 }
 
+export interface CreateDemandPayload {
+    title: string;
+    description: string;
+    categoryId: string;
+    address?: string;
+    latitude?: number;
+    longitude?: number;
+}
+
 export interface ListDemandsParams {
     page?: number;
     limit?: number;

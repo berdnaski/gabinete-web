@@ -5,28 +5,28 @@ import {
 } from "react-hook-form";
 
 import { FieldContent, FieldError } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import React, { type ComponentProps } from "react";
 import { AlertCircle } from "lucide-react";
 
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export type InputFormProps<T extends FieldValues> = ComponentProps<
-  typeof Input
+export type TextareaFormProps<T extends FieldValues> = ComponentProps<
+  typeof Textarea
 > &
   UseControllerProps<T> & {
     icon?: LucideIcon;
   };
 
-export function InputForm<T extends FieldValues>({
+export function TextareaForm<T extends FieldValues>({
   name,
   control,
   icon: Icon,
   className,
   onChange: onChangeProp,
   ...props
-}: InputFormProps<T>) {
+}: TextareaFormProps<T>) {
   const {
     field,
     fieldState: { error },
@@ -36,7 +36,7 @@ export function InputForm<T extends FieldValues>({
   });
 
   const handleChange = onChangeProp
-    ? (e: React.ChangeEvent<HTMLInputElement>) => {
+    ? (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         field.onChange(e);
         onChangeProp(e);
       }
@@ -44,17 +44,17 @@ export function InputForm<T extends FieldValues>({
 
   return (
     <FieldContent>
-      <div className="relative flex items-center w-full group">
+      <div className="relative flex items-start w-full group">
         {Icon && (
-          <div className="absolute left-3 flex items-center justify-center text-[#008EFF] transition-colors group-focus-within:text-[#008EFF]">
+          <div className="absolute left-3 top-3 flex items-center justify-center text-[#008EFF] transition-colors group-focus-within:text-[#008EFF]">
             <Icon size={18} strokeWidth={2.5} />
           </div>
         )}
-        <Input
+        <Textarea
           className={cn(
             error && "border-red-500 focus-visible:ring-red-300!",
             Icon && "pl-10",
-            "h-12 bg-zinc-50/50 border-zinc-200 rounded-xl focus-visible:ring-[#008EFF]/20 focus-visible:border-[#008EFF]",
+            "bg-zinc-50/50 border-zinc-200 rounded-xl focus-visible:ring-[#008EFF]/20 focus-visible:border-[#008EFF]",
             className,
           )}
           id={name}
