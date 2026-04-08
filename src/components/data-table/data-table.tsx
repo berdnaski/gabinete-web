@@ -1,14 +1,4 @@
-import {
-  type ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  type RowSelectionState,
-  type PaginationState,
-  type OnChangeFn,
-} from "@tanstack/react-table";
+import { Skeleton } from "@/components/ui/skeleton"
 import {
   Table,
   TableBody,
@@ -16,227 +6,192 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Ghost, SearchIcon, Trash2, X } from "lucide-react";
-import type { ReactNode } from "react";
-import { useState } from "react";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { TablePagination } from "./table-pagination";
+} from "@/components/ui/table"
+import { cn } from "@/lib/utils"
+import type { Column, Table as TanstackTable } from "@tanstack/react-table"
+import { flexRender } from "@tanstack/react-table"
+import { useEffect, useRef, useState } from "react"
+import { DataTableColumnHeader } from "./data-table-column-header"
+import { DataTableEmpty } from "./data-table-empty"
+import { DataTablePagination } from "./data-table-pagination"
+import { DataTableToolbar } from "./data-table-toolbar"
+import type { DataTableFilterField } from "./types"
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-  toolbarButton?: ReactNode;
-  filterSlot?: ReactNode;
-  searchPlaceholder?: string;
-  enableRowSelection?: boolean;
-  onBulkDelete?: (selectedRows: TData[]) => void;
-  manualPagination?: boolean;
-  pageCount?: number;
-  pagination?: PaginationState;
-  onPaginationChange?: OnChangeFn<PaginationState>;
-
-  searchValue?: string;
-  onSearchChange?: (value: string) => void;
+interface DataTableProps<TData> {
+  table: TanstackTable<TData>
+  filterFields?: DataTableFilterField[]
+  search: string
+  onSearchChange: (value: string) => void
+  setParam: (key: string, value: string | null) => void
+  resetFilters: () => void
+  searchParams: URLSearchParams
+  isLoading?: boolean
+  searchPlaceholder?: string
 }
 
-export function DataTable<TData, TValue>({
-  columns,
-  data,
-  toolbarButton,
-  filterSlot,
-  searchPlaceholder = "Pesquisar...",
-  enableRowSelection = false,
-  onBulkDelete,
-  manualPagination,
-  pageCount,
-  pagination,
-  onPaginationChange,
-  searchValue: externalSearchValue,
+function getPinnedStyles<TData>(
+  column: Column<TData, unknown>,
+  isOverflowing: boolean
+): React.CSSProperties {
+  const pinned = column.getIsPinned()
+  if (!pinned || !isOverflowing) return {}
+  return {
+    position: "sticky",
+    right: pinned === "right" ? column.getAfter("right") : undefined,
+    left: pinned === "left" ? column.getStart("left") : undefined,
+    zIndex: 1,
+  }
+}
+
+export function DataTable<TData>({
+  table,
+  filterFields,
+  search,
   onSearchChange,
-}: DataTableProps<TData, TValue>) {
-  const [internalSearchValue, setInternalSearchValue] = useState("");
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  setParam,
+  resetFilters,
+  searchParams,
+  isLoading = false,
+  searchPlaceholder,
+}: DataTableProps<TData>) {
+  const rows = table.getRowModel().rows
+  const columns = table.getAllColumns()
+  const colSpan = columns.length
 
-  const searchValue =
-    externalSearchValue !== undefined
-      ? externalSearchValue
-      : internalSearchValue;
-  const handleSearchChange = (value: string) => {
-    if (onSearchChange) {
-      onSearchChange(value);
-    } else {
-      setInternalSearchValue(value);
+  const wrapperRef = useRef<HTMLDivElement>(null)
+  const [isOverflowing, setIsOverflowing] = useState(false)
+  const initialPinningRef = useRef(table.getState().columnPinning)
+
+  useEffect(() => {
+    const wrapper = wrapperRef.current
+    if (!wrapper) return
+
+    const tableContainer = wrapper.querySelector<HTMLElement>(
+      '[data-slot="table-container"]'
+    )
+    if (!tableContainer) return
+
+    const update = () => {
+      const overflow = tableContainer.scrollWidth > tableContainer.clientWidth
+      setIsOverflowing(overflow)
+      table.setColumnPinning(overflow ? initialPinningRef.current : {})
     }
-  };
 
-  const selectColumn: ColumnDef<TData, TValue> = {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value: boolean) =>
-          table.toggleAllPageRowsSelected(!!value)
-        }
-        aria-label="Selecionar todos"
-        className="data-[state=checked]:bg-[#008EFF] data-[state=checked]:border-[#008EFF] data-[state=indeterminate]:bg-[#008EFF] data-[state=indeterminate]:border-[#008EFF]"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value: boolean) => row.toggleSelected(!!value)}
-        aria-label="Selecionar linha"
-        className="data-[state=checked]:bg-[#008EFF] data-[state=checked]:border-[#008EFF]"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-    size: 44,
-  };
-
-  const tableColumns = enableRowSelection
-    ? [selectColumn, ...columns]
-    : columns;
-
-  const table = useReactTable({
-    data,
-    columns: tableColumns,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: manualPagination ? undefined : getFilteredRowModel(),
-    getPaginationRowModel: manualPagination
-      ? undefined
-      : getPaginationRowModel(),
-    manualPagination,
-    pageCount,
-    onPaginationChange,
-    enableRowSelection,
-    onRowSelectionChange: setRowSelection,
-    state: {
-      rowSelection,
-      pagination,
-      globalFilter: manualPagination ? undefined : searchValue,
-    },
-  });
-
-  const selectedRows = table
-    .getFilteredSelectedRowModel()
-    .rows.map((r) => r.original);
-  const hasSelection = selectedRows.length > 0;
+    const observer = new ResizeObserver(update)
+    observer.observe(tableContainer)
+    return () => observer.disconnect()
+  }, [table])
 
   return (
-    <div className="rounded-xl border shadow-sm overflow-hidden">
-      <div className="flex flex-wrap gap-3 items-center justify-between px-5 py-4 border-b ">
-        <div className="flex items-center gap-3 flex-wrap flex-1 min-w-0">
-          <div className="relative">
-            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400 pointer-events-none" />
-            <Input
-              placeholder={searchPlaceholder}
-              value={searchValue}
-              onChange={(e) => handleSearchChange(e.target.value)}
-              className="pl-9 h-9 w-96  text-sm placeholder:text-zinc-400 focus-visible:ring-1 focus-visible:ring-[#008EFF]/40 focus-visible:border-[#008EFF]"
-            />
-            {searchValue && (
-              <button
-                onClick={() => handleSearchChange("")}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 size-4 rounded text-zinc-400 hover:text-zinc-700 cursor-pointer"
-              >
-                <X className="size-4" />
-              </button>
-            )}
-          </div>
-
-          {hasSelection && onBulkDelete && (
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => {
-                onBulkDelete(selectedRows);
-                setRowSelection({});
-              }}
-              className="gap-2 h-9"
-            >
-              <Trash2 className="size-4" />
-              Excluir {selectedRows.length}{" "}
-              {selectedRows.length === 1 ? "item" : "itens"}
-            </Button>
-          )}
-          {filterSlot}
-        </div>
-        {toolbarButton}
-      </div>
-
-      <div className="overflow-x-auto">
-        <Table>
-          <TableHeader>
+    <div className="flex flex-col gap-4">
+      <DataTableToolbar
+        table={table}
+        search={search}
+        onSearchChange={onSearchChange}
+        setParam={setParam}
+        resetFilters={resetFilters}
+        searchParams={searchParams}
+        filterFields={filterFields}
+        searchPlaceholder={searchPlaceholder}
+      />
+      <div
+        ref={wrapperRef}
+        className="overflow-hidden rounded-lg border"
+      >
+        <Table className="w-full caption-bottom text-sm">
+          <TableHeader className="[&_tr]:border-b sticky top-0 z-10 bg-muted">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead
-                    key={header.id}
-                    className="text-xs font-semibold text-zinc-400 uppercase tracking-wider py-3"
-                    style={{ width: header.column.columnDef.size }}
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
+                {headerGroup.headers.map((header) => {
+                  const pinned = isOverflowing && header.column.getIsPinned()
+                  return (
+                    <TableHead
+                      key={header.id}
+                      style={{
+                        width: header.getSize(),
+                        ...getPinnedStyles(header.column, isOverflowing),
+                      }}
+                      className={cn(
+                        pinned === "right" &&
+                        "border-l border-l-border/60 bg-background shadow-[-4px_0_8px_-2px_oklch(0_0_0/0.06)]",
+                        pinned === "left" &&
+                        "border-r border-r-border/60 bg-background shadow-[4px_0_8px_-2px_oklch(0_0_0/0.06)]"
+                      )}
+                    >
+                      {header.isPlaceholder ? null : header.column.getCanSort() ? (
+                        <DataTableColumnHeader
+                          column={header.column}
+                          title={
+                            typeof header.column.columnDef.header === "string"
+                              ? header.column.columnDef.header
+                              : header.id
+                          }
+                        />
+                      ) : (
+                        flexRender(
                           header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                  </TableHead>
-                ))}
+                          header.getContext()
+                        )
+                      )}
+                    </TableHead>
+                  )
+                })}
               </TableRow>
             ))}
           </TableHeader>
+
           <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  className={cn(
-                    "transition-colors",
-                    row.getIsSelected()
-                      ? "bg-[#008EFF]/4 hover:bg-[#008EFF]/6"
-                      : "hover:bg-zinc-50/70",
-                  )}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      className="py-4 text-sm text-zinc-700"
-                    >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
+            {isLoading ? (
+              Array.from({ length: 5 }).map((_, i) => (
+                // biome-ignore lint/suspicious/noArrayIndexKey: skeleton rows have no stable id
+                <TableRow key={i}>
+                  {Array.from({ length: colSpan }).map((__, j) => (
+                    // biome-ignore lint/suspicious/noArrayIndexKey: skeleton cells have no stable id
+                    <TableCell key={j}>
+                      <Skeleton className="h-4 w-full" />
                     </TableCell>
                   ))}
                 </TableRow>
               ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={tableColumns.length}
-                  className="h-40 text-center"
+            ) : rows.length > 0 ? (
+              rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() ? "selected" : undefined}
                 >
-                  <div className="flex flex-col items-center justify-center gap-2 text-zinc-400">
-                    <Ghost className="size-8" />
-                    <p className="text-sm">Nenhum resultado encontrado</p>
-                  </div>
+                  {row.getVisibleCells().map((cell) => {
+                    const pinned = isOverflowing && cell.column.getIsPinned()
+                    return (
+                      <TableCell
+                        key={cell.id}
+                        style={getPinnedStyles(cell.column, isOverflowing)}
+                        className={cn(
+                          pinned === "right" &&
+                          "border-l border-l-border/60 bg-background shadow-[-4px_0_8px_-2px_oklch(0_0_0/0.06)]",
+                          pinned === "left" &&
+                          "border-r border-r-border/60 bg-background shadow-[4px_0_8px_-2px_oklch(0_0_0/0.06)]"
+                        )}
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    )
+                  })}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow className="hover:bg-transparent">
+                <TableCell colSpan={colSpan} className="p-0">
+                  <DataTableEmpty />
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
       </div>
-
-      {/* <TablePagination table={table} /> */}
+      <DataTablePagination table={table} />
     </div>
-  );
+  )
 }

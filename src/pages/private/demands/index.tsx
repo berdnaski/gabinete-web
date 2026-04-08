@@ -1,5 +1,5 @@
-import { useEffect } from "react";
 import { usePageTitle } from "@/hooks/use-page-title";
+import { useEffect } from "react";
 import { DemandsTable } from "./components/demands-table";
 
 export function Demands() {

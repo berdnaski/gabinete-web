@@ -1,20 +1,19 @@
 import { createContext, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import {
   AuthApi,
-  type AuthResponse,
-  type RegisterRequest,
-  type SignInRequest,
+  type GetUserProfileResponse,
+  type LoginRequest,
+  type RegisterRequest
 } from "../api/auth";
-import type { User } from "../types/auth-types";
-import { toast } from "sonner";
 
 interface AuthContextType {
-  user: User | null;
+  user: GetUserProfileResponse | null;
   isLoading: boolean;
   isAuthenticated: boolean;
   signUp: (data: RegisterRequest) => Promise<void>;
-  signIn: (data: SignInRequest) => Promise<void>;
+  login: (data: LoginRequest) => Promise<void>;
   logout: () => void;
   token: string | null;
 }
@@ -53,25 +52,27 @@ function getStoredAuth() {
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [user, setUser] = useState<User | null>(() => getStoredAuth().user);
+  const [user, setUser] = useState<GetUserProfileResponse | null>(() => getStoredAuth().user);
   const [token, setToken] = useState<string | null>(
     () => getStoredAuth().token,
   );
 
   const navigate = useNavigate();
 
-  const signIn = async (data: SignInRequest) => {
+  const login = async (data: LoginRequest) => {
     setIsLoading(true);
     try {
-      const response = await AuthApi.signIn(data);
-      const { access_token, ...userData }: AuthResponse = response;
+      const response = await AuthApi.login(data);
+      const { accessToken } = response;
 
-      setToken(access_token);
-      setUser(userData as User);
-      localStorage.setItem(TOKEN_KEY, access_token);
-      localStorage.setItem(USER_KEY, JSON.stringify(userData));
+      setToken(accessToken);
+      localStorage.setItem(TOKEN_KEY, accessToken);
 
-      toast.success("SignIn realizado com sucesso!");
+      const userProfile = await AuthApi.getUserProfile();
+      setUser(userProfile);
+      localStorage.setItem(USER_KEY, JSON.stringify(userProfile));
+
+      toast.success("Login realizado com sucesso!");
 
       await new Promise((resolve) => setTimeout(resolve, 3000));
 
@@ -87,7 +88,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const signUp = async (data: RegisterRequest) => {
     setIsLoading(true);
     try {
-      const response = await AuthApi.register(data);
+      await AuthApi.register(data);
       navigate("/");
     } catch (error) {
       toast.error("Erro ao realizar cadastro. Verifique suas credenciais.");
@@ -102,7 +103,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     localStorage.removeItem(USER_KEY);
     setUser(null);
     setToken(null);
-    navigate("/signin");
+    navigate("/login");
   };
 
   return (
@@ -112,7 +113,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         isLoading,
         isAuthenticated: !!token,
         signUp,
-        signIn,
+        login,
         logout,
         token,
       }}

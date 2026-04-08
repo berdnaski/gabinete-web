@@ -1,7 +1,7 @@
-import { useEffect } from "react";
-import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/use-auth";
 import { usePageTitle } from "@/hooks/use-page-title";
+import { useEffect } from "react";
 
 export function Home() {
   const { setTitle } = usePageTitle();

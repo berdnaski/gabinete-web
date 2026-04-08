@@ -1,32 +1,51 @@
 import { apiClient } from "../apiClient";
-import type { RegisterCabinetRequest, RegisterCabinetResponse } from "../../types/auth-types";
 
 const baseURL = "/auth"
 
-export type RegisterRequest = RegisterCabinetRequest;
-export type RegisterResponse = RegisterCabinetResponse;
-
-export interface SignInRequest {
-    email: string;
-    password: string;
+export interface LoginRequest {
+	email: string;
+	password: string;
 }
 
-export interface AuthResponse {
-    id: string;
-    name: string;
-    email: string;
-    role: string;
-    cabinetId: string;
-    access_token: string;
+export interface RegisterRequest {
+	name: string;
+	email: string;
+	password: string;
+}
+
+export interface LoginResponse {
+	expiresIn: number;
+	accessToken: string;
+}
+
+export interface RegisterResponse {
+	message: string;
+}
+
+export interface GetUserProfileResponse {
+	id: string;
+	name: string;
+	role: string;
+	email: string;
+	avatar_url: string;
 }
 
 export const AuthApi = {
-    register: async (data: RegisterRequest): Promise<RegisterResponse> => {
-        const response = await apiClient.post<RegisterResponse>(`${baseURL}/register-cabinet`, data);
-        return response.data;
-    },
-    signIn: async (data: SignInRequest): Promise<AuthResponse> => {
-        const response = await apiClient.post(`${baseURL}/login`, data);
-        return response.data
-    }
+	register: async (data: RegisterRequest): Promise<void> => {
+		await apiClient.post<RegisterResponse>(`${baseURL}/register`, data);
+	},
+	forgotPassword: async (email: string): Promise<void> => {
+		await apiClient.post(`${baseURL}/forgot-password`, { email });
+	},
+	resetPassword: async (data: { token: string; password: string }): Promise<void> => {
+		await apiClient.post(`${baseURL}/reset-password`, data);
+	},
+	login: async (data: LoginRequest): Promise<LoginResponse> => {
+		const response = await apiClient.post(`${baseURL}/login`, data);
+		return response.data
+	},
+	getUserProfile: async (): Promise<GetUserProfileResponse> => {
+		const response = await apiClient.get(`${baseURL}/me`);
+		return response.data;
+	}
 };

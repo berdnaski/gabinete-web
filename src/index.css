@@ -5,6 +5,26 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
 :root {
   font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -18,13 +38,16 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  --spacing: 4px;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(63.92% 0.1482 256.9);
+  /* --primary: oklch(63.92% 0.1482 256.9); */
+  --primary: oklch(58.91% 0.2029 257.9);
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
@@ -41,13 +64,13 @@
   --chart-3: oklch(0.546 0.245 262.881);
   --chart-4: oklch(0.488 0.243 264.376);
   --chart-5: oklch(0.424 0.199 265.638);
-  --radius: 0.5rem;
-  --sidebar: oklch(0.985 0 0);
+  --radius: 0.3rem;
+  --sidebar: oklch(96.74% 0.0029 84.6);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(100.00% 0.0000 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-accent: oklch(1 0 0);
+  --sidebar-accent-foreground: oklch(0.145 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 }
@@ -148,6 +171,54 @@ body {
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+@keyframes cardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.bg-auth-gradient {
+  background: radial-gradient(ellipse at 60% 10%, #1a56db 0%, #3b82f6 35%, #bfdbfe 75%, #eff6ff 100%);
+}
+
+.bg-auth-btn {
+  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%);
+}
+
+.shadow-auth-card {
+  box-shadow: 0 32px 64px -12px rgba(29, 78, 216, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.8);
+}
+
+.shadow-auth-btn {
+  box-shadow: 0 4px 16px -2px rgba(37, 99, 235, 0.45);
+}
+
+.animate-card-enter {
+  animation: cardEnter 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-fade-slide-in {
+  animation: fadeSlideIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 @layer base {

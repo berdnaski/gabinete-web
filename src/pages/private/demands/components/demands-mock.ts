@@ -1,0 +1,340 @@
+import type { Demand, PaginatedResponse } from "@/types/demand-types"
+import { DemandStatus, DemandPriority } from "@/types/demand-types"
+
+const CATEGORIES = [
+  { id: "cat-1", name: "Infraestrutura" },
+  { id: "cat-2", name: "Saúde" },
+  { id: "cat-3", name: "Educação" },
+  { id: "cat-4", name: "Segurança Pública" },
+  { id: "cat-5", name: "Meio Ambiente" },
+  { id: "cat-6", name: "Habitação" },
+  { id: "cat-7", name: "Transporte" },
+  { id: "cat-8", name: "Assistência Social" },
+]
+
+const REPORTERS = [
+  { id: "usr-1", name: "Carlos Mendonça", email: "carlos.mendonca@gabinete.gov.br" },
+  { id: "usr-2", name: "Fernanda Oliveira", email: "fernanda.oliveira@gabinete.gov.br" },
+  { id: "usr-3", name: "João Pedro Lima", email: "joaopedro.lima@gabinete.gov.br" },
+  { id: "usr-4", name: "Beatriz Santos", email: "beatriz.santos@gabinete.gov.br" },
+  { id: "usr-5", name: "Rafael Almeida", email: "rafael.almeida@gabinete.gov.br" },
+]
+
+export const MOCK_DEMANDS: Demand[] = [
+  {
+    id: "dem-001",
+    title: "Reparação de buraco na Av. Brasil",
+    description: "Grande cratera na pista sentido centro, causando acidentes e danos em veículos de moradores do bairro.",
+    status: DemandStatus.IN_PROGRESS,
+    priority: DemandPriority.URGENT,
+    categoryId: "cat-1",
+    category: CATEGORIES[0],
+    reporterId: "usr-1",
+    reporter: REPORTERS[0],
+    address: "Av. Brasil, 1420 – Centro",
+    createdAt: "2026-03-10T08:30:00Z",
+    updatedAt: "2026-03-15T14:00:00Z",
+  },
+  {
+    id: "dem-002",
+    title: "Falta de médicos no UBS do Jardim América",
+    description: "Unidade básica de saúde com apenas um clínico geral atendendo mais de 3.000 famílias cadastradas.",
+    status: DemandStatus.IN_ANALYSIS,
+    priority: DemandPriority.HIGH,
+    categoryId: "cat-2",
+    category: CATEGORIES[1],
+    reporterId: "usr-2",
+    reporter: REPORTERS[1],
+    address: "R. das Flores, 300 – Jardim América",
+    createdAt: "2026-03-12T10:00:00Z",
+    updatedAt: "2026-03-13T09:15:00Z",
+  },
+  {
+    id: "dem-003",
+    title: "Falta de merenda escolar na EMEF São Lucas",
+    description: "Escola relatou ausência de repasse de verba para merenda nos últimos 45 dias, afetando 480 alunos.",
+    status: DemandStatus.SUBMITTED,
+    priority: DemandPriority.HIGH,
+    categoryId: "cat-3",
+    category: CATEGORIES[2],
+    reporterId: "usr-3",
+    reporter: REPORTERS[2],
+    address: "R. São Lucas, 88 – Vila Nova",
+    createdAt: "2026-03-18T07:45:00Z",
+    updatedAt: "2026-03-18T07:45:00Z",
+  },
+  {
+    id: "dem-004",
+    title: "Iluminação pública apagada no Bairro Ipiranga",
+    description: "Três quadras sem iluminação há mais de 15 dias, aumentando sensação de insegurança dos moradores.",
+    status: DemandStatus.RESOLVED,
+    priority: DemandPriority.MEDIUM,
+    categoryId: "cat-4",
+    category: CATEGORIES[3],
+    reporterId: "usr-4",
+    reporter: REPORTERS[3],
+    address: "R. Ipiranga, 500–650 – Bairro Ipiranga",
+    createdAt: "2026-02-28T16:00:00Z",
+    updatedAt: "2026-03-05T11:30:00Z",
+  },
+  {
+    id: "dem-005",
+    title: "Descarte irregular de lixo no Rio Pinheiros",
+    description: "Empresa de construção civil despejando entulho às margens do rio, infringindo legislação ambiental.",
+    status: DemandStatus.IN_ANALYSIS,
+    priority: DemandPriority.URGENT,
+    categoryId: "cat-5",
+    category: CATEGORIES[4],
+    reporterId: "usr-5",
+    reporter: REPORTERS[4],
+    address: "Marginal Pinheiros, km 14",
+    createdAt: "2026-03-20T11:20:00Z",
+    updatedAt: "2026-03-21T08:00:00Z",
+  },
+  {
+    id: "dem-006",
+    title: "Família em situação de risco habitacional",
+    description: "Família com 6 pessoas, incluindo idosa de 78 anos, residindo em imóvel com risco de desabamento.",
+    status: DemandStatus.IN_PROGRESS,
+    priority: DemandPriority.URGENT,
+    categoryId: "cat-6",
+    category: CATEGORIES[5],
+    reporterId: "usr-1",
+    reporter: REPORTERS[0],
+    address: "Beco das Palmeiras, 12 – Periferia Norte",
+    createdAt: "2026-03-22T09:00:00Z",
+    updatedAt: "2026-03-22T17:30:00Z",
+  },
+  {
+    id: "dem-007",
+    title: "Ônibus superlotado na linha 203 – Centro/Terminal Sul",
+    description: "Passageiros relatam que veículos passam lotados sem parar nos pontos em horário de pico.",
+    status: DemandStatus.SUBMITTED,
+    priority: DemandPriority.MEDIUM,
+    categoryId: "cat-7",
+    category: CATEGORIES[6],
+    reporterId: "usr-2",
+    reporter: REPORTERS[1],
+    address: "Terminal Sul – Av. Principal, s/n",
+    createdAt: "2026-03-14T13:00:00Z",
+    updatedAt: "2026-03-14T13:00:00Z",
+  },
+  {
+    id: "dem-008",
+    title: "Idosos sem acesso ao benefício LOAS",
+    description: "Grupo de 12 idosos encaminhados pelo CRAS há 6 meses aguardando análise do benefício assistencial.",
+    status: DemandStatus.IN_ANALYSIS,
+    priority: DemandPriority.HIGH,
+    categoryId: "cat-8",
+    category: CATEGORIES[7],
+    reporterId: "usr-3",
+    reporter: REPORTERS[2],
+    address: "CRAS Norte – R. da Integração, 45",
+    createdAt: "2026-03-08T14:30:00Z",
+    updatedAt: "2026-03-10T10:00:00Z",
+  },
+  {
+    id: "dem-009",
+    title: "Manutenção da Ponte do Rio Verde",
+    description: "Estrutura com fissuras visíveis na base e grade de proteção comprometida. Laudo técnico já emitido.",
+    status: DemandStatus.REJECTED,
+    priority: DemandPriority.MEDIUM,
+    categoryId: "cat-1",
+    category: CATEGORIES[0],
+    reporterId: "usr-4",
+    reporter: REPORTERS[3],
+    address: "Ponte Rio Verde – Rodovia Estadual 050",
+    createdAt: "2026-02-15T09:00:00Z",
+    updatedAt: "2026-02-25T16:45:00Z",
+  },
+  {
+    id: "dem-010",
+    title: "Surto de dengue no Conjunto Habitacional Vitória",
+    description: "20 casos confirmados em 10 dias. Moradores solicitam fumigação emergencial e visita de agentes de saúde.",
+    status: DemandStatus.IN_PROGRESS,
+    priority: DemandPriority.URGENT,
+    categoryId: "cat-2",
+    category: CATEGORIES[1],
+    reporterId: "usr-5",
+    reporter: REPORTERS[4],
+    address: "Conj. Hab. Vitória – Bloco A ao D",
+    createdAt: "2026-03-25T06:30:00Z",
+    updatedAt: "2026-03-25T15:00:00Z",
+  },
+  {
+    id: "dem-011",
+    title: "Escola sem professor de matemática há 2 meses",
+    description: "EMEF Tiradentes sem docente de matemática para 8º e 9º ano desde fevereiro. Alunos com aulas vagas.",
+    status: DemandStatus.IN_ANALYSIS,
+    priority: DemandPriority.HIGH,
+    categoryId: "cat-3",
+    category: CATEGORIES[2],
+    reporterId: "usr-1",
+    reporter: REPORTERS[0],
+    address: "EMEF Tiradentes – R. Independência, 210",
+    createdAt: "2026-03-16T08:00:00Z",
+    updatedAt: "2026-03-17T11:00:00Z",
+  },
+  {
+    id: "dem-012",
+    title: "Câmeras de segurança inoperantes no Mercado Municipal",
+    description: "Sistema de monitoramento do Mercado Municipal fora de funcionamento há 30 dias.",
+    status: DemandStatus.SUBMITTED,
+    priority: DemandPriority.LOW,
+    categoryId: "cat-4",
+    category: CATEGORIES[3],
+    reporterId: "usr-2",
+    reporter: REPORTERS[1],
+    address: "Mercado Municipal Central – Praça da República",
+    createdAt: "2026-03-19T10:15:00Z",
+    updatedAt: "2026-03-19T10:15:00Z",
+  },
+  {
+    id: "dem-013",
+    title: "Área de preservação permanente sendo desmatada",
+    description: "Empresa utilizando retroescavadeiras em APP registrada. Moradores enviaram fotos e vídeos como evidência.",
+    status: DemandStatus.IN_PROGRESS,
+    priority: DemandPriority.URGENT,
+    categoryId: "cat-5",
+    category: CATEGORIES[4],
+    reporterId: "usr-3",
+    reporter: REPORTERS[2],
+    address: "Estrada do Guabirotuba, km 3",
+    createdAt: "2026-03-23T07:00:00Z",
+    updatedAt: "2026-03-24T13:30:00Z",
+  },
+  {
+    id: "dem-014",
+    title: "Regularização fundiária de 40 famílias",
+    description: "Comunidade aguarda há 3 anos a emissão de títulos de regularização fundiária pelo cartório municipal.",
+    status: DemandStatus.SUBMITTED,
+    priority: DemandPriority.MEDIUM,
+    categoryId: "cat-6",
+    category: CATEGORIES[5],
+    reporterId: "usr-4",
+    reporter: REPORTERS[3],
+    address: "Vila Progresso – Setor Leste",
+    createdAt: "2026-03-21T14:00:00Z",
+    updatedAt: "2026-03-21T14:00:00Z",
+  },
+  {
+    id: "dem-015",
+    title: "Calçadas inacessíveis para cadeirantes no Centro",
+    description: "Rampas de acessibilidade ausentes ou danificadas em 8 esquinas do centro histórico.",
+    status: DemandStatus.RESOLVED,
+    priority: DemandPriority.MEDIUM,
+    categoryId: "cat-7",
+    category: CATEGORIES[6],
+    reporterId: "usr-5",
+    reporter: REPORTERS[4],
+    address: "Centro Histórico – Trecho entre Rua XV e Rua Marechal",
+    createdAt: "2026-02-20T09:30:00Z",
+    updatedAt: "2026-03-12T16:00:00Z",
+  },
+  {
+    id: "dem-016",
+    title: "CRAS fechado durante expediente regular",
+    description: "Funcionários relatam que unidade encerrou atendimentos às 14h sem comunicação prévia à população.",
+    status: DemandStatus.RESOLVED,
+    priority: DemandPriority.LOW,
+    categoryId: "cat-8",
+    category: CATEGORIES[7],
+    reporterId: "usr-1",
+    reporter: REPORTERS[0],
+    address: "CRAS Bela Vista – R. das Acácias, 78",
+    createdAt: "2026-03-05T15:00:00Z",
+    updatedAt: "2026-03-07T09:00:00Z",
+  },
+  {
+    id: "dem-017",
+    title: "Vazamento de água na R. 7 de Setembro",
+    description: "Vazamento contínuo há 8 dias desperdiçando milhares de litros. SAAE já foi notificado sem resposta.",
+    status: DemandStatus.IN_ANALYSIS,
+    priority: DemandPriority.HIGH,
+    categoryId: "cat-1",
+    category: CATEGORIES[0],
+    reporterId: "usr-2",
+    reporter: REPORTERS[1],
+    address: "R. 7 de Setembro, 890 – Bairro Novo",
+    createdAt: "2026-03-24T12:00:00Z",
+    updatedAt: "2026-03-25T08:30:00Z",
+  },
+  {
+    id: "dem-018",
+    title: "Fila de espera para cirurgia eletiva com mais de 18 meses",
+    description: "Pacientes aguardando procedimentos ortopédicos e oftalmológicos há até 18 meses no sistema público.",
+    status: DemandStatus.SUBMITTED,
+    priority: DemandPriority.HIGH,
+    categoryId: "cat-2",
+    category: CATEGORIES[1],
+    reporterId: "usr-3",
+    reporter: REPORTERS[2],
+    address: "Hospital Municipal Santa Cruz",
+    createdAt: "2026-03-17T11:00:00Z",
+    updatedAt: "2026-03-17T11:00:00Z",
+  },
+  {
+    id: "dem-019",
+    title: "Telhado da escola EMEF Paulo Freire com infiltração grave",
+    description: "Dois salas de aula interditadas por risco de queda de laje. 60 alunos realocados em espaços improvisados.",
+    status: DemandStatus.IN_PROGRESS,
+    priority: DemandPriority.URGENT,
+    categoryId: "cat-3",
+    category: CATEGORIES[2],
+    reporterId: "usr-4",
+    reporter: REPORTERS[3],
+    address: "EMEF Paulo Freire – R. da Esperança, 55",
+    createdAt: "2026-03-26T07:30:00Z",
+    updatedAt: "2026-03-26T14:00:00Z",
+  },
+  {
+    id: "dem-020",
+    title: "Veículo policial sem manutenção há 4 meses",
+    description: "Viatura da GCM com falhas no sistema de freio. Guarda municipal solicitou manutenção sem retorno da frota.",
+    status: DemandStatus.REJECTED,
+    priority: DemandPriority.LOW,
+    categoryId: "cat-4",
+    category: CATEGORIES[3],
+    reporterId: "usr-5",
+    reporter: REPORTERS[4],
+    address: "Base GCM – Av. dos Trabalhadores, 300",
+    createdAt: "2026-02-10T10:00:00Z",
+    updatedAt: "2026-02-20T17:00:00Z",
+  },
+]
+
+export function getMockDemands(params: {
+  page?: number
+  limit?: number
+  search?: string
+  status?: string
+  priority?: string
+}): PaginatedResponse<Demand> {
+  const page = params.page ?? 1
+  const limit = params.limit ?? 10
+
+  let filtered = MOCK_DEMANDS
+
+  if (params.search) {
+    const q = params.search.toLowerCase()
+    filtered = filtered.filter(
+      (d) =>
+        d.title.toLowerCase().includes(q) ||
+        d.description.toLowerCase().includes(q)
+    )
+  }
+
+  if (params.status) {
+    filtered = filtered.filter((d) => d.status === params.status)
+  }
+
+  if (params.priority) {
+    filtered = filtered.filter((d) => d.priority === params.priority)
+  }
+
+  const total = filtered.length
+  const lastPage = Math.max(1, Math.ceil(total / limit))
+  const items = filtered.slice((page - 1) * limit, page * limit)
+
+  return { items, meta: { total, page, totalPages: lastPage, limit } }
+}

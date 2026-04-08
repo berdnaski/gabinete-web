@@ -37,3 +37,10 @@ export function useUpdateDemand() {
 		},
 	});
 }
+
+export function useAddEvidences() {
+	return useMutation({
+		mutationFn: ({ id, formData }: { id: string; formData: FormData }) =>
+			DemandsApi.addEvidences(id, formData),
+	});
+}

@@ -6,11 +6,11 @@ import {
 
 import { FieldContent, FieldError } from "@/components/ui/field";
 import { Textarea } from "@/components/ui/textarea";
-import React, { type ComponentProps } from "react";
 import { AlertCircle } from "lucide-react";
+import React, { type ComponentProps } from "react";
 
-import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import type { LucideIcon } from "lucide-react";
 
 export type TextareaFormProps<T extends FieldValues> = ComponentProps<
   typeof Textarea
@@ -37,9 +37,9 @@ export function TextareaForm<T extends FieldValues>({
 
   const handleChange = onChangeProp
     ? (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        field.onChange(e);
-        onChangeProp(e);
-      }
+      field.onChange(e);
+      onChangeProp(e);
+    }
     : field.onChange;
 
   return (
@@ -54,7 +54,6 @@ export function TextareaForm<T extends FieldValues>({
           className={cn(
             error && "border-red-500 focus-visible:ring-red-300!",
             Icon && "pl-10",
-            "bg-zinc-50/50 border-zinc-200 rounded-xl focus-visible:ring-[#008EFF]/20 focus-visible:border-[#008EFF]",
             className,
           )}
           id={name}

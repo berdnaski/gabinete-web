@@ -1,10 +1,8 @@
-"use client"
-
-import * as React from "react"
 import { Dialog as SheetPrimitive } from "radix-ui"
+import * as React from "react"
 
-import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 import { XIcon } from "lucide-react"
 
 function Sheet({ ...props }: React.ComponentProps<typeof SheetPrimitive.Root>) {
@@ -59,6 +57,7 @@ function SheetContent({
     <SheetPortal>
       <SheetOverlay />
       <SheetPrimitive.Content
+        aria-describedby={undefined}
         data-slot="sheet-content"
         data-side={side}
         className={cn(
@@ -133,12 +132,7 @@ function SheetDescription({
 }
 
 export {
-  Sheet,
-  SheetTrigger,
-  SheetClose,
-  SheetContent,
-  SheetHeader,
-  SheetFooter,
-  SheetTitle,
-  SheetDescription,
+  Sheet, SheetClose,
+  SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger
 }
+

@@ -1,28 +1,37 @@
 import { QueryClientProvider } from "@tanstack/react-query";
-import { AppRouter } from "./routes/app-router";
-import { queryClient } from "./api/queryClient";
+import { useState } from "react";
 import { BrowserRouter } from "react-router-dom";
+import { queryClient } from "./api/queryClient";
+import { SplashScreen } from "./components/ui/splash-screen";
+import { Toaster } from "./components/ui/sonner";
+import { TooltipProvider } from "./components/ui/tooltip";
 import { AuthProvider } from "./contexts/auth-context";
 import { PageTitleProvider } from "./contexts/page-title-context";
-import { SidebarProvider } from "./components/ui/sidebar";
-import { TooltipProvider } from "./components/ui/tooltip";
-import { Toaster } from "./components/ui/sonner";
 import { ThemeProvider } from "./contexts/theme-provider";
+import { AppRouter } from "./routes/app-router";
 
 export function App() {
+  const [showSplash, setShowSplash] = useState(true);
+
+  if (showSplash) {
+    return (
+      <ThemeProvider defaultTheme="light">
+        <SplashScreen onFinish={() => setShowSplash(false)} />
+      </ThemeProvider>
+    );
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <AuthProvider>
           <TooltipProvider>
-            <SidebarProvider>
-              <ThemeProvider>
-                <PageTitleProvider>
-                  <AppRouter />
-                  <Toaster richColors closeButton />
-                </PageTitleProvider>
-              </ThemeProvider>
-            </SidebarProvider>
+            <ThemeProvider defaultTheme="light">
+              <PageTitleProvider>
+                <AppRouter />
+                <Toaster closeButton position="top-right" />
+              </PageTitleProvider>
+            </ThemeProvider>
           </TooltipProvider>
         </AuthProvider>
       </BrowserRouter>

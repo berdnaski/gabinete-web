@@ -61,7 +61,7 @@ export function TeamSwitcher({
             <DropdownMenuLabel className="text-xs text-muted-foreground uppercase tracking-widest px-4 py-3">
               Workspaces
             </DropdownMenuLabel>
-            {teams.map((team, index) => (
+            {teams.map((team) => (
               <DropdownMenuItem
                 key={team.name}
                 onClick={() => setActiveTeam(team)}

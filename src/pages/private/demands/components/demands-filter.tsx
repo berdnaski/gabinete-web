@@ -1,19 +1,19 @@
 import { DatePicker } from "@/components/ui/date-picker"
 import {
-    ChevronDownIcon,
-    XIcon,
-    FilterIcon,
-    AlertCircleIcon,
-} from "lucide-react"
-import type { DateRange } from "react-day-picker"
-import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { DemandPriority, DemandStatus } from "@/types/demand-types"
-import { STATUS_OPTIONS, PRIORITY_OPTIONS } from "./demand-utils"
+import {
+    AlertCircleIcon,
+    ChevronDownIcon,
+    FilterIcon,
+    XIcon,
+} from "lucide-react"
+import type { DateRange } from "react-day-picker"
+import { PRIORITY_OPTIONS, STATUS_OPTIONS } from "./demand-utils"
 
 interface DemandsFilterProps {
     status: DemandStatus | null
@@ -42,7 +42,7 @@ export function DemandsFilter({
 
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <button className={`inline-flex items-center gap-1.5 h-9 px-3 rounded-lg text-sm font-medium border transition-all cursor-pointer ${status
+                    <button className={`inline-flex items-center gap-1.5 px-3 rounded-lg text-sm font-medium border transition-all cursor-pointer ${status
                         ? "bg-[#008EFF]/8 border-[#008EFF]/25 text-[#008EFF]"
                         : "bg-white border-zinc-200 text-zinc-600 hover:border-zinc-300 hover:bg-zinc-50"
                         }`}>
@@ -75,7 +75,7 @@ export function DemandsFilter({
 
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <button className={`inline-flex items-center gap-1.5 h-9 px-3 rounded-lg text-sm font-medium border transition-all cursor-pointer ${priority
+                    <button className={`inline-flex items-center gap-1.5 px-3 rounded-lg text-sm font-medium border transition-all cursor-pointer ${priority
                         ? "bg-[#008EFF]/8 border-[#008EFF]/25 text-[#008EFF]"
                         : "bg-white border-zinc-200 text-zinc-600 hover:border-zinc-300 hover:bg-zinc-50"
                         }`}>
@@ -115,7 +115,7 @@ export function DemandsFilter({
             {hasFilters && (
                 <button
                     onClick={onClearAll}
-                    className="inline-flex items-center gap-1.5 h-9 px-3 rounded-lg text-sm font-medium text-zinc-400 hover:text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-3 rounded-lg text-sm font-medium text-zinc-400 hover:text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
                 >
                     <XIcon className="size-3.5" />
                     Limpar
