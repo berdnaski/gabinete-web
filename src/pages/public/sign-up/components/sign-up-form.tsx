@@ -62,6 +62,7 @@ export function SignUpForm() {
 						type="text"
 						name="name"
 						control={control}
+						autoComplete='name'
 						placeholder="Digite seu nome"
 						disabled={isFormSubmittingOrIsPending}
 					/>
@@ -75,6 +76,7 @@ export function SignUpForm() {
 						type="email"
 						name="email"
 						control={control}
+						autoComplete='email'
 						placeholder="nome@exemplo.com"
 						disabled={isFormSubmittingOrIsPending}
 					/>
@@ -89,8 +91,8 @@ export function SignUpForm() {
 						id="password"
 						name="password"
 						type="password"
-						placeholder="Crie uma senha forte"
 						autoComplete="new-password"
+						placeholder="Crie uma senha forte"
 						disabled={isFormSubmittingOrIsPending}
 					/>
 				</Field>

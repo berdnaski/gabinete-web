@@ -44,6 +44,9 @@ export const AuthApi = {
 		const response = await apiClient.post(`${baseURL}/login`, data);
 		return response.data
 	},
+	verifyEmail: async (token: string): Promise<void> => {
+		await apiClient.post(`${baseURL}/verify-email`, { token });
+	},
 	getUserProfile: async (): Promise<GetUserProfileResponse> => {
 		const response = await apiClient.get(`${baseURL}/me`);
 		return response.data;

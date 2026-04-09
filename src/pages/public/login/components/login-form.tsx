@@ -7,12 +7,10 @@ import {
 } from '@/components/ui/field'
 import { InputForm } from '@/components/ui/form/input-form'
 import { useAuth } from '@/hooks/use-auth'
-import { getApiErrorMessage } from '@/lib/utils'
 import { loginFormSchema, type LoginFormData } from '@/schemas/login-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
-import { toast } from 'sonner'
 
 export function LoginForm() {
 
@@ -29,11 +27,7 @@ export function LoginForm() {
 	const { handleSubmit, control } = form
 
 	const onSubmit = handleSubmit(async (data: LoginFormData) => {
-		try {
-			await login(data);
-		} catch (error) {
-			toast.error(getApiErrorMessage(error) || "Erro ao realizar login. Verifique suas credenciais e tente novamente.");
-		}
+		await login(data);
 	});
 
 	return (
@@ -49,11 +43,12 @@ export function LoginForm() {
 					<FieldLabel htmlFor="email">Email</FieldLabel>
 					<InputForm
 						control={control}
-						name="email"
+						required
 						id="email"
 						type="email"
+						name="email"
+						autoComplete='email webauthn'
 						placeholder="m@example.com"
-						required
 					/>
 				</Field>
 				<Field>
@@ -72,6 +67,7 @@ export function LoginForm() {
 						name="password"
 						type="password"
 						control={control}
+						autoComplete='current-password webauthn'
 					/>
 				</Field>
 				<Field>

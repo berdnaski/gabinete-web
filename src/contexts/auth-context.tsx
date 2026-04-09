@@ -74,8 +74,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       toast.success("Login realizado com sucesso!");
 
-      await new Promise((resolve) => setTimeout(resolve, 3000));
-
       navigate("/home");
     } catch (error) {
       toast.error("Erro ao realizar login. Verifique suas credenciais.");

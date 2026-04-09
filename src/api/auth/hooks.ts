@@ -1,4 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { AuthApi, type RegisterRequest } from ".";
 
 export function useForgotPassword() {
@@ -13,9 +14,18 @@ export function useResetPassword() {
 	})
 }
 
+export function useVerifyEmail() {
+	return useMutation({
+		mutationFn: (token: string) => AuthApi.verifyEmail(token)
+	})
+}
+
 export function useRegister() {
 	return useMutation({
-		mutationFn: (data: RegisterRequest) => AuthApi.register(data)
+		mutationFn: (data: RegisterRequest) => AuthApi.register(data),
+		onSuccess: () => {
+			toast.success("Registro realizado com sucesso! Verifique seu e-amil para validação de e-mail.");
+		}
 	})
 }
 
