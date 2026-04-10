@@ -26,11 +26,9 @@
 }
 
 :root {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  font-feature-settings: 'cv11', 'ss01';
-  font-variation-settings: 'opsz' 32;
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
@@ -241,11 +239,7 @@ body {
 
 @layer base {
   * {
-    @apply border-border;
-  }
-
-  *:focus-visible {
-    @apply outline-ring/50;
+    @apply border-border outline-ring/50;
   }
 
   body {
@@ -254,7 +248,6 @@ body {
 
   html {
     @apply font-sans;
-    font-feature-settings: 'cv11', 'ss01';
     width: 100%;
     height: 100%;
   }
