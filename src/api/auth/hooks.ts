@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { AuthApi, type RegisterRequest } from ".";
+import { AuthApi, type RegisterRequest, type ChangePasswordRequest } from ".";
 
 export function useForgotPassword() {
 	return useMutation({
@@ -11,6 +11,12 @@ export function useForgotPassword() {
 export function useResetPassword() {
 	return useMutation({
 		mutationFn: (data: { token: string; password: string }) => AuthApi.resetPassword(data)
+	})
+}
+
+export function useChangePassword() {
+	return useMutation({
+		mutationFn: (data: ChangePasswordRequest) => AuthApi.changePassword(data)
 	})
 }
 

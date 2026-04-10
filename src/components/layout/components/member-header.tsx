@@ -14,17 +14,9 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 import { DemandsForm } from "@/pages/private/demands/components/demands-form";
-import {
-  ChevronDown,
-  ClipboardListIcon,
-  Home,
-  LogOut,
-  Menu,
-  Settings,
-  User,
-} from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
 import Logo from "../../../assets/logo.png";
+import { ChevronDown, ClipboardListIcon, Home, LogOut, Menu, Settings, User } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const navItems = [
   { to: "/home", label: "Início", icon: Home },
@@ -34,14 +26,15 @@ const navItems = [
 export function MemberHeader() {
   const { user, logout } = useAuth();
   const { pathname } = useLocation();
+  const navigate = useNavigate();
 
   const initials = user?.name
     ? user.name
-        .split(" ")
-        .slice(0, 2)
-        .map((w) => w[0])
-        .join("")
-        .toUpperCase()
+      .split(" ")
+      .slice(0, 2)
+      .map((w) => w[0])
+      .join("")
+      .toUpperCase()
     : "U";
 
   return (
@@ -107,7 +100,10 @@ export function MemberHeader() {
               Ver perfil
             </DropdownMenuItem>
 
-            <DropdownMenuItem className="cursor-pointer gap-2 rounded-lg">
+            <DropdownMenuItem
+              className="cursor-pointer gap-2 rounded-lg"
+              onClick={() => navigate("/settings")}
+            >
               <Settings className="size-4" />
               Configurações
             </DropdownMenuItem>

@@ -16,9 +16,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useAuth } from "@/hooks/use-auth";
+import { useNavigate } from "react-router-dom";
+import { NotificationPopover } from "./notification-popover";
 
 export function Header() {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const initials = user?.name
     ? user.name
@@ -37,6 +40,7 @@ export function Header() {
       </div>
 
       <div className="flex items-center gap-1 shrink-0">
+        <NotificationPopover />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
@@ -73,7 +77,10 @@ export function Header() {
               Ver perfil
             </DropdownMenuItem>
 
-            <DropdownMenuItem className="cursor-pointer gap-2 rounded-lg">
+            <DropdownMenuItem
+              className="cursor-pointer gap-2 rounded-lg"
+              onClick={() => navigate("/settings")}
+            >
               <Settings className="size-4" />
               Configurações
             </DropdownMenuItem>
