@@ -1,4 +1,5 @@
 import { useRegister } from '@/api/auth/hooks'
+import { InputForm } from '@/components/form/input-form'
 import { Loading } from '@/components/loading'
 import { Button } from '@/components/ui/button'
 import {
@@ -6,8 +7,7 @@ import {
 	FieldGroup,
 	FieldLabel
 } from '@/components/ui/field'
-import { InputForm } from '@/components/ui/form/input-form'
-import { registerFormSchema, type RegisterFormData } from '@/schemas/register-form'
+import { registerFormSchema, type RegisterFormData } from '@/validation-schemas/register'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
@@ -115,7 +115,7 @@ export function SignUpForm() {
 					Já possui uma conta?{" "}
 					<Link
 						to="/login"
-						className="text-[#008EFF] font-bold hover:underline"
+						className="text-primary font-bold hover:underline"
 					>
 						Fazer login
 					</Link>

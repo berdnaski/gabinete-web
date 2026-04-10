@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { CategoriesApi } from ".";
-import type { ListCategoriesParams } from "@/types/categories";
+import type { ListCategoriesParams } from "./types";
 
 export function useGetCategories(params?: ListCategoriesParams) {
   return useQuery({

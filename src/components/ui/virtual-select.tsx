@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CheckIcon, ChevronDownIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import type { SelectOption } from "@/components/ui/form/select-form";
+import type { SelectOption } from "@/components/form/select-form";
 
 const ITEM_HEIGHT = 36;
 const LIST_HEIGHT = 252;

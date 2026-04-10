@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from 'react'
-import { useMapsLibrary } from '@vis.gl/react-google-maps'
-import { Search, X, Loader2, MapPin } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useMapsLibrary } from '@vis.gl/react-google-maps'
+import { Loader2, MapPin, Search, X } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 
 export interface GooglePlaceResult {
   placeId: string
@@ -155,9 +155,10 @@ export function AddressSearchInput({
         {isLoading && (
           <Loader2 className="absolute right-3 size-4 animate-spin text-muted-foreground pointer-events-none" />
         )}
-        {isSelected && !isLoading && (
+        {isSelected && !isLoading && !disabled && (
           <button
             type="button"
+            disabled={disabled}
             onClick={handleClear}
             className="absolute right-3 rounded-sm text-muted-foreground hover:text-foreground transition-colors"
             aria-label="Limpar endereço"

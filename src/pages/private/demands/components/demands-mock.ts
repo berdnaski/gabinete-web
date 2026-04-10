@@ -1,5 +1,4 @@
-import type { Demand, PaginatedResponse } from "@/types/demand-types"
-import { DemandStatus, DemandPriority } from "@/types/demand-types"
+import { DemandPriority, DemandStatus, type Demand, type PaginatedResponse } from "@/api/demands/types"
 
 const CATEGORIES = [
   { id: "cat-1", name: "Infraestrutura" },

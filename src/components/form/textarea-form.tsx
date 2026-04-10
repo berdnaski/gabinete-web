@@ -46,7 +46,7 @@ export function TextareaForm<T extends FieldValues>({
     <FieldContent>
       <div className="relative flex items-start w-full group">
         {Icon && (
-          <div className="absolute left-3 top-3 flex items-center justify-center text-[#008EFF] transition-colors group-focus-within:text-[#008EFF]">
+          <div className="absolute left-3 top-3 flex items-center justify-center text-primary transition-colors group-focus-within:text-primary">
             <Icon size={18} strokeWidth={2.5} />
           </div>
         )}

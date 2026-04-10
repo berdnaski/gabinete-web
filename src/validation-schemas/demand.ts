@@ -1,3 +1,4 @@
+import { DemandPriority } from "@/api/demands/types";
 import z from "zod";
 
 const locationSchema = z.object({
@@ -18,6 +19,7 @@ export const demandSchema = z.object({
   categoryId: z.string({
     error: "Selecione uma categoria",
   }),
+  priority: z.enum(Object.values(DemandPriority) as [string, ...string[]]).optional(),
   location: locationSchema,
   files: z
     .array(z.instanceof(File), { error: "Envie pelo menos um arquivo" })
@@ -34,6 +36,7 @@ export const defaultDemandValues: DemandFormData = {
   title: "",
   description: "",
   categoryId: "",
+  priority: undefined,
   location: {
     address: "",
     latitude: "",

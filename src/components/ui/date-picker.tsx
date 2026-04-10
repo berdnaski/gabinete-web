@@ -44,7 +44,7 @@ export function DatePicker({ placeholder = "Selecionar período", className, sel
                     className={cn(
                         "inline-flex items-center gap-1.5 h-9 px-3 rounded-lg text-sm font-medium border transition-all duration-150 cursor-pointer",
                         hasValue
-                            ? "bg-[#008EFF]/8 border-[#008EFF]/25 text-[#008EFF]"
+                            ? "bg-primary/10 border-primary/25 text-primary"
                             : "bg-white border-zinc-200/80 text-zinc-500 hover:text-zinc-800 hover:border-zinc-300 hover:bg-zinc-50",
                         className
                     )}
@@ -73,9 +73,9 @@ export function DatePicker({ placeholder = "Selecionar período", className, sel
 
                 <div className="p-4">
                     <div className="
-                    **:data-[range-start=true]:bg-[#008EFF]! **:data-[range-start=true]:text-white!
-                    **:data-[range-end=true]:bg-[#008EFF]! **:data-[range-end=true]:text-white!
-                    **:data-[range-middle=true]:bg-[#008EFF]/12! **:data-[range-middle=true]:text-[#008EFF]!
+                    **:data-[range-start=true]:bg-primary! **:data-[range-start=true]:text-primary-foreground!
+                    **:data-[range-end=true]:bg-primary! **:data-[range-end=true]:text-primary-foreground!
+                    **:data-[range-middle=true]:bg-primary/12! **:data-[range-middle=true]:text-primary!
                 ">
                         <Calendar
                             mode="range"
@@ -88,9 +88,9 @@ export function DatePicker({ placeholder = "Selecionar período", className, sel
                             showOutsideDays={false}
                             classNames={{
                                 nav: "hidden",
-                                range_start: "rounded-l-lg! rounded-r-none! bg-[#008EFF]/20!",
-                                range_end: "rounded-r-lg! rounded-l-none! bg-[#008EFF]/20!",
-                                range_middle: "rounded-none! bg-[#008EFF]/10!",
+                                range_start: "rounded-l-lg! rounded-r-none! bg-primary/20!",
+                                range_end: "rounded-r-lg! rounded-l-none! bg-primary/20!",
+                                range_middle: "rounded-none! bg-primary/10!",
                             }}
                         />
                     </div>

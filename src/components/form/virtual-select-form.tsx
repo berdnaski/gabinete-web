@@ -8,7 +8,7 @@ import { AlertCircle, CheckIcon, ChevronDownIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { FieldError } from "@/components/ui/field";
-import type { SelectOption } from "@/components/ui/form/select-form";
+import type { SelectOption } from "./select-form";
 
 const ITEM_HEIGHT = 36;
 const LIST_HEIGHT = 252;

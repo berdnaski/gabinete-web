@@ -6,10 +6,23 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 import { DemandsForm } from "@/pages/private/demands/components/demands-form";
-import { ChevronDown, ClipboardListIcon, Home, LogOut, Settings, User } from "lucide-react";
+import {
+  ChevronDown,
+  ClipboardListIcon,
+  Home,
+  LogOut,
+  Menu,
+  Settings,
+  User,
+} from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import Logo from "../../../assets/logo.png";
 
@@ -24,19 +37,20 @@ export function MemberHeader() {
 
   const initials = user?.name
     ? user.name
-      .split(" ")
-      .slice(0, 2)
-      .map((w) => w[0])
-      .join("")
-      .toUpperCase()
+        .split(" ")
+        .slice(0, 2)
+        .map((w) => w[0])
+        .join("")
+        .toUpperCase()
     : "U";
 
-
   return (
-    <header className="flex fixed top-0 inset-x-0 z-50 shadow items-center justify-between px-6 py-2 border-b border-muted bg-background">
-      <img src={Logo} alt="Logo" className="w-32 shrink-0" />
+    <header className="flex fixed top-0 inset-x-0 z-50 shadow items-center justify-between px-4 sm:px-6 py-2 border-b border-muted bg-background">
+      {/* Logo */}
+      <img src={Logo} alt="Logo" className="w-24 sm:w-32 shrink-0" />
 
-      <nav className="flex items-center gap-1">
+      {/* Desktop Nav */}
+      <nav className="hidden md:flex items-center gap-1">
         {navItems.map(({ to, label, icon: Icon }) => (
           <Link
             key={to}
@@ -44,7 +58,7 @@ export function MemberHeader() {
             className={cn(
               "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors",
               pathname === to
-                ? "bg-[#1877F2]/10 text-[#1877F2]"
+                ? "bg-primary/10 text-primary"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
             )}
           >
@@ -54,7 +68,8 @@ export function MemberHeader() {
         ))}
       </nav>
 
-      <div className="flex items-center gap-2">
+      {/* Desktop Actions */}
+      <div className="hidden md:flex items-center gap-2">
         <DemandsForm sizeTrigger="icon" />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -64,7 +79,7 @@ export function MemberHeader() {
               className="flex items-center gap-1 p-1.5 rounded-full hover:bg-muted transition-colors focus:outline-none shrink-0"
             >
               <Avatar size="default">
-                <AvatarFallback className="bg-[#1877F2] text-white font-semibold text-xs">
+                <AvatarFallback className="bg-primary text-white font-semibold text-xs">
                   {initials}
                 </AvatarFallback>
               </Avatar>
@@ -72,12 +87,10 @@ export function MemberHeader() {
             </button>
           </DropdownMenuTrigger>
 
-
-
           <DropdownMenuContent align="end" className="w-56 mt-1 rounded-xl shadow-lg">
             <div className="flex items-center gap-3 px-3 py-3">
               <Avatar size="lg">
-                <AvatarFallback className="bg-[#1877F2] text-white font-semibold">
+                <AvatarFallback className="bg-primary text-white font-semibold">
                   {initials}
                 </AvatarFallback>
               </Avatar>
@@ -112,6 +125,88 @@ export function MemberHeader() {
         </DropdownMenu>
       </div>
 
+      {/* Mobile Actions */}
+      <div className="flex md:hidden items-center gap-2">
+        <DemandsForm sizeTrigger="icon" />
+
+        <Sheet>
+          <SheetTrigger asChild>
+            <button
+              type="button"
+              aria-label="Abrir menu"
+              className="p-2 rounded-lg hover:bg-muted transition-colors focus:outline-none"
+            >
+              <Menu className="size-5 text-foreground" />
+            </button>
+          </SheetTrigger>
+
+          <SheetContent side="right" className="w-72 p-0 flex flex-col">
+            {/* User info */}
+            <div className="flex items-center gap-3 px-5 py-5 border-b border-muted">
+              <Avatar size="lg">
+                <AvatarFallback className="bg-primary text-white font-semibold">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex flex-col min-w-0">
+                <span className="text-sm font-semibold truncate">{user?.name}</span>
+                <span className="text-xs text-muted-foreground truncate">{user?.email}</span>
+              </div>
+            </div>
+
+            {/* Nav */}
+            <nav className="flex flex-col gap-1 px-3 py-4">
+              {navItems.map(({ to, label, icon: Icon }) => (
+                <Link
+                  key={to}
+                  to={to}
+                  className={cn(
+                    "flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                    pathname === to
+                      ? "bg-primary/10 text-primary"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  )}
+                >
+                  <Icon className="size-4 shrink-0" />
+                  {label}
+                </Link>
+              ))}
+            </nav>
+
+            <div className="h-px bg-muted mx-3" />
+
+            {/* Settings / Profile */}
+            <div className="flex flex-col gap-1 px-3 py-4">
+              <button
+                type="button"
+                className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors text-left"
+              >
+                <User className="size-4 shrink-0" />
+                Ver perfil
+              </button>
+              <button
+                type="button"
+                className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors text-left"
+              >
+                <Settings className="size-4 shrink-0" />
+                Configurações
+              </button>
+            </div>
+
+            {/* Logout pinned to bottom */}
+            <div className="mt-auto px-3 py-4 border-t border-muted">
+              <button
+                type="button"
+                onClick={logout}
+                className="flex w-full items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+              >
+                <LogOut className="size-4 shrink-0" />
+                Sair
+              </button>
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
     </header>
   );
 }

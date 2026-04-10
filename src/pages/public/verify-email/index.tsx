@@ -16,8 +16,8 @@ export function VerifyEmail() {
         aria-hidden="true"
         className="pointer-events-none fixed inset-0 overflow-hidden"
       >
-        <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full opacity-20 blur-3xl bg-[#1d4ed8]" />
-        <div className="absolute bottom-0 -left-24 w-80 h-80 rounded-full opacity-15 blur-3xl bg-[#93c5fd]" />
+        <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full opacity-20 blur-3xl bg-primary" />
+        <div className="absolute bottom-0 -left-24 w-80 h-80 rounded-full opacity-15 blur-3xl bg-primary/30" />
       </div>
 
       <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-8 flex flex-col gap-6 animate-card-enter shadow-auth-card">

@@ -1,38 +1,24 @@
-import { apiClient } from "../apiClient";
+import { apiClient } from "..";
+import type {
+	GetUserProfileResponse,
+	LoginRequest,
+	LoginResponse,
+	RegisterRequest,
+} from "./types";
+
+export type {
+	GetUserProfileResponse,
+	LoginRequest,
+	LoginResponse,
+	RegisterRequest,
+	RegisterResponse,
+} from "./types";
 
 const baseURL = "/auth"
 
-export interface LoginRequest {
-	email: string;
-	password: string;
-}
-
-export interface RegisterRequest {
-	name: string;
-	email: string;
-	password: string;
-}
-
-export interface LoginResponse {
-	expiresIn: number;
-	accessToken: string;
-}
-
-export interface RegisterResponse {
-	message: string;
-}
-
-export interface GetUserProfileResponse {
-	id: string;
-	name: string;
-	role: string;
-	email: string;
-	avatar_url: string;
-}
-
 export const AuthApi = {
 	register: async (data: RegisterRequest): Promise<void> => {
-		await apiClient.post<RegisterResponse>(`${baseURL}/register`, data);
+		await apiClient.post(`${baseURL}/register`, data);
 	},
 	forgotPassword: async (email: string): Promise<void> => {
 		await apiClient.post(`${baseURL}/forgot-password`, { email });

@@ -1,3 +1,4 @@
+import { InputForm } from '@/components/form/input-form'
 import { Button } from '@/components/ui/button'
 import {
 	Field,
@@ -5,9 +6,8 @@ import {
 	FieldGroup,
 	FieldLabel,
 } from '@/components/ui/field'
-import { InputForm } from '@/components/ui/form/input-form'
 import { useAuth } from '@/hooks/use-auth'
-import { loginFormSchema, type LoginFormData } from '@/schemas/login-form'
+import { loginFormSchema, type LoginFormData } from '@/validation-schemas/login'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
@@ -48,6 +48,7 @@ export function LoginForm() {
 						type="email"
 						name="email"
 						autoComplete='email webauthn'
+						inputMode='email'
 						placeholder="m@example.com"
 					/>
 				</Field>
@@ -66,6 +67,7 @@ export function LoginForm() {
 						id="password"
 						name="password"
 						type="password"
+						inputMode='text'
 						control={control}
 						autoComplete='current-password webauthn'
 					/>

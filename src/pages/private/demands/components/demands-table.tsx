@@ -1,6 +1,6 @@
+import type { DemandPriority, DemandStatus } from "@/api/demands/types";
 import { DataTable, type DataTableFilterField } from "@/components/data-table";
 import { useDataTable } from "@/hooks/use-data-table";
-import type { DemandPriority, DemandStatus } from "@/types/demand-types";
 import { useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { PRIORITY_OPTIONS, STATUS_OPTIONS } from "./demand-utils";

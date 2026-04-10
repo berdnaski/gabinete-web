@@ -32,7 +32,7 @@ export function Header() {
   return (
     <header className="flex p-1 border-b border-muted items-center justify-between">
       <div className="flex items-center gap-1 min-w-0 shrink-0">
-        <SidebarTrigger className="hover:text-[#1877F2] transition-all duraion-200 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-full" />
+        <SidebarTrigger className="hover:text-primary transition-all duraion-200 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-full" />
         <ThemeToggle />
       </div>
 
@@ -45,7 +45,7 @@ export function Header() {
               className="flex items-center gap-1 p-1.5 rounded-full hover:bg-muted transition-colors focus:outline-none"
             >
               <Avatar size="default">
-                <AvatarFallback className="bg-[#1877F2] text-white font-semibold text-xs">
+                <AvatarFallback className="bg-primary text-white font-semibold text-xs">
                   {initials}
                 </AvatarFallback>
               </Avatar>
@@ -56,7 +56,7 @@ export function Header() {
           <DropdownMenuContent align="end" className="w-56 mt-1 rounded-xl shadow-lg">
             <div className="flex items-center gap-3 px-3 py-3">
               <Avatar size="lg">
-                <AvatarFallback className="bg-[#1877F2] text-white font-semibold">
+                <AvatarFallback className="bg-primary text-white font-semibold">
                   {initials}
                 </AvatarFallback>
               </Avatar>

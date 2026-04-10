@@ -40,7 +40,7 @@
   -moz-osx-font-smoothing: grayscale;
 
   --spacing: 4px;
-  --background: oklch(1 0 0);
+  --background: oklch(97.02% 0.0000 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
@@ -171,6 +171,22 @@ body {
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+@keyframes feedIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.feed-card {
+  animation: feedIn 0.3s ease-out both;
 }
 
 @keyframes cardEnter {

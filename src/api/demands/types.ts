@@ -8,6 +8,14 @@ export const DemandStatus = {
 
 export type DemandStatus = (typeof DemandStatus)[keyof typeof DemandStatus]
 
+export const DemandStatusLabel: Record<DemandStatus, string> = {
+	SUBMITTED: "Enviada",
+	IN_ANALYSIS: "Em análise",
+	IN_PROGRESS: "Em andamento",
+	RESOLVED: "Resolvida",
+	REJECTED: "Rejeitada",
+}
+
 export const DemandPriority = {
 	URGENT: "URGENT",
 	HIGH: "HIGH",
@@ -34,26 +42,53 @@ export interface Demand {
 	description: string;
 	status: DemandStatus;
 	priority?: DemandPriority;
-	date?: string;
-	location?: string;
 	address?: string;
-	categoryId: string;
-	category: Category;
+	zipcode?: string;
+	lat?: string;
+	long?: string;
+	neighborhood?: string;
+	city?: string;
+	state?: string;
 	reporterId: string;
-	reporter: User;
-	assigneeId?: string | null;
-	assignee?: User | null;
+	guestEmail?: string;
+	cabinetId?: string;
+	date?: string;
+	categoryId: string;
+	assigneeMemberId?: string;
+	reporter: {
+		name: string;
+		avatarUrl?: string;
+	};
+	category?: Category;
 	createdAt: string;
 	updatedAt: string;
+	disabledAt?: string;
+	evidences?: Evidence[];
 }
 
-export interface CreateDemandPayload {
+export interface Evidence {
+	id: string;
+	storageKey: string;
+	url: string;
+	mimeType: string;
+	size: number;
+	demandId: string;
+}
+
+export interface CreateDemandProps {
 	title: string;
 	description: string;
 	categoryId: string;
+	cabinetId?: string;
+	priority?: DemandPriority;
 	address?: string;
-	latitude?: number;
-	longitude?: number;
+	zipcode?: string;
+	lat?: number;
+	long?: number;
+	neighborhood?: string;
+	city?: string;
+	state?: string;
+	guestEmail?: string;
 }
 
 export interface ListDemandsParams {
