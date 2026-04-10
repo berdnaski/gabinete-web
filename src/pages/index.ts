@@ -1,1 +1,1 @@
-export { Demands, Home } from "./private";
+export { Demands, Home, Settings } from "./private";

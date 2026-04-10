@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,7 +10,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 import { DemandsForm } from "@/pages/private/demands/components/demands-form";
 import { ChevronDown, ClipboardListIcon, Home, LogOut, Settings, User } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Logo from "../../../assets/logo.png";
 
 const navItems = [
@@ -21,15 +21,8 @@ const navItems = [
 export function MemberHeader() {
   const { user, logout } = useAuth();
   const { pathname } = useLocation();
+  const navigate = useNavigate();
 
-  const initials = user?.name
-    ? user.name
-      .split(" ")
-      .slice(0, 2)
-      .map((w) => w[0])
-      .join("")
-      .toUpperCase()
-    : "U";
 
 
   return (
@@ -64,8 +57,9 @@ export function MemberHeader() {
               className="flex items-center gap-1 p-1.5 rounded-full hover:bg-muted transition-colors focus:outline-none shrink-0"
             >
               <Avatar size="default">
-                <AvatarFallback className="bg-[#1877F2] text-white font-semibold text-xs">
-                  {initials}
+                <AvatarImage src={user?.avatarUrl} className="object-cover" />
+                <AvatarFallback className="bg-muted text-muted-foreground">
+                  <User className="size-4" />
                 </AvatarFallback>
               </Avatar>
               <ChevronDown className="size-3.5 text-muted-foreground" />
@@ -77,8 +71,9 @@ export function MemberHeader() {
           <DropdownMenuContent align="end" className="w-56 mt-1 rounded-xl shadow-lg">
             <div className="flex items-center gap-3 px-3 py-3">
               <Avatar size="lg">
-                <AvatarFallback className="bg-[#1877F2] text-white font-semibold">
-                  {initials}
+                <AvatarImage src={user?.avatarUrl} className="object-cover" />
+                <AvatarFallback className="bg-muted text-muted-foreground">
+                  <User className="size-6" />
                 </AvatarFallback>
               </Avatar>
               <div className="flex flex-col min-w-0">
@@ -94,7 +89,10 @@ export function MemberHeader() {
               Ver perfil
             </DropdownMenuItem>
 
-            <DropdownMenuItem className="cursor-pointer gap-2 rounded-lg">
+            <DropdownMenuItem
+              className="cursor-pointer gap-2 rounded-lg"
+              onClick={() => navigate("/settings")}
+            >
               <Settings className="size-4" />
               Configurações
             </DropdownMenuItem>
