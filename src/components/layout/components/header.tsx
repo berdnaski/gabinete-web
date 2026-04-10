@@ -17,6 +17,7 @@ import {
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useAuth } from "@/hooks/use-auth";
 import { useNavigate } from "react-router-dom";
+import { NotificationPopover } from "./notification-popover";
 
 export function Header() {
   const { user, logout } = useAuth();
@@ -39,6 +40,7 @@ export function Header() {
       </div>
 
       <div className="flex items-center gap-1 shrink-0">
+        <NotificationPopover />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
