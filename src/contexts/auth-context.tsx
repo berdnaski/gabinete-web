@@ -14,7 +14,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   signUp: (data: RegisterRequest) => Promise<void>;
   login: (data: LoginRequest) => Promise<void>;
-  handleGoogleLogin: (token: string) => Promise<void>;
+  handleGoogleLogin: (token: string, refreshToken: string) => Promise<void>;
   logout: () => void;
   updateLocalUser: (data: Partial<GetUserProfileResponse>) => void;
   token: string | null;
@@ -102,11 +102,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
-  const handleGoogleLogin = async (accessToken: string) => {
+  const handleGoogleLogin = async (accessToken: string, refreshToken: string) => {
     setIsLoading(true);
     try {
       setToken(accessToken);
       localStorage.setItem(TOKEN_KEY, accessToken);
+      localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
 
       const userProfile = await AuthApi.getUserProfile();
       setUser(userProfile);

@@ -11,14 +11,17 @@ export function GoogleCallback() {
 
   useEffect(() => {
     const token = searchParams.get('token');
+    const refreshToken = searchParams.get('refreshToken');
 
-    if (token && !isProcessing.current) {
+    if (token && refreshToken && !isProcessing.current) {
       isProcessing.current = true;
-      handleGoogleLogin(token).catch(() => {
+      handleGoogleLogin(token, refreshToken).catch(() => {
         navigate('/login');
       });
-    } else if (!token) {
-      navigate('/login');
+    } else if (!token || !refreshToken) {
+      if (!isProcessing.current) {
+        navigate('/login');
+      }
     }
   }, [searchParams, navigate, handleGoogleLogin]);
 
