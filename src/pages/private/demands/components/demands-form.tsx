@@ -1,11 +1,11 @@
 import { CategoriesApi } from "@/api/categories";
 import { useAddEvidences, useCreateDemand } from "@/api/demands/hooks";
+import { AsyncSelectForm } from "@/components/form/async-select-form";
+import { ImageDropzoneForm } from "@/components/form/image-dropzone-form";
+import { InputForm } from "@/components/form/input-form";
+import { TextareaForm } from "@/components/form/textarea-form";
 import { Button } from "@/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { AsyncSelectForm } from "@/components/ui/form/async-select-form";
-import { ImageDropzoneForm } from "@/components/ui/form/image-dropzone-form";
-import { InputForm } from "@/components/ui/form/input-form";
-import { TextareaForm } from "@/components/ui/form/textarea-form";
 import { LocationPickerField } from "@/components/ui/location-picker/location-picker-field";
 import {
   Sheet,
@@ -16,7 +16,8 @@ import {
   SheetTitle,
   SheetTrigger
 } from '@/components/ui/sheet';
-import { demandSchema, type DemandFormData } from "@/schemas/demand-form";
+import { useAuth } from "@/hooks/use-auth";
+import { demandSchema, type DemandFormData } from "@/validation-schemas/demand";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PlusIcon } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -29,6 +30,7 @@ interface DemandFormProps {
 
 export function DemandsForm({ sizeTrigger }: DemandFormProps) {
   const [openSheet, setOpenSheet] = useState(false);
+  const { isAuthenticated } = useAuth();
 
   const form = useForm<DemandFormData>({
     resolver: zodResolver(demandSchema),
@@ -63,13 +65,18 @@ export function DemandsForm({ sizeTrigger }: DemandFormProps) {
   );
 
   const onSubmit = handleSubmit(async (data: DemandFormData) => {
+    if (!isAuthenticated && !data.guestEmail) {
+      form.setError("guestEmail", { message: "Digite seu e-mail para continuar" });
+      return;
+    }
+
     try {
       submitLabelRef.current = "Criando demanda...";
       const demand = await createDemand({
         title: data.title,
         description: data.description,
         categoryId: data.categoryId,
-        priority: data.priority as import("@/types/demand-types").DemandPriority | undefined,
+        priority: data.priority as import("@/api/demands/types").DemandPriority | undefined,
         address: data.location?.address,
         zipcode: data.location?.zipcode,
         lat: data.location ? parseFloat(data.location.latitude) : undefined,
@@ -77,6 +84,7 @@ export function DemandsForm({ sizeTrigger }: DemandFormProps) {
         neighborhood: data.location?.neighborhood,
         city: data.location?.city,
         state: data.location?.state,
+        guestEmail: !isAuthenticated ? data.guestEmail : undefined,
       });
 
       if (data.files?.length) {
@@ -119,6 +127,19 @@ export function DemandsForm({ sizeTrigger }: DemandFormProps) {
         </SheetHeader>
         <form onSubmit={onSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
           <FieldGroup className="flex-1 min-h-0 overflow-y-auto px-4">
+            {!isAuthenticated && (
+              <Field>
+                <FieldLabel>Seu e-mail</FieldLabel>
+                <InputForm
+                  name="guestEmail"
+                  control={control}
+                  disabled={isFormSubmitting}
+                  placeholder="Digite seu e-mail"
+                  type="email"
+                />
+              </Field>
+            )}
+
             <Field>
               <FieldLabel>Título</FieldLabel>
               <InputForm

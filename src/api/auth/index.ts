@@ -1,5 +1,4 @@
-import { apiClient } from "../apiClient";
-
+import { apiClient } from "..";
 const baseURL = "/auth"
 
 export interface LoginRequest {
@@ -40,7 +39,7 @@ export interface GetUserProfileResponse {
 
 export const AuthApi = {
 	register: async (data: RegisterRequest): Promise<void> => {
-		await apiClient.post<RegisterResponse>(`${baseURL}/register`, data);
+		await apiClient.post(`${baseURL}/register`, data);
 	},
 	forgotPassword: async (email: string): Promise<void> => {
 		await apiClient.post(`${baseURL}/forgot-password`, { email });

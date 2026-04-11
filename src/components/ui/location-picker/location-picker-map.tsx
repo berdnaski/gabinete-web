@@ -30,17 +30,19 @@ interface LocationPickerMapProps {
   position: [number, number] | null
   onPositionChange: (lat: number, lng: number) => void
   isReverseGeocoding?: boolean
+  disabled?: boolean
 }
 
 export function LocationPickerMap({
   position,
   onPositionChange,
   isReverseGeocoding,
+  disabled,
 }: LocationPickerMapProps) {
   const latLng = position ? { lat: position[0], lng: position[1] } : null
 
   return (
-    <div className="relative overflow-hidden rounded-md border border-border" style={{ height: 280 }}>
+    <div className="relative overflow-hidden rounded-md border border-border h-70">
       <Map
         // DEMO_MAP_ID is required for AdvancedMarker; replace with your Cloud Console Map ID in production
         mapId="DEMO_MAP_ID"
@@ -49,9 +51,10 @@ export function LocationPickerMap({
         streetViewControl={false}
         mapTypeControl={false}
         fullscreenControl={false}
-        gestureHandling="cooperative"
+        gestureHandling={disabled ? 'none' : 'cooperative'}
         disableDefaultUI={false}
         onClick={(e) => {
+          if (disabled) return
           if (e.detail.latLng) {
             onPositionChange(e.detail.latLng.lat, e.detail.latLng.lng)
           }
@@ -63,13 +66,17 @@ export function LocationPickerMap({
         {latLng && (
           <AdvancedMarker
             position={latLng}
-            draggable
+            draggable={!disabled}
             onDragEnd={(e) => {
+              if (disabled) return
               if (e.latLng) onPositionChange(e.latLng.lat(), e.latLng.lng())
             }}
           />
         )}
       </Map>
+
+      {/* Interaction blocker overlay when disabled */}
+      {disabled && <div className="absolute inset-0 cursor-not-allowed" />}
 
       {/* Hint overlay when no position is set */}
       {!position && (

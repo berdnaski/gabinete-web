@@ -9,7 +9,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
-import type { Demand } from "@/types/demand-types"
+import type { Demand } from "@/api/demands/types"
 import type { ColumnDef, Row } from "@tanstack/react-table"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
@@ -24,28 +24,19 @@ import {
 	TagsIcon,
 	Trash2Icon
 } from "lucide-react"
-import { DEMAND_PRIORITY_CONFIG, DEMAND_STATUS_CONFIG, PRIORITY_OPTIONS, STATUS_OPTIONS } from "./demand-utils"
+import { DemandPriority } from "./demand-priority"
+import { DEMAND_STATUS_CONFIG, PRIORITY_OPTIONS, STATUS_OPTIONS } from "./demand-utils"
 
-const PriorityCell = ({ row }: { row: Row<Demand> }) => {
+function PriorityCell({ row }: { row: Row<Demand> }) {
 	const demand = row.original
 	const priority = demand.priority || "LOW"
-	const config = DEMAND_PRIORITY_CONFIG[priority]
 	const { mutate: updateDemand, isPending } = useUpdateDemand()
 
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild disabled={isPending}>
 				<button className="outline-none cursor-pointer group">
-					<Badge
-						variant="outline"
-						className={cn(
-							"text-[10px] font-bold px-2 py-0 uppercase transition-all group-hover:opacity-80 active:scale-95",
-							config.className,
-							isPending && "opacity-50 animate-pulse"
-						)}
-					>
-						{config.label}
-					</Badge>
+					<DemandPriority variant={priority} />
 				</button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="start" className="w-40">
@@ -56,7 +47,7 @@ const PriorityCell = ({ row }: { row: Row<Demand> }) => {
 						onClick={() => updateDemand({ id: demand.id, data: { priority: opt.value } })}
 						className={cn(
 							"cursor-pointer",
-							priority === opt.value && "bg-zinc-50 text-[#008EFF] font-semibold"
+							priority === opt.value && "bg-accent text-primary font-semibold"
 						)}
 					>
 						{opt.label}
@@ -67,7 +58,7 @@ const PriorityCell = ({ row }: { row: Row<Demand> }) => {
 	)
 }
 
-const StatusCell = ({ row }: { row: Row<Demand> }) => {
+function StatusCell({ row }: { row: Row<Demand> }) {
 	const demand = row.original
 	const config = DEMAND_STATUS_CONFIG[demand.status]
 	const { mutate: updateStatus, isPending } = useUpdateDemandStatus()
@@ -96,7 +87,7 @@ const StatusCell = ({ row }: { row: Row<Demand> }) => {
 						onClick={() => updateStatus({ id: demand.id, status: opt.value })}
 						className={cn(
 							"cursor-pointer",
-							demand.status === opt.value && "bg-zinc-50 text-[#008EFF] font-semibold"
+							demand.status === opt.value && "bg-accent text-primary font-semibold"
 						)}
 					>
 						{opt.label}

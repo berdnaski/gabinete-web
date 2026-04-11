@@ -1,6 +1,6 @@
-import { apiClient } from "../apiClient";
-import type { Category, ListCategoriesParams } from "@/types/categories";
-import type { PaginatedResponse } from "@/types/demand-types";
+import { apiClient } from "..";
+import type { Category, ListCategoriesParams } from "./types";
+import type { PaginatedResponse } from "@/api/demands/types";
 
 const baseURL = "/categories";
 

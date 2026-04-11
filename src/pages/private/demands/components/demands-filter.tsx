@@ -5,7 +5,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { DemandPriority, DemandStatus } from "@/types/demand-types"
+import { DemandPriority, DemandStatus } from "@/api/demands/types"
 import {
     AlertCircleIcon,
     ChevronDownIcon,
@@ -43,7 +43,7 @@ export function DemandsFilter({
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <button className={`inline-flex items-center gap-1.5 px-3 rounded-lg text-sm font-medium border transition-all cursor-pointer ${status
-                        ? "bg-[#008EFF]/8 border-[#008EFF]/25 text-[#008EFF]"
+                        ? "bg-primary/10 border-primary/25 text-primary"
                         : "bg-white border-zinc-200 text-zinc-600 hover:border-zinc-300 hover:bg-zinc-50"
                         }`}>
                         <FilterIcon className="size-3.5 shrink-0" />
@@ -51,7 +51,7 @@ export function DemandsFilter({
                         {status ? (
                             <span
                                 onClick={e => { e.stopPropagation(); onStatusChange(null) }}
-                                className="ml-0.5 size-4 rounded-full flex items-center justify-center hover:bg-[#008EFF]/20 transition-colors"
+                                className="ml-0.5 size-4 rounded-full flex items-center justify-center hover:bg-primary/20 transition-colors"
                             >
                                 <XIcon className="size-2.5" />
                             </span>
@@ -65,7 +65,7 @@ export function DemandsFilter({
                         <DropdownMenuItem
                             key={opt.value}
                             onClick={() => onStatusChange(opt.value)}
-                            className={`cursor-pointer ${status === opt.value ? "text-[#008EFF] font-semibold" : ""}`}
+                            className={`cursor-pointer ${status === opt.value ? "text-primary font-semibold" : ""}`}
                         >
                             {opt.label}
                         </DropdownMenuItem>
@@ -76,7 +76,7 @@ export function DemandsFilter({
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <button className={`inline-flex items-center gap-1.5 px-3 rounded-lg text-sm font-medium border transition-all cursor-pointer ${priority
-                        ? "bg-[#008EFF]/8 border-[#008EFF]/25 text-[#008EFF]"
+                        ? "bg-primary/10 border-primary/25 text-primary"
                         : "bg-white border-zinc-200 text-zinc-600 hover:border-zinc-300 hover:bg-zinc-50"
                         }`}>
                         <AlertCircleIcon className="size-3.5 shrink-0" />
@@ -84,7 +84,7 @@ export function DemandsFilter({
                         {priority ? (
                             <span
                                 onClick={e => { e.stopPropagation(); onPriorityChange(null) }}
-                                className="ml-0.5 size-4 rounded-full flex items-center justify-center hover:bg-[#008EFF]/20 transition-colors"
+                                className="ml-0.5 size-4 rounded-full flex items-center justify-center hover:bg-primary/20 transition-colors"
                             >
                                 <XIcon className="size-2.5" />
                             </span>
@@ -98,7 +98,7 @@ export function DemandsFilter({
                         <DropdownMenuItem
                             key={opt.value}
                             onClick={() => onPriorityChange(opt.value)}
-                            className={`cursor-pointer ${priority === opt.value ? "text-[#008EFF] font-semibold" : ""}`}
+                            className={`cursor-pointer ${priority === opt.value ? "text-primary font-semibold" : ""}`}
                         >
                             {opt.label}
                         </DropdownMenuItem>

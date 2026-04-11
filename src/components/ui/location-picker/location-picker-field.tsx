@@ -125,6 +125,7 @@ function LocationPickerInner({ value, onChange, error, disabled }: InnerProps) {
         position={position}
         onPositionChange={handlePositionChange}
         isReverseGeocoding={isReverseGeocoding}
+        disabled={disabled}
       />
 
       {error && (
