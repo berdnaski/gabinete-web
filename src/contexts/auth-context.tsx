@@ -25,6 +25,7 @@ export const AuthContext = createContext<AuthContextType | undefined>(
 );
 
 const TOKEN_KEY = "@gabinete:token";
+const REFRESH_TOKEN_KEY = "@gabinete:refreshToken";
 const USER_KEY = "@gabinete:user";
 
 interface AuthProviderProps {
@@ -80,10 +81,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setIsLoading(true);
     try {
       const response = await AuthApi.login(data);
-      const { accessToken } = response;
+      const { accessToken, refreshToken } = response;
 
       setToken(accessToken);
       localStorage.setItem(TOKEN_KEY, accessToken);
+      localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
 
       const userProfile = await AuthApi.getUserProfile();
       setUser(userProfile);
@@ -136,6 +138,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const logout = () => {
     localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
     setUser(null);
     setToken(null);

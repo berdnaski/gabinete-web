@@ -1,25 +1,114 @@
 import axios from "axios";
+import type { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from "axios";
 
-const TOKEN_KEY = "@gabinete:token";
+const STORAGE_KEYS = {
+	TOKEN: "@gabinete:token",
+	REFRESH_TOKEN: "@gabinete:refreshToken",
+} as const;
 
-export const apiClient = axios.create({
+interface FailedRequest {
+	resolve: (token: string | null) => void;
+	reject: (error: Error) => void;
+}
+
+export const apiClient: AxiosInstance = axios.create({
 	baseURL: import.meta.env.VITE_API_URL,
 	headers: {
 		"Content-Type": "application/json",
-	}
-})
+	},
+});
 
 apiClient.interceptors.request.use(
-	(config) => {
-		const token = localStorage.getItem(TOKEN_KEY)
+	(config: InternalAxiosRequestConfig) => {
+		const token = localStorage.getItem(STORAGE_KEYS.TOKEN);
 
-		if (token) {
-			config.headers.Authorization = `Bearer ${token}`
+		if (token && config.headers) {
+			config.headers.Authorization = `Bearer ${token}`;
 		}
 
-		return config
+		return config;
 	},
-	(error) => {
-		return Promise.reject(error)
+	(error: AxiosError) => Promise.reject(error)
+);
+
+let isRefreshing = false;
+let failedQueue: FailedRequest[] = [];
+
+const processQueue = (error: Error | null, token: string | null = null) => {
+	failedQueue.forEach((prom) => {
+		if (error) {
+			prom.reject(error);
+		} else {
+			prom.resolve(token);
+		}
+	});
+
+	failedQueue = [];
+};
+
+apiClient.interceptors.response.use(
+	(response) => response,
+	async (error: AxiosError) => {
+		const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+
+		if (error.response?.status === 401 && !originalRequest._retry) {
+			if (isRefreshing) {
+				return new Promise<string | null>((resolve, reject) => {
+					failedQueue.push({ resolve, reject });
+				})
+					.then((token) => {
+						if (originalRequest.headers) {
+							originalRequest.headers.Authorization = `Bearer ${token}`;
+						}
+						return apiClient(originalRequest);
+					})
+					.catch((err) => Promise.reject(err));
+			}
+
+			originalRequest._retry = true;
+			isRefreshing = true;
+
+			const refreshToken = localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
+
+			if (!refreshToken) {
+				isRefreshing = false;
+				handleUnauthorized();
+				return Promise.reject(error);
+			}
+
+			try {
+				const { data } = await axios.post(`${import.meta.env.VITE_API_URL}/auth/refresh`, {
+					refreshToken,
+				});
+
+				const { accessToken, refreshToken: newRefreshToken } = data;
+
+				localStorage.setItem(STORAGE_KEYS.TOKEN, accessToken);
+				localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, newRefreshToken);
+
+				apiClient.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
+
+				if (originalRequest.headers) {
+					originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+				}
+
+				processQueue(null, accessToken);
+				return apiClient(originalRequest);
+			} catch (refreshError) {
+				processQueue(refreshError as Error, null);
+				handleUnauthorized();
+				return Promise.reject(refreshError);
+			} finally {
+				isRefreshing = false;
+			}
+		}
+
+		return Promise.reject(error);
 	}
-)
+);
+
+function handleUnauthorized() {
+	localStorage.removeItem(STORAGE_KEYS.TOKEN);
+	localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
+	window.location.href = "/login";
+}
