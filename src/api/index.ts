@@ -13,6 +13,7 @@ interface FailedRequest {
 
 export const apiClient: AxiosInstance = axios.create({
 	baseURL: import.meta.env.VITE_API_URL,
+	withCredentials: true,
 	headers: {
 		"Content-Type": "application/json",
 	},
@@ -20,12 +21,6 @@ export const apiClient: AxiosInstance = axios.create({
 
 apiClient.interceptors.request.use(
 	(config: InternalAxiosRequestConfig) => {
-		const token = localStorage.getItem(STORAGE_KEYS.TOKEN);
-
-		if (token && config.headers) {
-			config.headers.Authorization = `Bearer ${token}`;
-		}
-
 		return config;
 	},
 	(error: AxiosError) => Promise.reject(error)
@@ -56,10 +51,7 @@ apiClient.interceptors.response.use(
 				return new Promise<string | null>((resolve, reject) => {
 					failedQueue.push({ resolve, reject });
 				})
-					.then((token) => {
-						if (originalRequest.headers) {
-							originalRequest.headers.Authorization = `Bearer ${token}`;
-						}
+					.then(() => {
 						return apiClient(originalRequest);
 					})
 					.catch((err) => Promise.reject(err));
@@ -68,31 +60,10 @@ apiClient.interceptors.response.use(
 			originalRequest._retry = true;
 			isRefreshing = true;
 
-			const refreshToken = localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
-
-			if (!refreshToken) {
-				isRefreshing = false;
-				handleUnauthorized();
-				return Promise.reject(error);
-			}
-
 			try {
-				const { data } = await axios.post(`${import.meta.env.VITE_API_URL}/auth/refresh`, {
-					refreshToken,
-				});
+				await apiClient.post("/auth/refresh");
 
-				const { accessToken, refreshToken: newRefreshToken } = data;
-
-				localStorage.setItem(STORAGE_KEYS.TOKEN, accessToken);
-				localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, newRefreshToken);
-
-				apiClient.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
-
-				if (originalRequest.headers) {
-					originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-				}
-
-				processQueue(null, accessToken);
+				processQueue(null);
 				return apiClient(originalRequest);
 			} catch (refreshError) {
 				processQueue(refreshError as Error, null);
@@ -110,5 +81,8 @@ apiClient.interceptors.response.use(
 function handleUnauthorized() {
 	localStorage.removeItem(STORAGE_KEYS.TOKEN);
 	localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
-	window.location.href = "/login";
+
+	if (window.location.pathname !== "/login") {
+		window.location.href = "/login";
+	}
 }
