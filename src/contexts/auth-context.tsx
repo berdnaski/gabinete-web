@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, type ReactNode } from "react";
+import { createContext, useState, useEffect, type ReactNode, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import {
@@ -14,18 +14,15 @@ interface AuthContextType {
   isAuthenticated: boolean;
   signUp: (data: RegisterRequest) => Promise<void>;
   login: (data: LoginRequest) => Promise<void>;
-  handleGoogleLogin: (token: string, refreshToken: string) => Promise<void>;
+  handleGoogleLogin: () => Promise<void>;
   logout: () => void;
   updateLocalUser: (data: Partial<GetUserProfileResponse>) => void;
-  token: string | null;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(
   undefined,
 );
 
-const TOKEN_KEY = "@gabinete:token";
-const REFRESH_TOKEN_KEY = "@gabinete:refreshToken";
 const USER_KEY = "@gabinete:user";
 
 interface AuthProviderProps {
@@ -33,66 +30,52 @@ interface AuthProviderProps {
 }
 
 function getStoredAuth() {
-  const storedToken = localStorage.getItem(TOKEN_KEY);
   const storedUser = localStorage.getItem(USER_KEY);
 
-  if (storedToken && storedUser) {
+  if (storedUser) {
     try {
       return {
-        token: storedToken,
         user: JSON.parse(storedUser),
       };
     } catch {
-      return { user: null, token: null };
+      return { user: null };
     }
   }
 
   return {
     user: null,
-    token: null,
   };
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [user, setUser] = useState<GetUserProfileResponse | null>(() => getStoredAuth().user);
-  const [token, setToken] = useState<string | null>(
-    () => getStoredAuth().token,
-  );
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    async function syncProfile() {
-      if (token) {
-        try {
-          const profile = await AuthApi.getUserProfile();
-          setUser(profile);
-          localStorage.setItem(USER_KEY, JSON.stringify(profile));
-        } catch {
-          // If token is invalid or request fails, we might want to logout
-        }
+  const syncProfile = useCallback(async () => {
+    try {
+      const profile = await AuthApi.getUserProfile();
+      setUser(profile);
+      localStorage.setItem(USER_KEY, JSON.stringify(profile));
+    } catch (error: any) {
+      if (error.response?.status === 401) {
+        setUser(null);
+        localStorage.removeItem(USER_KEY);
       }
     }
+  }, []);
+
+  useEffect(() => {
     syncProfile();
-  }, [token]);
+  }, [syncProfile]);
 
   const login = async (data: LoginRequest) => {
     setIsLoading(true);
     try {
-      const response = await AuthApi.login(data);
-      const { accessToken, refreshToken } = response;
-
-      setToken(accessToken);
-      localStorage.setItem(TOKEN_KEY, accessToken);
-      localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
-
-      const userProfile = await AuthApi.getUserProfile();
-      setUser(userProfile);
-      localStorage.setItem(USER_KEY, JSON.stringify(userProfile));
-
+      await AuthApi.login(data);
+      await syncProfile();
       toast.success("Login realizado com sucesso!");
-
       navigate("/home");
     } catch (error) {
       toast.error("Erro ao realizar login. Verifique suas credenciais.");
@@ -102,19 +85,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
-  const handleGoogleLogin = async (accessToken: string, refreshToken: string) => {
+  const handleGoogleLogin = async () => {
     setIsLoading(true);
     try {
-      setToken(accessToken);
-      localStorage.setItem(TOKEN_KEY, accessToken);
-      localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
-
-      const userProfile = await AuthApi.getUserProfile();
-      setUser(userProfile);
-      localStorage.setItem(USER_KEY, JSON.stringify(userProfile));
-
+      await syncProfile();
       toast.success("Login com Google realizado com sucesso!");
-
       navigate("/home");
     } catch (error) {
       toast.error("Erro ao concluir o login com Google.");
@@ -137,13 +112,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(REFRESH_TOKEN_KEY);
-    localStorage.removeItem(USER_KEY);
-    setUser(null);
-    setToken(null);
-    navigate("/login");
+  const logout = async () => {
+    try {
+      await AuthApi.logout();
+    } catch (error) {
+      console.error("Erro ao realizar logout no servidor", error);
+    } finally {
+      localStorage.removeItem(USER_KEY);
+      setUser(null);
+      navigate("/login");
+    }
   };
 
   const updateLocalUser = (data: Partial<GetUserProfileResponse>) => {
@@ -159,13 +137,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
       value={{
         user,
         isLoading,
-        isAuthenticated: !!token,
+        isAuthenticated: !!user,
         signUp,
         login,
         handleGoogleLogin,
         logout,
         updateLocalUser,
-        token,
       }}
     >
       {children}

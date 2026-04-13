@@ -63,5 +63,8 @@ export const AuthApi = {
 	},
 	confirmChangePassword: async (token: string): Promise<void> => {
 		await apiClient.post(`${baseURL}/confirm-change-password`, { token });
+	},
+	logout: async (): Promise<void> => {
+		await apiClient.post(`${baseURL}/logout`);
 	}
 };

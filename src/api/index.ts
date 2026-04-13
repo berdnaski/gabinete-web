@@ -2,8 +2,7 @@ import axios from "axios";
 import type { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from "axios";
 
 const STORAGE_KEYS = {
-	TOKEN: "@gabinete:token",
-	REFRESH_TOKEN: "@gabinete:refreshToken",
+	USER: "@gabinete:user",
 } as const;
 
 interface FailedRequest {
@@ -47,6 +46,10 @@ apiClient.interceptors.response.use(
 		const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
 		if (error.response?.status === 401 && !originalRequest._retry) {
+			if (window.location.pathname === "/login") {
+				return Promise.reject(error);
+			}
+
 			if (isRefreshing) {
 				return new Promise<string | null>((resolve, reject) => {
 					failedQueue.push({ resolve, reject });
@@ -79,8 +82,7 @@ apiClient.interceptors.response.use(
 );
 
 function handleUnauthorized() {
-	localStorage.removeItem(STORAGE_KEYS.TOKEN);
-	localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
+	localStorage.removeItem(STORAGE_KEYS.USER);
 
 	if (window.location.pathname !== "/login") {
 		window.location.href = "/login";
