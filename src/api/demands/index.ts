@@ -47,4 +47,36 @@ export const DemandsApi = {
 			headers: { 'Content-Type': 'multipart/form-data' },
 		});
 	},
+
+	generatePresignedUploadUrl: async (
+		id: string,
+		filename: string,
+	): Promise<{ uploadUrl: string; storageKey: string }> => {
+		const response = await apiClient.post<{ uploadUrl: string; storageKey: string }>(
+			`${baseURL}/${id}/evidence/presign`,
+			{ filename },
+		);
+		return response.data;
+	},
+
+	uploadToR2: async (uploadUrl: string, file: File): Promise<void> => {
+		await fetch(uploadUrl, {
+			method: 'PUT',
+			body: file,
+			headers: {
+				'Content-Type': file.type || 'image/jpeg',
+			},
+		});
+	},
+
+	confirmEvidenceUpload: async (
+		id: string,
+		storageKey: string,
+		size: number,
+	): Promise<void> => {
+		await apiClient.post(`${baseURL}/${id}/evidence/confirm`, {
+			storageKey,
+			size,
+		});
+	},
 };
