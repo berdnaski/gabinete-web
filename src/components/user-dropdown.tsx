@@ -1,11 +1,10 @@
-import { getFirstLettersFromNames } from "@/utils/get-first-letters-from-names";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { useAuth } from "@/hooks/use-auth";
 import { ChevronDown, LogOut, Settings } from "lucide-react";
 import { Button } from "./ui/button";
 import { UserRole, UserRoleLabel } from "@/api/users/types";
 import { Link } from "react-router-dom";
+import { UserAvatar } from "./user-avatar";
 
 export function UserDropdown() {
   const { user, logout } = useAuth()
@@ -18,24 +17,22 @@ export function UserDropdown() {
           aria-label="Menu do perfil"
           className="flex items-center gap-1 p-1.5 rounded-full hover:bg-muted transition-colors focus:outline-none shrink-0"
         >
-          <Avatar size="default">
-            <AvatarImage src={user?.avatarUrl} />
-            <AvatarFallback className="bg-primary text-white font-semibold text-xs">
-              {getFirstLettersFromNames(user?.name as string)}
-            </AvatarFallback>
-          </Avatar>
+          <UserAvatar
+            size="default"
+            name={user?.name}
+            avatarUrl={user?.avatarUrl}
+          />
           <ChevronDown className="size-3.5 text-muted-foreground" />
         </Button>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="w-64">
         <div className="flex p-1 gap-2 items-center">
-          <Avatar size="lg">
-            <AvatarImage src={user?.avatarUrl} />
-            <AvatarFallback className="bg-primary text-white font-semibold">
-              {getFirstLettersFromNames(user?.name as string)}
-            </AvatarFallback>
-          </Avatar>
+          <UserAvatar
+            size="lg"
+            name={user?.name}
+            avatarUrl={user?.avatarUrl}
+          />
           <div className="flex flex-col min-w-0">
             <div className="flex items-center gap-1">
               <span className="text-sm font-semibold truncate">

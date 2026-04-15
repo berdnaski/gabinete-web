@@ -1,130 +1,123 @@
+import { useLikeDemand } from "@/api/demands/hooks";
 import type { Demand } from "@/api/demands/types";
-import { getFirstLettersFromNames } from "@/utils/get-first-letters-from-names";
-import { formatDistanceToNow } from "date-fns";
-import { ptBR } from "date-fns/locale";
-import { Heart, MapPinIcon, MessageCircle, MoreHorizontal, Share2, ThumbsUp } from "lucide-react";
+import { ExternalLinkIcon, MapPinIcon, MessageCircle, MoreHorizontal, ThumbsUp } from "lucide-react";
 import type { ComponentProps } from "react";
-import { useState } from "react";
+import { Link } from "react-router-dom";
 
 import { cn } from "@/lib/utils";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Button } from "./ui/button";
 import { Gallery } from "./gallery";
+import { UserAvatar } from "./user-avatar";
+import { Separator } from "./ui/separator";
+import { PostInfo } from "./post-info";
+import { formatDateToNow } from "@/utils/format-date-to-now";
+import { Button } from "./ui/button";
 
 export interface PostProps extends ComponentProps<"article"> {
   demand: Demand;
+  hideComment?: boolean;
 }
 
 export function Post({
   demand,
   className,
+  hideComment = false,
+  children,
   ...props
 }: PostProps) {
-  const [liked, setLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(0);
+  const { mutate: likeDemand } = useLikeDemand();
 
-  const authorName = demand.reporter?.name || demand.guestEmail || "Anônimo";
-  const authorInitials = demand.guestEmail
-    ? "?"
-    : getFirstLettersFromNames(authorName);
-  const timestamp = demand.createdAt
-    ? formatDistanceToNow(new Date(demand.createdAt), { addSuffix: true, locale: ptBR })
-    : "";
+  const liked = demand.isLiked;
+  const likeCount = demand.likesCount;
+  const authorName = demand.reporter?.name || demand.guestEmail as string;
 
-  function handleLike() {
-    setLiked((prev) => {
-      setLikeCount((c) => (prev ? c - 1 : c + 1));
-      return !prev;
-    });
+  function handleLike(e: React.MouseEvent) {
+    e.stopPropagation();
+    console.log(e)
+    likeDemand(demand.id);
   }
+
+  const mapsUrl =
+    demand.lat && demand.long
+      ? `https://www.google.com/maps?q=${demand.lat},${demand.long}`
+      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(demand.address ?? "")}`;
 
   return (
     <article
       className={cn(
-        "bg-card text-card-foreground rounded-xl shadow-sm border border-border overflow-hidden w-full",
+        "bg-card text-card-foreground rounded-xl shadow-sm border border-border overflow-hidden w-full cursor-pointer",
         className,
       )}
       {...props}
     >
       <div className="flex items-start justify-between px-4 pt-4 pb-3">
         <div className="flex items-center gap-3">
-          <Avatar size="lg">
-            {demand.reporter?.avatarUrl && (
-              <AvatarImage src={demand.reporter.avatarUrl} alt={authorName} />
-            )}
-            <AvatarFallback className="bg-primary/10 text-primary font-semibold text-sm">
-              {authorInitials}
-            </AvatarFallback>
-          </Avatar>
-
-          <div className="flex flex-col gap-0.5">
-            <p className="text-sm font-semibold leading-none">{authorName}</p>
-            <div className="flex items-center gap-1 text-xs text-muted-foreground">
-              {demand.category?.name && (
-                <>
-                  <span>{demand.category.name}</span>
-                  <span aria-hidden>·</span>
-                </>
-              )}
-              <span>{timestamp}</span>
-            </div>
-          </div>
+          <UserAvatar
+            size="lg"
+            name={authorName}
+            avatarUrl={demand?.reporter?.avatarUrl}
+          />
+          <PostInfo
+            authorName={authorName}
+            category={demand?.category?.name}
+            dateToNow={formatDateToNow(demand.createdAt)}
+          />
         </div>
 
         <Button
-          variant="ghost"
           size="icon"
-          className="text-muted-foreground rounded-full -mt-0.5 -mr-1 size-8"
+          variant="ghost"
           aria-label="Mais opções"
+          className="text-muted-foreground rounded-full -mt-0.5 -mr-1 size-8"
         >
           <MoreHorizontal />
         </Button>
       </div>
 
-      <div className="px-4 pb-3 space-y-2">
+      <div className="px-4 pb-4 space-y-2">
         <p className="text-sm font-semibold">{demand.title}</p>
         <p className="text-sm leading-relaxed">{demand.description}</p>
-        {demand.address && (
-          <a
-            href={
-              demand.lat && demand.long
-                ? `https://www.google.com/maps?q=${demand.lat},${demand.long}`
-                : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(demand.address)}`
-            }
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-zinc-400 hover:text-primary mt-0.5 w-fit transition-colors"
-          >
-            <MapPinIcon className="size-3.5 shrink-0" />
-            <span className="text-xs">{demand.address}</span>
-          </a>
-        )}
       </div>
-
 
       {demand.evidences && demand.evidences.length > 0 && (
         <Gallery images={demand.evidences} />
       )}
 
-      {likeCount > 0 && (
-        <div className="flex items-center justify-between px-4 py-2 text-xs text-muted-foreground">
-          <div className="flex items-center gap-1.5">
-            <div className="flex -space-x-1">
-              <span className="inline-flex size-4.5 items-center justify-center rounded-full bg-primary text-[9px] ring-2 ring-card">
-                <ThumbsUp className="size-3 text-white" />
-              </span>
-              <span className="inline-flex size-4.5 items-center justify-center rounded-full bg-red-500 text-[9px] ring-2 ring-card">
-                <Heart className="size-3 text-white" />
-              </span>
+      {demand.address && (
+        <div className="p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground mb-2">
+            Localização Geográfica
+          </p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-sm text-foreground/80">
+              <MapPinIcon className="size-4 text-primary shrink-0" />
+              <span>{demand.address}</span>
             </div>
-            <span>{likeCount}</span>
+            <Link
+              to={mapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button variant="link">
+                Ver no mapa
+                <ExternalLinkIcon className="size-3" />
+              </Button>
+            </Link>
           </div>
         </div>
       )}
 
-      <div className="mx-4 border-t border-border" />
+      {likeCount > 0 && (
+        <div className="flex items-center gap-1.5 px-4 pb-4 text-xs text-muted-foreground">
+          <span className="inline-flex size-4.5 items-center justify-center rounded-full bg-primary ring-2 ring-card">
+            <ThumbsUp className="size-3 text-white" />
+          </span>
+          <span>{likeCount}</span>
+        </div>
+      )}
 
-      <div className="grid grid-cols-3 px-2 py-1">
+      <Separator />
+
+      <div className={cn("grid grid-cols-2 px-2 py-1", { 'grid-cols-1': hideComment })}>
         <Button
           variant="ghost"
           size="sm"
@@ -137,27 +130,29 @@ export function Post({
           <ThumbsUp
             className={cn("size-4 transition-all", liked && "fill-primary")}
           />
-          <span>Curtir</span>
+          <span>Apoiar</span>
         </Button>
 
-        <Button
-          size="sm"
-          variant="ghost"
-          className="gap-2 rounded-lg font-medium h-9 text-muted-foreground"
-        >
-          <MessageCircle className="size-4" />
-          <span>Comentar</span>
-        </Button>
-
-        <Button
-          size="sm"
-          variant="ghost"
-          className="gap-2 rounded-lg font-medium h-9 text-muted-foreground"
-        >
-          <Share2 className="size-4" />
-          <span>Compartilhar</span>
-        </Button>
+        {!hideComment && (
+          <Button
+            size="sm"
+            variant="ghost"
+            className="gap-2 rounded-lg font-medium h-9 text-muted-foreground"
+          >
+            <Link to={`/comments/${demand.id}`} className="flex gap-2">
+              <MessageCircle className="size-4" />
+              <span>Comentar</span>
+            </Link>
+          </Button>
+        )}
       </div>
+
+      {children && (
+        <>
+          <Separator />
+          {children}
+        </>
+      )}
     </article>
   );
 }

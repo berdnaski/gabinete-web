@@ -1,8 +1,16 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { DemandsApi } from ".";
 import { queryClient } from "../queryClient";
-import type { CreateDemandProps, Demand, DemandStatus, ListDemandsParams } from "./types";
+import { DemandStatus, type CreateDemandCommentProps, type CreateDemandProps, type Demand, type ListDemandCommentsParams, type ListDemandsParams } from "./types";
 
+
+export function useGetDemandById({ id }: { id: string }) {
+  return useQuery({
+    queryKey: ["demands", id],
+    queryFn: () => DemandsApi.getById(id),
+    enabled: !!id,
+  });
+}
 
 export function useCreateDemand() {
   return useMutation({
@@ -62,6 +70,18 @@ export function useUploadToR2() {
   });
 }
 
+export function useLikeDemand() {
+  return useMutation({
+    mutationFn: (id: string) => DemandsApi.like(id),
+    onSuccess: async (_, variables) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["demands"] }),
+        queryClient.invalidateQueries({ queryKey: ["demands", variables] })
+      ])
+    },
+  });
+}
+
 export function useConfirmEvidenceUpload() {
   return useMutation({
     mutationFn: ({ demandId, storageKey, size }: { demandId: string; storageKey: string; size: number }) =>
@@ -69,6 +89,24 @@ export function useConfirmEvidenceUpload() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["demands"] });
       queryClient.refetchQueries({ queryKey: ["demands"] });
+    },
+  });
+}
+
+export function useListDemandComments(params: ListDemandCommentsParams) {
+  return useQuery({
+    queryKey: ["comments", params],
+    queryFn: () => DemandsApi.listDemandComments(params),
+    enabled: !!params.demandId,
+  });
+}
+
+
+export function useCreateDemandComment() {
+  return useMutation({
+    mutationFn: (data: CreateDemandCommentProps) => DemandsApi.createDemandComment(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["comments"] });
     },
   });
 }

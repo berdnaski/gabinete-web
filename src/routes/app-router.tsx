@@ -10,6 +10,7 @@ import { ConfirmPasswordPage } from "@/pages/public/confirm-password";
 import { Route, Routes } from "react-router-dom";
 import { Feed } from "@/pages/feed";
 import { Settings } from "@/pages/settings";
+import { DemandComments } from "@/pages/demand-comments";
 
 export function AppRouter() {
   return (
@@ -26,6 +27,7 @@ export function AppRouter() {
       <Route path="/" element={<Layout />}>
         <Route index element={<Feed />} />
         <Route path="settings" element={<Settings />} />
+        <Route path="comments/:demandId" element={<DemandComments />} />
       </Route>
 
 

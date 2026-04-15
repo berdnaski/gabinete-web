@@ -1,5 +1,5 @@
 import { apiClient } from "..";
-import type { CreateDemandProps, Demand, DemandStatus, ListDemandsParams, PaginatedResponse } from "./types";
+import type { CreateDemandCommentProps, CreateDemandProps, Demand, DemandCommmentsPaginatedResponse, DemandStatus, ListDemandCommentsParams, ListDemandsParams, PaginatedResponse } from "./types";
 
 export type { CreateDemandProps } from "./types";
 
@@ -69,6 +69,10 @@ export const DemandsApi = {
 		});
 	},
 
+	like: async (id: string): Promise<void> => {
+		await apiClient.post(`${baseURL}/${id}/like`);
+	},
+
 	confirmEvidenceUpload: async (
 		id: string,
 		storageKey: string,
@@ -78,5 +82,17 @@ export const DemandsApi = {
 			storageKey,
 			size,
 		});
+	},
+
+	listDemandComments: async ({ demandId, page, limit }: ListDemandCommentsParams): Promise<DemandCommmentsPaginatedResponse> => {
+		const response = await apiClient.get<DemandCommmentsPaginatedResponse>(`/demands/${demandId}/comments`, {
+			params: { page, limit },
+		});
+		return response.data;
+	},
+
+	createDemandComment: async ({ demandId, content }: CreateDemandCommentProps): Promise<Comment> => {
+		const { data } = await apiClient.post<Comment>(`/demands/${demandId}/comments`, { content });
+		return data;
 	},
 };

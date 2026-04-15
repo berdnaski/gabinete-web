@@ -44,8 +44,8 @@ export interface Demand {
 	priority?: DemandPriority;
 	address?: string;
 	zipcode?: string;
-	lat?: string;
-	long?: string;
+	lat?: number;
+	long?: number;
 	neighborhood?: string;
 	city?: string;
 	state?: string;
@@ -55,15 +55,18 @@ export interface Demand {
 	date?: string;
 	categoryId: string;
 	assigneeMemberId?: string;
-	reporter: {
+	reporter?: {
 		name: string;
 		avatarUrl?: string;
 	};
-	category?: Category;
+	category: Category;
 	createdAt: string;
 	updatedAt: string;
 	disabledAt?: string;
 	evidences?: Evidence[];
+	likesCount: number;
+	isLiked: boolean;
+	results: string[];
 }
 
 export interface Evidence {
@@ -111,4 +114,31 @@ export interface PaginationMeta {
 export interface PaginatedResponse<T> {
 	items: T[];
 	meta: PaginationMeta;
+}
+
+export interface DemandComments {
+	id: string;
+	authorId: string;
+	content: string;
+	demandId: string;
+	createdAt: string;
+	authorName: string;
+	authorAvatarUrl: string;
+	isCabinetResponse: boolean;
+}
+
+export interface ListDemandCommentsParams {
+	demandId: string;
+	page?: number;
+	limit?: number;
+}
+
+export interface DemandCommmentsPaginatedResponse {
+	items: DemandComments[]
+	total: number;
+}
+
+export interface CreateDemandCommentProps {
+	content: string;
+	demandId: string;
 }
