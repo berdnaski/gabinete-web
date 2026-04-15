@@ -9,8 +9,8 @@ export function useCreateDemand() {
     mutationFn: (data: CreateDemandProps) => DemandsApi.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["demands"] });
-    }
-  })
+    },
+  });
 }
 
 export function useGetDemands(params: ListDemandsParams) {
@@ -45,5 +45,30 @@ export function useAddEvidences() {
   return useMutation({
     mutationFn: ({ id, formData }: { id: string; formData: FormData }) =>
       DemandsApi.addEvidences(id, formData),
+  });
+}
+
+export function useGeneratePresignedUploadUrl() {
+  return useMutation({
+    mutationFn: ({ demandId, filename }: { demandId: string; filename: string }) =>
+      DemandsApi.generatePresignedUploadUrl(demandId, filename),
+  });
+}
+
+export function useUploadToR2() {
+  return useMutation({
+    mutationFn: ({ uploadUrl, file }: { uploadUrl: string; file: File }) =>
+      DemandsApi.uploadToR2(uploadUrl, file),
+  });
+}
+
+export function useConfirmEvidenceUpload() {
+  return useMutation({
+    mutationFn: ({ demandId, storageKey, size }: { demandId: string; storageKey: string; size: number }) =>
+      DemandsApi.confirmEvidenceUpload(demandId, storageKey, size),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["demands"] });
+      queryClient.refetchQueries({ queryKey: ["demands"] });
+    },
   });
 }

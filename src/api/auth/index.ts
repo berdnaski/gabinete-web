@@ -16,7 +16,6 @@ export interface RegisterRequest {
 export interface LoginResponse {
 	expiresIn: number;
 	accessToken: string;
-	refreshToken: string;
 }
 
 export interface RegisterResponse {

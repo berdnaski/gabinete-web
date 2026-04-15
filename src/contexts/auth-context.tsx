@@ -1,6 +1,7 @@
-import { createContext, useState, useEffect, type ReactNode, useCallback } from "react";
+import { createContext, useState, useEffect, useRef, type ReactNode, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { apiClient } from "../api";
 import {
   AuthApi,
   type GetUserProfileResponse,
@@ -24,6 +25,7 @@ export const AuthContext = createContext<AuthContextType | undefined>(
 );
 
 const USER_KEY = "@gabinete:user";
+const ACCESS_TOKEN_KEY = "@gabinete:access_token";
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -50,10 +52,14 @@ function getStoredAuth() {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [user, setUser] = useState<GetUserProfileResponse | null>(() => getStoredAuth().user);
+  const isSyncingProfile = useRef(false);
 
   const navigate = useNavigate();
 
   const syncProfile = useCallback(async () => {
+    if (isSyncingProfile.current) return;
+
+    isSyncingProfile.current = true;
     try {
       const profile = await AuthApi.getUserProfile();
       setUser(profile);
@@ -63,11 +69,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setUser(null);
         localStorage.removeItem(USER_KEY);
       }
+    } finally {
+      isSyncingProfile.current = false;
     }
   }, []);
 
   useEffect(() => {
-    if (localStorage.getItem(USER_KEY)) {
+    const storedUser = localStorage.getItem(USER_KEY);
+    if (storedUser) {
       syncProfile();
     }
   }, [syncProfile]);
@@ -75,7 +84,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const login = async (data: LoginRequest) => {
     setIsLoading(true);
     try {
-      await AuthApi.login(data);
+      const response = await AuthApi.login(data);
+      localStorage.setItem(ACCESS_TOKEN_KEY, response.accessToken);
       await syncProfile();
       toast.success("Login realizado com sucesso!");
       navigate("/home");
@@ -91,6 +101,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setIsLoading(true);
     try {
       await syncProfile();
+      try {
+        const refreshResponse = await apiClient.post('/auth/refresh');
+        if (refreshResponse.data?.accessToken) {
+          localStorage.setItem(ACCESS_TOKEN_KEY, refreshResponse.data.accessToken);
+          console.log("Google login token armazenado em localStorage");
+        }
+      } catch (err) {
+        console.warn("Não foi possível armazenar token do Google login", err);
+      }
       toast.success("Login com Google realizado com sucesso!");
       navigate("/home");
     } catch (error) {
@@ -121,6 +140,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       console.error("Erro ao realizar logout no servidor", error);
     } finally {
       localStorage.removeItem(USER_KEY);
+      localStorage.removeItem(ACCESS_TOKEN_KEY);
       setUser(null);
       navigate("/login");
     }

@@ -1,5 +1,10 @@
 import { CategoriesApi } from "@/api/categories";
-import { useAddEvidences, useCreateDemand } from "@/api/demands/hooks";
+import {
+  useCreateDemand,
+  useGeneratePresignedUploadUrl,
+  useUploadToR2,
+  useConfirmEvidenceUpload,
+} from "@/api/demands/hooks";
 import { AsyncSelectForm } from "@/components/form/async-select-form";
 import { ImageDropzoneForm } from "@/components/form/image-dropzone-form";
 import { InputForm } from "@/components/form/input-form";
@@ -45,10 +50,18 @@ export function DemandsForm({ sizeTrigger }: DemandFormProps) {
   const { handleSubmit, control, reset } = form;
 
   const { mutateAsync: createDemand, isPending: isPendingCreateDemand } = useCreateDemand();
-  const { mutateAsync: addEvidences, isPending: isPendingAddEvidences } = useAddEvidences();
+  const { mutateAsync: generatePresignedUrl, isPending: isPendingPresignedUrl } =
+    useGeneratePresignedUploadUrl();
+  const { mutateAsync: uploadToR2, isPending: isPendingUpload } = useUploadToR2();
+  const { mutateAsync: confirmEvidence, isPending: isPendingConfirm } =
+    useConfirmEvidenceUpload();
 
   const submitLabelRef = useRef("Criar demanda");
-  const isFormSubmitting = isPendingCreateDemand || isPendingAddEvidences;
+  const isFormSubmitting =
+    isPendingCreateDemand ||
+    isPendingPresignedUrl ||
+    isPendingUpload ||
+    isPendingConfirm;
 
   const fetchCategoryOptions = useCallback(
     async ({ page }: { page: number }) => {
@@ -89,15 +102,27 @@ export function DemandsForm({ sizeTrigger }: DemandFormProps) {
 
       if (data.files?.length) {
         submitLabelRef.current = "Enviando evidências...";
-        const formData = new FormData();
-        data.files.forEach((file) => formData.append('evidences', file));
-        await addEvidences({ id: demand.id, formData });
+
+        for (const file of data.files) {
+          const { uploadUrl, storageKey } = await generatePresignedUrl({
+            demandId: demand.id,
+            filename: file.name,
+          });
+
+          await uploadToR2({ uploadUrl, file });
+
+          await confirmEvidence({
+            demandId: demand.id,
+            storageKey,
+            size: file.size,
+          });
+        }
       }
 
       toast.success("Demanda criada com sucesso!");
       setOpenSheet(false);
       form.reset();
-    } catch {
+    } catch (error) {
       toast.error("Erro ao criar demanda. Tente novamente.");
     } finally {
       submitLabelRef.current = "Criar demanda";
