@@ -140,7 +140,7 @@ function GalleryGrid({ images, onOpen, className }: GalleryGridProps) {
       <button
         onClick={() => onOpen(index)}
         className={cn(
-          "relative overflow-hidden rounded-md bg-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+          "relative overflow-hidden bg-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
           imgClassName
         )}
         aria-label={`Ver imagem ${index + 1}`}
@@ -161,7 +161,7 @@ function GalleryGrid({ images, onOpen, className }: GalleryGridProps) {
 
   if (count === 1) {
     return (
-      <div className={cn("w-full max-h-80 overflow-hidden rounded-lg", className)}>
+      <div className={cn("w-full max-h-80 overflow-hidden", className)}>
         <GridImage index={0} className="w-full h-80" />
       </div>
     );
@@ -179,9 +179,9 @@ function GalleryGrid({ images, onOpen, className }: GalleryGridProps) {
   if (count === 3) {
     return (
       <div className={cn("grid grid-cols-2 gap-1 rounded-lg overflow-hidden", className)}>
-        <GridImage index={0} className="row-span-2 h-[224px]" />
-        <GridImage index={1} className="h-[110px]" />
-        <GridImage index={2} className="h-[110px]" />
+        <GridImage index={0} className="row-span-2 h-56" />
+        <GridImage index={1} className="h-27.5" />
+        <GridImage index={2} className="h-27.5" />
       </div>
     );
   }
@@ -189,10 +189,10 @@ function GalleryGrid({ images, onOpen, className }: GalleryGridProps) {
   if (count === 4) {
     return (
       <div className={cn("grid grid-cols-2 gap-1 rounded-lg overflow-hidden", className)}>
-        <GridImage index={0} className="h-[110px]" />
-        <GridImage index={1} className="h-[110px]" />
-        <GridImage index={2} className="h-[110px]" />
-        <GridImage index={3} className="h-[110px]" />
+        <GridImage index={0} className="h-27.5" />
+        <GridImage index={1} className="h-27.5" />
+        <GridImage index={2} className="h-27.5" />
+        <GridImage index={3} className="h-27.5" />
       </div>
     );
   }
@@ -201,13 +201,13 @@ function GalleryGrid({ images, onOpen, className }: GalleryGridProps) {
   return (
     <div className={cn("grid grid-cols-2 gap-1 rounded-lg overflow-hidden", className)}>
       <div className="grid grid-rows-2 gap-1">
-        <GridImage index={0} className="h-[110px]" />
-        <GridImage index={1} className="h-[110px]" />
+        <GridImage index={0} className="h-27.5" />
+        <GridImage index={1} className="h-27.5" />
       </div>
       <div className="grid grid-rows-3 gap-1">
-        <GridImage index={2} className="h-[72px]" />
-        <GridImage index={3} className="h-[72px]" />
-        <GridImage index={4} className="h-[72px]" />
+        <GridImage index={2} className="h-18" />
+        <GridImage index={3} className="h-18" />
+        <GridImage index={4} className="h-18" />
       </div>
     </div>
   );

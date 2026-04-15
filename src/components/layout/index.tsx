@@ -3,40 +3,43 @@ import { Outlet } from "react-router-dom";
 import { SidebarInset, SidebarProvider } from "../ui/sidebar";
 import { AppSidebar } from "./components/app-sidebar";
 import { Header } from "./components/header";
-import { MemberHeader } from "./components/member-header";
+import { CitizenHeader } from "./components/citizen-header";
+import { UserRole } from "@/api/users/types";
+
+const rolesWithSidebar = [UserRole.ADMIN, UserRole.MEMBER]
 
 export function Layout() {
   const { user } = useAuth();
 
-  if (user?.role === "MEMBER") {
+  if (user && rolesWithSidebar.includes(user.role)) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <MemberHeader />
-        <main className="pt-20 p-6 bg-muted min-h-screen">
-          <Outlet />
-        </main>
-      </div>
-    );
+      <SidebarProvider
+        style={
+          {
+            "--sidebar-width": "calc(var(--spacing) * 72)",
+            "--header-height": "calc(var(--spacing) * 12)",
+          } as React.CSSProperties
+        }
+      >
+        <AppSidebar />
+        <SidebarInset className="border border-muted shadow-2xl">
+          <main className="">
+            <Header />
+            <div className="p-6">
+              <Outlet />
+            </div>
+          </main>
+        </SidebarInset>
+      </SidebarProvider>
+    )
   }
 
   return (
-    <SidebarProvider
-      style={
-        {
-          "--sidebar-width": "calc(var(--spacing) * 72)",
-          "--header-height": "calc(var(--spacing) * 12)",
-        } as React.CSSProperties
-      }
-    >
-      <AppSidebar />
-      <SidebarInset className="border border-muted shadow-2xl">
-        <main className="">
-          <Header />
-          <div className="p-6">
-            <Outlet />
-          </div>
-        </main>
-      </SidebarInset>
-    </SidebarProvider>
+    <div className="min-h-screen flex flex-col">
+      <CitizenHeader />
+      <main className="pt-20 p-6 min-h-screen bg-[#F8F8F8]">
+        <Outlet />
+      </main>
+    </div>
   );
 }

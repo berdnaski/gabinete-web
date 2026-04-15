@@ -1,4 +1,5 @@
 import { apiClient } from "..";
+import type { UserRole } from "../users/types";
 const baseURL = "/auth"
 
 export interface LoginRequest {
@@ -29,8 +30,8 @@ export interface ChangePasswordRequest {
 export interface GetUserProfileResponse {
 	id: string;
 	name: string;
-	role: string;
 	email: string;
+	role: UserRole;
 	avatarUrl: string;
 	phone: string | null;
 	hasSetPassword: boolean;

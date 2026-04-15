@@ -5,6 +5,7 @@ import {
 	FieldDescription,
 	FieldGroup,
 	FieldLabel,
+	FieldSeparator,
 } from '@/components/ui/field'
 import { useAuth } from '@/hooks/use-auth'
 import { loginFormSchema, type LoginFormData } from '@/validation-schemas/login'
@@ -31,7 +32,7 @@ export function LoginForm() {
 	});
 
 	return (
-		<form onSubmit={onSubmit}>
+		<form onSubmit={onSubmit} className="w-full">
 			<FieldGroup>
 				<div className="flex flex-col gap-1">
 					<h1 className="text-2xl font-bold">Gestão inteligente da sua cidade</h1>
@@ -75,21 +76,16 @@ export function LoginForm() {
 				<Field>
 					<Button type="submit">Login</Button>
 				</Field>
-				<div className="relative my-2 flex items-center">
-					<div className="flex-grow border-t border-muted border-dashed" />
-					<span className="mx-2 text-xs text-muted-foreground uppercase">Ou</span>
-					<div className="flex-grow border-t border-muted border-dashed" />
-				</div>
+				<FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">Ou continue com</FieldSeparator>
 				<Field>
 					<Button
 						type="button"
-						variant="outline"
-						className="w-full relative flex items-center justify-center font-normal shadow-sm h-10 bg-white hover:bg-slate-50 text-slate-700 border-slate-200"
+						variant="secondary"
 						onClick={() => {
 							window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`
 						}}
 					>
-						<svg className="w-5 h-5 absolute left-3" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 							<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
 							<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
 							<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />

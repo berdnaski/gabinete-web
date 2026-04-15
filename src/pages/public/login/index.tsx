@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom'
 import LoginLeft from '../../../assets/login-left.png'
 import LoginRight from '../../../assets/login-right.png'
 import Logo from '../../../assets/logo.png'
@@ -6,28 +5,26 @@ import { LoginForm } from './components/login-form'
 
 export function Login() {
 	return (
-		<div className="grid h-screen lg:grid-cols-2">
-			<div className="mx-auto flex w-full max-w-lg flex-col items-center justify-center gap-6 p-4">
-				<div className="flex w-full justify-start">
-					<Link to="#">
-						<img src={Logo} alt="Logo Gabinete" />
-					</Link>
-				</div>
-				<div className="flex w-full max-w-lg flex-col">
+		<div className="flex h-screen w-screen">
+			<div className="flex w-full lg:w-1/2 flex-col items-center justify-center gap-4 p-4">
+				<div className="max-w-md w-full">
+					<div className="flex w-full justify-start">
+						<img src={Logo} alt="Logo Gabinete" className="w-48" />
+					</div>
 					<LoginForm />
 				</div>
 			</div>
-			<div className="lg:flex hidden items-center justify-center gap-8">
+			<div className="w-1/2 hidden lg:flex items-center justify-center gap-4 p-4">
 				<img
 					src={LoginLeft}
 					alt="Login background"
-					className="dark:brightness-[0.2] dark:grayscale w-[45%] rounded-lg"
+					className=" w-2/5 rounded-lg"
 				/>
 
 				<img
 					src={LoginRight}
 					alt="Login background"
-					className="dark:brightness-[0.2] dark:grayscale w-[45%] rounded-lg"
+					className=" w-2/5 rounded-lg"
 				/>
 			</div>
 		</div>

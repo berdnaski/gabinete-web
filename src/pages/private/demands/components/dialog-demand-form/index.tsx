@@ -67,25 +67,30 @@ export function DialogDemandForm() {
 
   useEffect(() => {
     reset()
-  }, [open])
+  }, [open, reset])
 
   return (
     <div className="bg-white rounded shadow-sm flex p-4 gap-2 items-center ">
+
       <Avatar size="lg">
-        <AvatarImage src={user?.avatar_url} />
-        <AvatarFallback className="font-semibold">
-          {isAuthenticated && user ? getFirstLettersFromNames(user?.name) :
-            <User />
-          }
+        <AvatarImage src={user?.avatarUrl} alt={user?.name} />
+        <AvatarFallback className="bg-primary/10 text-primary font-semibold text-sm">
+          {user?.name ? (
+            getFirstLettersFromNames(user?.name as string)
+          ) : (
+            <User className="size-5" />
+          )}
         </AvatarFallback>
       </Avatar>
+
+
       <Dialog open={open} onOpenChange={onOpenChangeDialog}>
         <DialogTrigger asChild>
           <Button variant="outline" size="lg" className="rounded-full bg-white flex-1 justify-start h-12">
             Registrar nova demanda
           </Button>
         </DialogTrigger>
-        <DialogContent className="min-w-1/3 bg-white">
+        <DialogContent className="min-w-1/3 bg-white" aria-describedby={undefined}>
           <DialogHeader>
             <DialogTitle>Criar demanda</DialogTitle>
           </DialogHeader>

@@ -1,6 +1,6 @@
 import { DemandPriority as DemandPriorityType, type Demand } from "@/api/demands/types";
 import { Gallery } from "@/components/gallery";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { getFirstLettersFromNames } from "@/utils/get-first-letters-from-names";
 import { formatDistanceToNow } from "date-fns";
@@ -33,6 +33,7 @@ export function DemandCard({ demand }: DemandCardProps) {
       <div className="flex items-start justify-between gap-3 px-5 pt-4 pb-3">
         <div className="flex items-start gap-3 min-w-0">
           <Avatar size="lg">
+            <AvatarImage src={demand.reporter.avatarUrl} />
             <AvatarFallback className="font-semibold">
               {demand.guestEmail ? <User /> : getFirstLettersFromNames(demand.reporter.name)}
             </AvatarFallback>

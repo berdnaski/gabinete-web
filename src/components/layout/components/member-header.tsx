@@ -15,12 +15,11 @@ import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 import { DemandsForm } from "@/pages/private/demands/components/demands-form";
 import Logo from "../../../assets/logo.png";
-import { ChevronDown, ClipboardListIcon, Home, LogOut, Menu, Settings, User } from "lucide-react";
+import { ChevronDown, ClipboardListIcon, LogOut, Menu, Settings, User } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const navItems = [
-  { to: "/home", label: "Início", icon: Home },
-  { to: "/demands", label: "Demandas", icon: ClipboardListIcon },
+  { to: "/", label: "Demandas", icon: ClipboardListIcon },
 ];
 
 export function MemberHeader() {
@@ -39,10 +38,8 @@ export function MemberHeader() {
 
   return (
     <header className="flex fixed top-0 inset-x-0 z-50 shadow items-center justify-between px-4 sm:px-6 py-2 border-b border-muted bg-background">
-      {/* Logo */}
       <img src={Logo} alt="Logo" className="w-24 sm:w-32 shrink-0" />
 
-      {/* Desktop Nav */}
       <nav className="hidden md:flex items-center gap-1">
         {navItems.map(({ to, label, icon: Icon }) => (
           <Link
@@ -63,7 +60,6 @@ export function MemberHeader() {
 
       {/* Desktop Actions */}
       <div className="hidden md:flex items-center gap-2">
-        <DemandsForm sizeTrigger="icon" />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button

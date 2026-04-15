@@ -80,7 +80,7 @@ export function PublicDemands() {
   return (
     <div className="min-h-screen bg-background">
       <PublicHeader />
-      <main className="pt-16 px-4 sm:px-6 py-6">
+      <main className="pt-16 px-4 sm:px-6 py-6 bg-[#F6F6F6] h-screen">
         <DemandsFeed />
       </main>
     </div>

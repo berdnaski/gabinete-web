@@ -67,7 +67,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, []);
 
   useEffect(() => {
-    syncProfile();
+    if (localStorage.getItem(USER_KEY)) {
+      syncProfile();
+    }
   }, [syncProfile]);
 
   const login = async (data: LoginRequest) => {

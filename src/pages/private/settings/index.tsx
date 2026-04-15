@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tabs as TabsPrimitive } from "radix-ui";
 import { PersonalInfoCard } from "./components/personal-info-card";
 import { CabinetInfoCard } from "./components/cabinet-info-card";
@@ -34,13 +34,24 @@ export function Settings() {
   }
 
   return (
-    <div className="flex-1 px-10 pt-8 pb-16 animate-in fade-in duration-700">
-      <header className="mb-8">
+    <div className="flex-1 animate-in fade-in duration-700">
+      <header>
         <h1 className="text-2xl font-bold tracking-tight">Configurações</h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          Gerencie suas informações pessoais e configurações do gabinete.
-        </p>
       </header>
+
+      <Tabs className="w-full">
+        <TabsList>
+          <TabsTrigger value="profile">Meu perfil</TabsTrigger>
+          <TabsTrigger value="test2">Teste 2</TabsTrigger>
+        </TabsList>
+        <TabsContent value="profile">
+          <PersonalInfoCard />
+          <SecurityCard />
+        </TabsContent>
+        <TabsContent value="system">
+          <CabinetInfoCard />
+        </TabsContent>
+      </Tabs>
 
       <Tabs value={active} onValueChange={setActive} className="w-full">
         <div className="relative border-b border-border/40 mb-8">
