@@ -14,13 +14,11 @@ import { defaultDemandValues, demandSchema, type DemandFormData } from "@/valida
 import { zodResolver } from "@hookform/resolvers/zod";
 import { User, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 export function DialogDemandForm() {
   const { isAuthenticated, user } = useAuth()
-  const navigate = useNavigate()
   const [open, setOpen] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState({ current: 0, total: 0 })
@@ -95,7 +93,6 @@ export function DialogDemandForm() {
       toast.success("Demanda criada com sucesso!");
       onOpenChangeDialog()
       form.reset();
-      navigate("/demands");
     } catch (error) {
       console.error(error);
       toast.error("Erro ao criar demanda. Tente novamente.");
@@ -120,7 +117,6 @@ export function DialogDemandForm() {
           }
         </AvatarFallback>
       </Avatar>
-
 
       <Dialog open={open} onOpenChange={onOpenChangeDialog}>
         <DialogTrigger asChild>

@@ -1,5 +1,5 @@
 import { getFirstLettersFromNames } from "@/utils/get-first-letters-from-names";
-import { Avatar, AvatarFallback } from "./ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { useAuth } from "@/hooks/use-auth";
 import { ChevronDown, LogOut, Settings } from "lucide-react";
@@ -19,6 +19,7 @@ export function UserDropdown() {
           className="flex items-center gap-1 p-1.5 rounded-full hover:bg-muted transition-colors focus:outline-none shrink-0"
         >
           <Avatar size="default">
+            <AvatarImage src={user?.avatarUrl} />
             <AvatarFallback className="bg-primary text-white font-semibold text-xs">
               {getFirstLettersFromNames(user?.name as string)}
             </AvatarFallback>
@@ -30,6 +31,7 @@ export function UserDropdown() {
       <DropdownMenuContent align="end" className="w-64">
         <div className="flex p-1 gap-2 items-center">
           <Avatar size="lg">
+            <AvatarImage src={user?.avatarUrl} />
             <AvatarFallback className="bg-primary text-white font-semibold">
               {getFirstLettersFromNames(user?.name as string)}
             </AvatarFallback>
