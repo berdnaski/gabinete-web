@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
 import { DemandsApi } from ".";
 import { queryClient } from "../queryClient";
 import { DemandStatus, type CreateDemandCommentProps, type CreateDemandProps, type Demand, type ListDemandCommentsParams, type ListDemandsParams } from "./types";
@@ -26,6 +26,18 @@ export function useGetDemands(params: ListDemandsParams) {
     queryKey: ["demands", params],
     queryFn: () => DemandsApi.list(params),
     placeholderData: (previousData) => previousData,
+  });
+}
+
+export function useInfiniteGetDemands(params: Omit<ListDemandsParams, "page">) {
+  return useInfiniteQuery({
+    queryKey: ["demands-infinite", params],
+    queryFn: ({ pageParam }) => DemandsApi.list({ ...params, page: pageParam as number }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      const { page, totalPages } = lastPage.meta;
+      return page < totalPages ? page + 1 : undefined;
+    },
   });
 }
 

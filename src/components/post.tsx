@@ -2,15 +2,18 @@ import { useLikeDemand } from "@/api/demands/hooks";
 import type { Demand } from "@/api/demands/types";
 import { ExternalLinkIcon, MapPinIcon, MessageCircle, MoreHorizontal, ThumbsUp } from "lucide-react";
 import type { ComponentProps } from "react";
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/use-auth";
 import { Gallery } from "./gallery";
 import { UserAvatar } from "./user-avatar";
 import { Separator } from "./ui/separator";
 import { PostInfo } from "./post-info";
 import { formatDateToNow } from "@/utils/format-date-to-now";
 import { Button } from "./ui/button";
+import { AuthRequiredModal } from "./auth-required-modal";
 
 export interface PostProps extends ComponentProps<"article"> {
   demand: Demand;
@@ -24,6 +27,12 @@ export function Post({
   children,
   ...props
 }: PostProps) {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authModalVariant, setAuthModalVariant] = useState<"like" | "comment">("like");
+
   const { mutate: likeDemand } = useLikeDemand();
 
   const liked = demand.isLiked;
@@ -32,8 +41,22 @@ export function Post({
 
   function handleLike(e: React.MouseEvent) {
     e.stopPropagation();
-    console.log(e)
+    if (!isAuthenticated) {
+      setAuthModalVariant("like");
+      setShowAuthModal(true);
+      return;
+    }
     likeDemand(demand.id);
+  }
+
+  function handleComment(e: React.MouseEvent) {
+    e.stopPropagation();
+    if (!isAuthenticated) {
+      setAuthModalVariant("comment");
+      setShowAuthModal(true);
+      return;
+    }
+    navigate(`/comments/${demand.id}`);
   }
 
   const mapsUrl =
@@ -138,11 +161,10 @@ export function Post({
             size="sm"
             variant="ghost"
             className="gap-2 rounded-lg font-medium h-9 text-muted-foreground"
+            onClick={handleComment}
           >
-            <Link to={`/comments/${demand.id}`} className="flex gap-2">
-              <MessageCircle className="size-4" />
-              <span>Comentar</span>
-            </Link>
+            <MessageCircle className="size-4" />
+            <span>Comentar</span>
           </Button>
         )}
       </div>
@@ -153,6 +175,12 @@ export function Post({
           {children}
         </>
       )}
+
+      <AuthRequiredModal
+        open={showAuthModal}
+        onOpenChange={setShowAuthModal}
+        variant={authModalVariant}
+      />
     </article>
   );
 }

@@ -1,11 +1,12 @@
-import { useGetDemands } from "@/api/demands/hooks"
+import { useInfiniteGetDemands } from "@/api/demands/hooks"
 import { FeedFilter, type DemandsFilterValue } from "./components/feed-filter"
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import type { Demand } from "@/api/demands/types"
 import { Separator } from "@base-ui/react"
 import { DialogDemandForm } from "../private/demands/components/dialog-demand-form"
 import { FeedEmptyState } from "./components/feed-empty-state"
 import { Post } from "@/components/post"
+import { Loading } from "@/components/loading"
 
 export function Feed() {
   const [filters, setFilters] = useState<DemandsFilterValue>({
@@ -16,17 +17,19 @@ export function Feed() {
     dateRange: undefined,
   })
 
-  const { data, isLoading } = useGetDemands({
+  const sentinelRef = useRef<HTMLDivElement>(null)
+
+  const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } = useInfiniteGetDemands({
     search: filters.search.trim() || undefined,
     priority: filters.priority ?? undefined,
     startDate: filters.dateRange?.from?.toISOString(),
     endDate: filters.dateRange?.to?.toISOString(),
-    limit: 100,
+    limit: 20,
   })
 
   const filtered = useMemo(() => {
     const priorityOrder: Record<string, number> = { URGENT: 0, HIGH: 1, MEDIUM: 2, LOW: 3 }
-    let result: Demand[] = (data?.items ?? []).sort((a, b) => {
+    let result: Demand[] = (data?.pages.flatMap((p) => p.items) ?? []).sort((a, b) => {
       const pa = priorityOrder[a.priority ?? "LOW"]
       const pb = priorityOrder[b.priority ?? "LOW"]
       if (pa !== pb) return pa - pb
@@ -39,6 +42,23 @@ export function Feed() {
     return result
   }, [data, filters])
 
+  useEffect(() => {
+    const sentinel = sentinelRef.current
+    if (!sentinel) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage()
+        }
+      },
+      { threshold: 0.1 },
+    )
+
+    observer.observe(sentinel)
+    return () => observer.disconnect()
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
+
   return (
     <div className="max-w-4xl mx-auto md:flex items-start gap-6">
       <FeedFilter value={filters} onChange={setFilters} resultCount={filtered.length} />
@@ -49,7 +69,9 @@ export function Feed() {
         <DialogDemandForm />
 
         {isLoading ? (
-          <div className="flex justify-center py-24 text-sm text-zinc-400">Carregando...</div>
+          <div className="items-center justify-center flex py-4">
+            <Loading className="text-primary size-6" />
+          </div>
         ) : filtered.length === 0 ? (
           <FeedEmptyState search={filters.search} />
         ) : (
@@ -57,6 +79,15 @@ export function Feed() {
             {filtered.map((demand) => (
               <Post key={demand.id} demand={demand} />
             ))}
+
+            <div ref={sentinelRef} className="py-2 flex justify-center">
+              {isFetchingNextPage && (
+                <div className="items-center justify-center flex-col gap-2 flex py-10">
+                  <Loading className="text-primary size-6" />
+                  <span className="text-sm text-zinc-400">Carregando...</span>
+                </div>
+              )}
+            </div>
           </>
         )}
       </div>
