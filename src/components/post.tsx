@@ -129,12 +129,22 @@ export function Post({
         </div>
       )}
 
-      {likeCount > 0 && (
-        <div className="flex items-center gap-1.5 px-4 pb-4 text-xs text-muted-foreground">
-          <span className="inline-flex size-4.5 items-center justify-center rounded-full bg-primary ring-2 ring-card">
-            <ThumbsUp className="size-3 text-white" />
-          </span>
-          <span>{likeCount}</span>
+      {(likeCount > 0 || demand.commentsCount > 0) && (
+        <div className="flex items-center justify-between px-4 pb-4">
+          {likeCount > 0 ? (
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <span className="inline-flex size-4.5 items-center justify-center rounded-full bg-primary ring-2 ring-card">
+                <ThumbsUp className="size-3 text-white" />
+              </span>
+              <span>{likeCount}</span>
+            </div>
+          ) : <span />}
+
+          {demand.commentsCount > 0 && (
+            <span className="text-xs text-muted-foreground">
+              {demand.commentsCount} {demand.commentsCount === 1 ? "comentário" : "comentários"}
+            </span>
+          )}
         </div>
       )}
 

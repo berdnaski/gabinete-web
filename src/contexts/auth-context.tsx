@@ -88,7 +88,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       localStorage.setItem(ACCESS_TOKEN_KEY, response.accessToken);
       await syncProfile();
       toast.success("Login realizado com sucesso!");
-      navigate("/home");
+      navigate("/");
     } catch (error) {
       toast.error("Erro ao realizar login. Verifique suas credenciais.");
       throw error;
@@ -111,7 +111,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         console.warn("Não foi possível armazenar token do Google login", err);
       }
       toast.success("Login com Google realizado com sucesso!");
-      navigate("/home");
+      navigate("/");
     } catch (error) {
       toast.error("Erro ao concluir o login com Google.");
       throw error;

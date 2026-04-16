@@ -38,7 +38,7 @@ export function AuthRequiredModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="p-0 overflow-hidden gap-0 max-w-sm"
+        className="p-0 overflow-hidden gap-0 sm:max-w-sm"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Hero */}

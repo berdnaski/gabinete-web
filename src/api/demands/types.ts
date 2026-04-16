@@ -65,6 +65,7 @@ export interface Demand {
 	disabledAt?: string;
 	evidences?: Evidence[];
 	likesCount: number;
+	commentsCount: number;
 	isLiked: boolean;
 	results: string[];
 }

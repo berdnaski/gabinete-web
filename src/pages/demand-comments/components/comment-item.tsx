@@ -8,7 +8,7 @@ interface CommentItemProps {
 
 export function CommentItem({ comment }: CommentItemProps) {
   return (
-    <div className="flex gap-3 px-4 py-3">
+    <div className="flex gap-3 px-4">
       <UserAvatar
         size="default"
         name={comment.authorName}
