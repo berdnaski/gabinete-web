@@ -162,7 +162,7 @@ export function NotificationPopover() {
         <button className="relative p-2 rounded-full hover:bg-muted transition-colors group">
           <Bell className="size-5 text-muted-foreground group-hover:text-foreground transition-colors" />
           {unreadCount > 0 && (
-            <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground border-2 border-background">
+            <span className="absolute top-1 right-1 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground border-2 border-background">
               {unreadCount > 9 ? "9+" : unreadCount}
             </span>
           )}
@@ -174,7 +174,7 @@ export function NotificationPopover() {
 
       <PopoverContent
         align="end"
-        className="w-[380px] p-0 rounded-2xl shadow-xl overflow-hidden border-border/50"
+        className="w-95 p-0 rounded-2xl shadow-xl overflow-hidden border-border/50"
       >
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-border/50 bg-background">
@@ -189,8 +189,8 @@ export function NotificationPopover() {
 
           {unreadCount > 0 && (
             <Button
-              variant="ghost"
               size="sm"
+              variant="ghost"
               onClick={() => markAllAsRead()}
               disabled={isMarkingAll}
               className="text-xs text-primary font-semibold h-7 px-2 gap-1.5 hover:bg-primary/5 hover:text-primary"
@@ -199,7 +199,7 @@ export function NotificationPopover() {
                 <Loader2 className="size-3 animate-spin" />
               ) : (
                 <>
-                  <MailCheck className="size-3.5" />
+                  <MailCheck className="size-3" />
                   Marcar todas como lidas
                 </>
               )}

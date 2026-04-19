@@ -72,7 +72,7 @@ export function DemandsFeed() {
         ) : filtered.length === 0 ? (
           <EmptyState search={filters.search} />
         ) : (
-          filtered.map((demand, i) => (
+          filtered.map((demand) => (
             <DemandCard key={demand.id} demand={demand} />
           ))
         )}

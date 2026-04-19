@@ -1,7 +1,7 @@
 import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
 import { DemandsApi } from ".";
 import { queryClient } from "../queryClient";
-import { DemandStatus, type CreateDemandCommentProps, type CreateDemandProps, type Demand, type ListDemandCommentsParams, type ListDemandsParams } from "./types";
+import { DemandStatus, type CreateDemandCommentProps, type CreateDemandProps, type Demand, type ListDemandCommentsParams, type ListDemandsByCabinetSlugParams, type ListDemandsParams } from "./types";
 
 
 export function useGetDemandById({ id }: { id: string }) {
@@ -25,6 +25,14 @@ export function useGetDemands(params: ListDemandsParams) {
   return useQuery({
     queryKey: ["demands", params],
     queryFn: () => DemandsApi.list(params),
+    placeholderData: (previousData) => previousData,
+  });
+}
+
+export function useGetDemandsByCabinetSlug(params: ListDemandsByCabinetSlugParams) {
+  return useQuery({
+    queryKey: ["demands", params],
+    queryFn: () => DemandsApi.listDemandsByCabinetSlug(params),
     placeholderData: (previousData) => previousData,
   });
 }

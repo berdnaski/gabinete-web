@@ -1,5 +1,5 @@
 import { apiClient } from "..";
-import type { CreateDemandCommentProps, CreateDemandProps, Demand, DemandCommmentsPaginatedResponse, DemandStatus, ListDemandCommentsParams, ListDemandsParams, PaginatedResponse } from "./types";
+import type { CreateDemandCommentProps, CreateDemandProps, Demand, DemandCommmentsPaginatedResponse, DemandStatus, ListDemandCommentsParams, ListDemandsByCabinetSlugParams, ListDemandsParams, PaginatedResponse } from "./types";
 
 export type { CreateDemandProps } from "./types";
 
@@ -25,6 +25,14 @@ export const DemandsApi = {
 			}
 		});
 		return response.data;
+	},
+
+	listDemandsByCabinetSlug: async ({ slug, ...params }: ListDemandsByCabinetSlugParams) => {
+		const response = await apiClient.get(`${baseURL}/cabinet/${slug}`, {
+			params
+		})
+
+		return response.data
 	},
 
 	getById: async (id: string): Promise<Demand> => {

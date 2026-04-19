@@ -5,33 +5,41 @@ import { queryClient } from "./api/queryClient";
 import { SplashScreen } from "./components/ui/splash-screen";
 import { Toaster } from "./components/ui/sonner";
 import { TooltipProvider } from "./components/ui/tooltip";
-import { AuthProvider } from "./contexts/auth-context";
+import { useAuth } from "./hooks/use-auth";
 import { PageTitleProvider } from "./contexts/page-title-context";
-import { ThemeProvider } from "./contexts/theme-provider";
 import { AppRouter } from "./routes/app-router";
+import { AuthProvider } from "./contexts/auth-context";
 
-export function App() {
-  const [showSplash, setShowSplash] = useState(true);
+function AppContent() {
+  const { isInitializing } = useAuth();
+  const [splashDone, setSplashDone] = useState(false);
 
-  if (showSplash) {
+  if (!splashDone || isInitializing) {
     return (
-      <ThemeProvider defaultTheme="light">
-        <SplashScreen onFinish={() => setShowSplash(false)} />
-      </ThemeProvider>
+      <SplashScreen
+        onFinish={() => setSplashDone(true)}
+        loading={isInitializing}
+      />
     );
   }
 
+  return (
+    <>
+      <AppRouter />
+      <Toaster closeButton position="top-right" />
+    </>
+  );
+}
+
+export function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <AuthProvider>
           <TooltipProvider>
-            <ThemeProvider defaultTheme="light">
-              <PageTitleProvider>
-                <AppRouter />
-                <Toaster closeButton position="top-right" />
-              </PageTitleProvider>
-            </ThemeProvider>
+            <PageTitleProvider>
+              <AppContent />
+            </PageTitleProvider>
           </TooltipProvider>
         </AuthProvider>
       </BrowserRouter>

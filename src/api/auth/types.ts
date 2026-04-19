@@ -1,3 +1,6 @@
+import type { Cabinet } from "../cabinets/types";
+import type { UserRole } from "../users/types";
+
 export interface LoginRequest {
 	email: string;
 	password: string;
@@ -18,21 +21,6 @@ export interface RegisterResponse {
 	message: string;
 }
 
-export interface GetUserProfileResponse {
-	id: string;
-	name: string;
-	role: string;
-	email: string;
-	avatar_url: string;
-}
-
-export interface Cabinet {
-	id: string;
-	name: string;
-	slug: string;
-	isActive: boolean;
-}
-
 export interface RegisterCabinetRequest {
 	cabinetName: string;
 	cabinetSlug: string;
@@ -44,4 +32,19 @@ export interface RegisterCabinetRequest {
 export interface RegisterCabinetResponse {
 	cabinet: Cabinet;
 	user: GetUserProfileResponse;
+}
+export interface ChangePasswordRequest {
+	currentPassword: string;
+	newPassword: string;
+}
+
+export interface GetUserProfileResponse {
+	id: string;
+	name: string;
+	email: string;
+	role: UserRole;
+	avatarUrl: string;
+	phone: string | null;
+	hasSetPassword: boolean;
+	isCabinetMember: boolean;
 }

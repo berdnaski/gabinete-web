@@ -1,4 +1,5 @@
 import { Layout } from "@/components/layout";
+import { ProtectedRoute } from "@/components/protected-route";
 import { ForgotPassword } from "@/pages/public/forgot-password";
 import { Login } from "@/pages/public/login";
 import { ResetPassword } from "@/pages/public/reset-password";
@@ -11,6 +12,11 @@ import { Route, Routes } from "react-router-dom";
 import { Feed } from "@/pages/feed";
 import { Settings } from "@/pages/settings";
 import { DemandComments } from "@/pages/demand-comments";
+import { Demands } from "@/pages/private/demands";
+import { Home } from "@/pages/private/home";
+import { UserRole } from "@/api/users/types";
+
+const adminAndMember = [UserRole.ADMIN, UserRole.MEMBER];
 
 export function AppRouter() {
   return (
@@ -28,20 +34,24 @@ export function AppRouter() {
         <Route index element={<Feed />} />
         <Route path="settings" element={<Settings />} />
         <Route path="comments/:demandId" element={<DemandComments />} />
+
+        <Route
+          path="home"
+          element={
+            <ProtectedRoute allowedRoles={adminAndMember}>
+              <Home />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="demands"
+          element={
+            <ProtectedRoute allowedRoles={adminAndMember}>
+              <Demands />
+            </ProtectedRoute>
+          }
+        />
       </Route>
-
-
-      {/* <Route
-        element={
-          <PrivateRoute>
-            <Layout />
-          </PrivateRoute>
-        }
-      >
-        <Route path="/home" element={<Home />} />
-        <Route path="/demands" element={<Demands />} />
-        <Route path="/settings" element={<Settings />} />
-      </Route> */}
     </Routes>
   );
 }

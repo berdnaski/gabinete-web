@@ -1,10 +1,9 @@
-import { ClipboardListIcon, Home } from "lucide-react";
+import { ClipboardListIcon, Home, Newspaper } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import Logo from "../../../assets/logo.png";
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupLabel,
   SidebarHeader,
@@ -12,9 +11,17 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "../../ui/sidebar";
-import { NavUser } from "@/components/layout/components/nav-user";
+import { cn } from "@/lib/utils";
 
 const routes = {
+  socialRoutes: [
+    {
+      to: "/",
+      label: "Feed",
+      tooltip: "Feed",
+      icon: Newspaper,
+    }
+  ],
   mainRoutes: [
     {
       to: "/home",
@@ -41,8 +48,25 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Navegação</SidebarGroupLabel>
-          <SidebarMenu className="space-y-2">
+          <SidebarGroupLabel className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Social</SidebarGroupLabel>
+          <SidebarMenu>
+            {routes.socialRoutes.map(({ to, label, tooltip, icon: Icon }) => (
+              <SidebarMenuItem key={to}>
+                <SidebarMenuButton
+                  asChild
+                  tooltip={tooltip}
+                  isActive={pathname === to}
+                >
+                  <Link to={to}>
+                    <Icon className={cn({ "text-primary": pathname === to })} />
+                    <span>{label}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+          <SidebarGroupLabel className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Gabinete</SidebarGroupLabel>
+          <SidebarMenu className="space-y-0.5">
             {routes.mainRoutes.map(({ to, label, tooltip, icon: Icon }) => (
               <SidebarMenuItem key={to}>
                 <SidebarMenuButton
@@ -51,7 +75,7 @@ export function AppSidebar() {
                   isActive={pathname === to}
                 >
                   <Link to={to}>
-                    <Icon />
+                    <Icon className={cn({ "text-primary": pathname === to })} />
                     <span>{label}</span>
                   </Link>
                 </SidebarMenuButton>
@@ -60,9 +84,6 @@ export function AppSidebar() {
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
-        <NavUser />
-      </SidebarFooter>
     </Sidebar>
   );
 }

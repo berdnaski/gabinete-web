@@ -1,31 +1,16 @@
-import { createContext, useState, useEffect, useRef, type ReactNode, useCallback } from "react";
+import { apiClient, ApiError } from "@/api";
+import { AuthApi } from "@/api/auth";
+import type { GetUserProfileResponse, LoginRequest, RegisterRequest } from "@/api/auth/types";
+import { CabinetsApi } from "@/api/cabinets";
+import { useState, useEffect, useRef, type ReactNode, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { apiClient } from "../api";
-import {
-  AuthApi,
-  type GetUserProfileResponse,
-  type LoginRequest,
-  type RegisterRequest
-} from "../api/auth";
-
-interface AuthContextType {
-  user: GetUserProfileResponse | null;
-  isLoading: boolean;
-  isAuthenticated: boolean;
-  signUp: (data: RegisterRequest) => Promise<void>;
-  login: (data: LoginRequest) => Promise<void>;
-  handleGoogleLogin: () => Promise<void>;
-  logout: () => void;
-  updateLocalUser: (data: Partial<GetUserProfileResponse>) => void;
-}
-
-export const AuthContext = createContext<AuthContextType | undefined>(
-  undefined,
-);
+import { AuthContext } from "./context";
+import type { Cabinet } from "@/api/cabinets/types";
 
 const USER_KEY = "@gabinete:user";
 const ACCESS_TOKEN_KEY = "@gabinete:access_token";
+const CABINET_KEY = "@gabinete:cabinet";
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -33,25 +18,25 @@ interface AuthProviderProps {
 
 function getStoredAuth() {
   const storedUser = localStorage.getItem(USER_KEY);
+  const storedCabinet = localStorage.getItem(CABINET_KEY);
 
-  if (storedUser) {
-    try {
-      return {
-        user: JSON.parse(storedUser),
-      };
-    } catch {
-      return { user: null };
-    }
+  try {
+    return {
+      user: storedUser ? JSON.parse(storedUser) : null,
+      cabinet: storedCabinet ? JSON.parse(storedCabinet) : null,
+    };
+  } catch {
+    return { user: null, cabinet: null };
   }
-
-  return {
-    user: null,
-  };
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
+  const stored = getStoredAuth();
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [user, setUser] = useState<GetUserProfileResponse | null>(() => getStoredAuth().user);
+  const [cabinet, setCabinet] = useState<Cabinet | null>(() => stored.cabinet);
+  const [user, setUser] = useState<GetUserProfileResponse | null>(() => stored.user);
+  const [isInitializing, setIsInitializing] = useState<boolean>(() => !!stored.user);
   const isSyncingProfile = useRef(false);
 
   const navigate = useNavigate();
@@ -64,13 +49,29 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const profile = await AuthApi.getUserProfile();
       setUser(profile);
       localStorage.setItem(USER_KEY, JSON.stringify(profile));
-    } catch (error: any) {
-      if (error.response?.status === 401) {
+
+      try {
+        const userCabinet = await CabinetsApi.me();
+        setCabinet(userCabinet);
+        if (userCabinet) {
+          localStorage.setItem(CABINET_KEY, JSON.stringify(userCabinet));
+        } else {
+          localStorage.removeItem(CABINET_KEY);
+        }
+      } catch {
+        setCabinet(null);
+        localStorage.removeItem(CABINET_KEY);
+      }
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 401) {
         setUser(null);
         localStorage.removeItem(USER_KEY);
+        setCabinet(null);
+        localStorage.removeItem(CABINET_KEY);
       }
     } finally {
       isSyncingProfile.current = false;
+      setIsInitializing(false);
     }
   }, []);
 
@@ -141,7 +142,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
     } finally {
       localStorage.removeItem(USER_KEY);
       localStorage.removeItem(ACCESS_TOKEN_KEY);
+      localStorage.removeItem(CABINET_KEY);
       setUser(null);
+      setCabinet(null);
       navigate("/login");
     }
   };
@@ -158,7 +161,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
     <AuthContext.Provider
       value={{
         user,
+        cabinet,
         isLoading,
+        isInitializing,
         isAuthenticated: !!user,
         signUp,
         login,

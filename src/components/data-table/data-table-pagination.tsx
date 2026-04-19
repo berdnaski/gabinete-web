@@ -33,7 +33,7 @@ export function DataTablePagination<TData>({
 			<p className="shrink-0 tabular-nums">
 				{rowCount > 0
 					? `${pageIndex * pageSize + 1}–${Math.min((pageIndex + 1) * pageSize, rowCount)} of ${rowCount} row${rowCount !== 1 ? 's' : ''}`
-					: 'No results'}
+					: 'Sem resultados'}
 			</p>
 
 			<div className="flex flex-wrap items-center gap-4">

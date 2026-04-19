@@ -105,6 +105,9 @@ export interface ListDemandsParams {
 	endDate?: string;
 }
 
+export interface ListDemandsByCabinetSlugParams extends ListDemandsParams {
+	slug: string;
+}
 export interface PaginationMeta {
 	limit: number;
 	page: number;

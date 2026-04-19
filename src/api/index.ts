@@ -1,5 +1,15 @@
 import axios from "axios";
 import type { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from "axios";
+import { getApiErrorMessage } from "@/lib/utils";
+
+export class ApiError extends Error {
+  status: number;
+  constructor(status: number, message: string) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+  }
+}
 
 const STORAGE_KEYS = {
 	USER: "@gabinete:user",
@@ -131,7 +141,9 @@ apiClient.interceptors.response.use(
 			}
 		}
 
-		return Promise.reject(error);
+		const status = error.response?.status ?? 0;
+		const message = getApiErrorMessage(error);
+		return Promise.reject(new ApiError(status, message));
 	}
 );
 

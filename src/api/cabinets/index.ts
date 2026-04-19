@@ -1,24 +1,14 @@
 import { apiClient } from "..";
+import type { Cabinet } from "./types";
 
 const baseURL = "/cabinets";
 
-export interface Cabinet {
-  id: string;
-  name: string;
-  slug: string;
-  description?: string;
-  avatarUrl?: string;
-  email?: string;
-}
-
-export interface CabinetMember {
-  id: string;
-  userId: string;
-  cabinetId: string;
-  role: string;
-}
-
 export const CabinetsApi = {
+  me: async (): Promise<Cabinet | null> => {
+    const response = await apiClient.get<Cabinet[]>(`${baseURL}/me`);
+    return response.data[0] ?? null;
+  },
+
   list: async (): Promise<Cabinet[]> => {
     const response = await apiClient.get<Cabinet[]>(baseURL);
     return response.data;

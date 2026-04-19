@@ -377,10 +377,10 @@ export function DataTableEmpty() {
       {/* Text */}
       <div className="dte-text-block space-y-2 text-center">
         <p className="text-lg font-semibold tracking-widest text-muted-foreground/60 uppercase">
-          No results
+          Sem resultados
         </p>
         <p className="text-md leading-relaxed text-muted-foreground/40">
-          Try adjusting your filters or search terms
+          Tente ajustar seus filtros ou termos de pesquisa.
         </p>
       </div>
     </div>

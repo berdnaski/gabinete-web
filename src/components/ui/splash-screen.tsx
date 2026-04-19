@@ -4,10 +4,12 @@ import Logo from "@/assets/logo.png";
 interface SplashScreenProps {
   onFinish: () => void;
   duration?: number;
+  loading?: boolean;
 }
 
-export function SplashScreen({ onFinish, duration = 2000 }: SplashScreenProps) {
+export function SplashScreen({ onFinish, duration = 2000, loading = false }: SplashScreenProps) {
   const [phase, setPhase] = useState<"in" | "visible" | "out">("in");
+  const [timerDone, setTimerDone] = useState(false);
 
   useEffect(() => {
     const fadeInDuration = 600;
@@ -16,14 +18,20 @@ export function SplashScreen({ onFinish, duration = 2000 }: SplashScreenProps) {
 
     const toVisible = setTimeout(() => setPhase("visible"), fadeInDuration);
     const toOut = setTimeout(() => setPhase("out"), fadeInDuration + visibleDuration);
-    const toFinish = setTimeout(onFinish, fadeInDuration + visibleDuration + fadeOutDuration);
+    const toFinish = setTimeout(() => setTimerDone(true), fadeInDuration + visibleDuration + fadeOutDuration);
 
     return () => {
       clearTimeout(toVisible);
       clearTimeout(toOut);
       clearTimeout(toFinish);
     };
-  }, [duration, onFinish]);
+  }, [duration]);
+
+  useEffect(() => {
+    if (timerDone && !loading) {
+      onFinish();
+    }
+  }, [timerDone, loading, onFinish]);
 
   const opacity =
     phase === "in" ? "opacity-0 animate-[fadeIn_600ms_ease-in-out_forwards]"

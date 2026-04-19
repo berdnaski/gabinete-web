@@ -24,8 +24,8 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { demandSchema, type DemandFormData } from "@/validation-schemas/demand";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { PlusIcon } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Loader2, PlusIcon } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -35,7 +35,9 @@ interface DemandFormProps {
 
 export function DemandsForm({ sizeTrigger }: DemandFormProps) {
   const [openSheet, setOpenSheet] = useState(false);
-  const { isAuthenticated } = useAuth();
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState({ current: 0, total: 0 });
+  const { isAuthenticated, cabinet } = useAuth();
 
   const form = useForm<DemandFormData>({
     resolver: zodResolver(demandSchema),
@@ -49,19 +51,10 @@ export function DemandsForm({ sizeTrigger }: DemandFormProps) {
 
   const { handleSubmit, control, reset } = form;
 
-  const { mutateAsync: createDemand, isPending: isPendingCreateDemand } = useCreateDemand();
-  const { mutateAsync: generatePresignedUrl, isPending: isPendingPresignedUrl } =
-    useGeneratePresignedUploadUrl();
-  const { mutateAsync: uploadToR2, isPending: isPendingUpload } = useUploadToR2();
-  const { mutateAsync: confirmEvidence, isPending: isPendingConfirm } =
-    useConfirmEvidenceUpload();
-
-  const submitLabelRef = useRef("Criar demanda");
-  const isFormSubmitting =
-    isPendingCreateDemand ||
-    isPendingPresignedUrl ||
-    isPendingUpload ||
-    isPendingConfirm;
+  const { mutateAsync: createDemand } = useCreateDemand();
+  const { mutateAsync: generatePresignedUrl } = useGeneratePresignedUploadUrl();
+  const { mutateAsync: uploadToR2 } = useUploadToR2();
+  const { mutateAsync: confirmEvidence } = useConfirmEvidenceUpload();
 
   const fetchCategoryOptions = useCallback(
     async ({ page }: { page: number }) => {
@@ -84,7 +77,8 @@ export function DemandsForm({ sizeTrigger }: DemandFormProps) {
     }
 
     try {
-      submitLabelRef.current = "Criando demanda...";
+      setIsUploading(true);
+
       const demand = await createDemand({
         title: data.title,
         description: data.description,
@@ -98,24 +92,32 @@ export function DemandsForm({ sizeTrigger }: DemandFormProps) {
         city: data.location?.city,
         state: data.location?.state,
         guestEmail: !isAuthenticated ? data.guestEmail : undefined,
+        cabinetId: isAuthenticated && cabinet ? cabinet.id : undefined
       });
 
       if (data.files?.length) {
-        submitLabelRef.current = "Enviando evidências...";
+        setUploadProgress({ current: 0, total: data.files.length });
+        for (let i = 0; i < data.files.length; i++) {
+          const file = data.files[i];
+          try {
+            const { uploadUrl, storageKey } = await generatePresignedUrl({
+              demandId: demand.id,
+              filename: file.name,
+            });
 
-        for (const file of data.files) {
-          const { uploadUrl, storageKey } = await generatePresignedUrl({
-            demandId: demand.id,
-            filename: file.name,
-          });
+            await uploadToR2({ uploadUrl, file });
 
-          await uploadToR2({ uploadUrl, file });
+            await confirmEvidence({
+              demandId: demand.id,
+              storageKey,
+              size: file.size,
+            });
 
-          await confirmEvidence({
-            demandId: demand.id,
-            storageKey,
-            size: file.size,
-          });
+            setUploadProgress({ current: i + 1, total: data.files.length });
+          } catch (fileError) {
+            console.error(`Erro ao fazer upload do arquivo ${file.name}:`, fileError);
+            toast.error(`Falha ao enviar ${file.name}`);
+          }
         }
       }
 
@@ -125,17 +127,21 @@ export function DemandsForm({ sizeTrigger }: DemandFormProps) {
     } catch (error) {
       toast.error("Erro ao criar demanda. Tente novamente.");
     } finally {
-      submitLabelRef.current = "Criar demanda";
+      setIsUploading(false);
+      setUploadProgress({ current: 0, total: 0 });
     }
   });
 
-  const toggleOpenChange = () => {
-    setOpenSheet((prev) => !prev);
+  const toggleOpenChange = (next?: boolean) => {
+    if (isUploading) return;
+    setOpenSheet(prev => next !== undefined ? next : !prev);
   };
 
   useEffect(() => {
     reset();
-  }, [openSheet])
+  }, [openSheet, reset])
+
+  const isFormSubmitting = isUploading;
 
   return (
     <Sheet open={openSheet} onOpenChange={toggleOpenChange}>
@@ -146,7 +152,30 @@ export function DemandsForm({ sizeTrigger }: DemandFormProps) {
         </Button>
       </SheetTrigger>
 
-      <SheetContent className="min-w-2xl">
+      <SheetContent
+        className="min-w-2xl"
+        onInteractOutside={(e) => { if (isUploading) e.preventDefault(); }}
+        onEscapeKeyDown={(e) => { if (isUploading) e.preventDefault(); }}
+      >
+        {isUploading && (
+          <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center z-50 rounded-lg">
+            <Loader2 className="h-12 w-12 animate-spin text-white mb-4" />
+            <p className="text-white font-semibold mb-2">Enviando arquivos...</p>
+            <p className="text-white/80 text-sm">
+              {uploadProgress.current} de {uploadProgress.total}
+            </p>
+            <div className="w-48 h-2 bg-white/20 rounded-full mt-4 overflow-hidden">
+              <div
+                className="h-full bg-white transition-all duration-300"
+                style={{
+                  width: uploadProgress.total
+                    ? `${(uploadProgress.current / uploadProgress.total) * 100}%`
+                    : "0%",
+                }}
+              />
+            </div>
+          </div>
+        )}
         <SheetHeader className="border-b">
           <SheetTitle>Nova demanda</SheetTitle>
         </SheetHeader>
@@ -213,10 +242,17 @@ export function DemandsForm({ sizeTrigger }: DemandFormProps) {
 
           <SheetFooter>
             <SheetClose asChild>
-              <Button variant="outline">Cancelar</Button>
+              <Button variant="outline" disabled={isUploading}>Cancelar</Button>
             </SheetClose>
-            <Button type="submit" disabled={isFormSubmitting}>
-              {submitLabelRef.current}
+            <Button type="submit" disabled={isUploading}>
+              {isUploading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Enviando...
+                </>
+              ) : (
+                "Criar demanda"
+              )}
             </Button>
           </SheetFooter>
         </form>
