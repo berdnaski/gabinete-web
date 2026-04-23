@@ -1,6 +1,6 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { useAuth } from "@/hooks/use-auth";
-import { ChevronDown, LogOut, Settings } from "lucide-react";
+import { ChevronDown, LogOut, Settings, User } from "lucide-react";
 import { Button } from "./ui/button";
 import { UserRole, UserRoleLabel } from "@/api/users/types";
 import { Link } from "react-router-dom";
@@ -27,7 +27,7 @@ export function UserDropdown() {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="w-64">
-        <div className="flex p-1 gap-2 items-center">
+        <Link to={`/profile/${user?.id}`} className="flex p-1 gap-2 items-center rounded-sm hover:bg-muted transition-colors">
           <UserAvatar
             size="lg"
             name={user?.name}
@@ -43,9 +43,19 @@ export function UserDropdown() {
             </div>
             <span className="text-xs text-muted-foreground truncate">{user?.email}</span>
           </div>
-        </div>
+        </Link>
 
         <DropdownMenuSeparator />
+
+        <Link to={`/profile/${user?.id}`}>
+          <DropdownMenuItem
+            variant="default"
+            className="cursor-pointer"
+          >
+            <User className="size-4" />
+            Meu Perfil
+          </DropdownMenuItem>
+        </Link>
 
         <Link to="/settings">
           <DropdownMenuItem

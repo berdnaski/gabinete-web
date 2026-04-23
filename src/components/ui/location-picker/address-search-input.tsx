@@ -41,13 +41,11 @@ export function AddressSearchInput({
 
   const placesLib = useMapsLibrary('places')
 
-  // Sync external value changes (e.g. reverse geocode update)
   useEffect(() => {
     if (value && value !== query) {
       setQuery(value)
       setIsSelected(true)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value])
 
   useEffect(() => {
@@ -116,7 +114,6 @@ export function AddressSearchInput({
         })
       }
     } catch {
-      // silently fail
     }
   }
 

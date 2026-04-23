@@ -1,5 +1,5 @@
 import { apiClient } from "..";
-import type { CreateDemandCommentProps, CreateDemandProps, Demand, DemandCommmentsPaginatedResponse, DemandStatus, ListDemandCommentsParams, ListDemandsByCabinetSlugParams, ListDemandsParams, PaginatedResponse } from "./types";
+import type { CreateDemandCommentProps, CreateDemandProps, Demand, DemandCommmentsPaginatedResponse, DemandStatus, HeatmapResponse, ListDemandCommentsParams, ListDemandsByCabinetSlugParams, ListDemandsParams, NeighborhoodCount, PaginatedResponse } from "./types";
 
 export type { CreateDemandProps } from "./types";
 
@@ -22,6 +22,7 @@ export const DemandsApi = {
 				endDate: params.endDate,
 				priority: params.priority,
 				startDate: params.startDate,
+				neighborhood: params.neighborhood,
 			}
 		});
 		return response.data;
@@ -81,6 +82,21 @@ export const DemandsApi = {
 		await apiClient.post(`${baseURL}/${id}/like`);
 	},
 
+	claim: async (id: string): Promise<Demand> => {
+		const response = await apiClient.post<Demand>(`${baseURL}/${id}/claim`);
+		return response.data;
+	},
+
+	assign: async (id: string, assigneeMemberId: string): Promise<Demand> => {
+		const response = await apiClient.patch<Demand>(`${baseURL}/${id}/assign`, { assigneeMemberId });
+		return response.data;
+	},
+
+	unlink: async (id: string): Promise<Demand> => {
+		const response = await apiClient.patch<Demand>(`${baseURL}/${id}/unlink`);
+		return response.data;
+	},
+
 	confirmEvidenceUpload: async (
 		id: string,
 		storageKey: string,
@@ -102,5 +118,32 @@ export const DemandsApi = {
 	createDemandComment: async ({ demandId, content }: CreateDemandCommentProps): Promise<Comment> => {
 		const { data } = await apiClient.post<Comment>(`/demands/${demandId}/comments`, { content });
 		return data;
+	},
+
+	getHeatmap: async (): Promise<HeatmapResponse> => {
+		const response = await apiClient.get<HeatmapResponse>(`${baseURL}/heatmap`);
+		return response.data;
+	},
+
+	getNeighborhoods: async (): Promise<NeighborhoodCount[]> => {
+		const response = await apiClient.get(`${baseURL}/neighborhoods`);
+		const data = response.data;
+		if (!Array.isArray(data) || data.length === 0) return [];
+		if (typeof data[0] === 'string') {
+			return (data as string[]).map((n) => ({ neighborhood: n, count: 0 }));
+		}
+		return data as NeighborhoodCount[];
+	},
+
+	getMyDemands: async (params: ListDemandsParams): Promise<PaginatedResponse<Demand>> => {
+		const response = await apiClient.get<PaginatedResponse<Demand>>(`${baseURL}/me`, {
+			params: {
+				page: params.page,
+				limit: params.limit,
+				status: params.status,
+				search: params.search,
+			},
+		});
+		return response.data;
 	},
 };

@@ -3,6 +3,26 @@ import { DemandsApi } from ".";
 import { queryClient } from "../queryClient";
 import { DemandStatus, type CreateDemandCommentProps, type CreateDemandProps, type Demand, type ListDemandCommentsParams, type ListDemandsByCabinetSlugParams, type ListDemandsParams } from "./types";
 
+export function useGetHeatmap() {
+  return useQuery({
+    queryKey: ["demands-heatmap"],
+    queryFn: DemandsApi.getHeatmap,
+    staleTime: 1000 * 60 * 5,
+    select: (data) => ({
+      points: Array.isArray(data?.points) ? data.points : [],
+      insight: data?.insight ?? null,
+    }),
+  });
+}
+
+export function useGetNeighborhoods() {
+  return useQuery({
+    queryKey: ["demands-neighborhoods"],
+    queryFn: DemandsApi.getNeighborhoods,
+    staleTime: 1000 * 60 * 10,
+  });
+}
+
 
 export function useGetDemandById({ id }: { id: string }) {
   return useQuery({
@@ -127,6 +147,51 @@ export function useCreateDemandComment() {
     mutationFn: (data: CreateDemandCommentProps) => DemandsApi.createDemandComment(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["comments"] });
+    },
+  });
+}
+
+export function useClaimDemand() {
+  return useMutation({
+    mutationFn: (id: string) => DemandsApi.claim(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["demands"] });
+      queryClient.invalidateQueries({ queryKey: ["demands-infinite"] });
+    },
+  });
+}
+
+export function useUnlinkDemand() {
+  return useMutation({
+    mutationFn: (id: string) => DemandsApi.unlink(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["demands"] });
+      queryClient.invalidateQueries({ queryKey: ["demands-infinite"] });
+    },
+  });
+}
+
+export function useAssignDemand() {
+  return useMutation({
+    mutationFn: ({ id, assigneeMemberId }: { id: string; assigneeMemberId: string }) =>
+      DemandsApi.assign(id, assigneeMemberId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["demands"] });
+      queryClient.invalidateQueries({ queryKey: ["demands-infinite"] });
+    },
+  });
+}
+
+export function useGetMyDemands(params: Omit<ListDemandsParams, "page"> & { enabled?: boolean } = {}) {
+  const { enabled = true, ...queryParams } = params
+  return useInfiniteQuery({
+    queryKey: ["my-demands", queryParams],
+    queryFn: ({ pageParam }) => DemandsApi.getMyDemands({ ...queryParams, page: pageParam as number }),
+    initialPageParam: 1,
+    enabled,
+    getNextPageParam: (lastPage) => {
+      const { page, totalPages } = lastPage.meta;
+      return page < totalPages ? page + 1 : undefined;
     },
   });
 }

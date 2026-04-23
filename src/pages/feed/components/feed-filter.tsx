@@ -1,10 +1,18 @@
 import { CategoriesApi } from "@/api/categories";
+import { useGetNeighborhoods } from "@/api/demands/hooks";
 import { DemandPriority, DemandStatus, DemandStatusLabel } from "@/api/demands/types";
 import { AsyncMultiSelect } from "@/components/ui/async-multi-select";
 import { Button } from "@/components/ui/button";
 import { Field, FieldGroup } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Sheet,
   SheetContent,
@@ -14,7 +22,7 @@ import {
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { DEMAND_STATUS_CONFIG } from "@/pages/private/demands/components/demand-utils";
-import { Filter, Info, Search, Shapes, SlidersHorizontalIcon, XIcon } from "lucide-react";
+import { Filter, Info, MapPin, Search, Shapes, SlidersHorizontalIcon, XIcon } from "lucide-react";
 import { useCallback, useState } from "react";
 import type { DateRange } from "react-day-picker";
 
@@ -24,6 +32,7 @@ export interface DemandsFilterValue {
   status: DemandStatus[];
   priority: DemandPriority | null;
   dateRange: DateRange | undefined;
+  neighborhood: string | null;
 }
 
 interface DemandsFilterProps {
@@ -42,6 +51,8 @@ interface SharedFieldsProps {
 }
 
 function CategoryAndStatusFields({ value, onChange, fetchCategories }: SharedFieldsProps) {
+  const { data: neighborhoods } = useGetNeighborhoods();
+
   const toggleStatus = (status: DemandStatus) => {
     const next = value.status.includes(status)
       ? value.status.filter((s) => s !== status)
@@ -91,6 +102,36 @@ function CategoryAndStatusFields({ value, onChange, fetchCategories }: SharedFie
           })}
         </div>
       </Field>
+
+      {neighborhoods && neighborhoods.length > 0 && (
+        <Field>
+          <Label className="text-xs">
+            <MapPin className="size-3.5 text-primary" />
+            Bairro
+          </Label>
+          <Select
+            value={value.neighborhood ?? "all"}
+            onValueChange={(v) =>
+              onChange({ ...value, neighborhood: v === "all" ? null : v })
+            }
+          >
+            <SelectTrigger className="text-sm">
+              <SelectValue placeholder="Todos os bairros" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos os bairros</SelectItem>
+              {neighborhoods.map((n) => (
+                <SelectItem key={n.neighborhood} value={n.neighborhood}>
+                  {n.neighborhood}
+                  {n.count > 0 && (
+                    <span className="ml-auto text-muted-foreground text-xs">{n.count}</span>
+                  )}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </Field>
+      )}
     </>
   );
 }
@@ -107,7 +148,7 @@ export function FeedFilter({ value, onChange, resultCount }: DemandsFilterProps)
   }, []);
 
   const clearMobileFilters = () => {
-    onChange({ ...value, status: [], categories: [], priority: null, dateRange: undefined });
+    onChange({ ...value, status: [], categories: [], priority: null, dateRange: undefined, neighborhood: null });
   };
 
   const mobileActiveCount = [
@@ -115,6 +156,7 @@ export function FeedFilter({ value, onChange, resultCount }: DemandsFilterProps)
     value.categories.length > 0,
     value.priority !== null,
     !!value.dateRange?.from,
+    value.neighborhood !== null,
   ].filter(Boolean).length;
 
   return (

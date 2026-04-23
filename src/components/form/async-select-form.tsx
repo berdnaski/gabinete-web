@@ -51,24 +51,20 @@ export function AsyncSelectForm<T extends FieldValues>({
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Keep selectedLabel in sync when valueLabel prop changes (e.g. from parent in edit mode)
   useEffect(() => {
     if (valueLabel !== undefined) setSelectedLabel(valueLabel);
   }, [valueLabel]);
 
-  // Clear label when field value is cleared externally
   useEffect(() => {
     if (!field.value) setSelectedLabel("");
   }, [field.value]);
 
-  // Filter loaded options client-side
   const filteredOptions = useMemo(() => {
     if (!search.trim()) return options;
     const lower = search.toLowerCase();
     return options.filter((opt) => opt.label.toLowerCase().includes(lower));
   }, [options, search]);
 
-  // Fetch first page whenever the dropdown opens
   useEffect(() => {
     if (!open) return;
 
@@ -93,7 +89,6 @@ export function AsyncSelectForm<T extends FieldValues>({
     };
   }, [open, fetchOptions]);
 
-  // Load the next page (called by the intersection observer)
   const loadMore = useCallback(() => {
     if (loading || !hasNextPage) return;
     const nextPage = page + 1;
@@ -107,7 +102,6 @@ export function AsyncSelectForm<T extends FieldValues>({
       .finally(() => setLoading(false));
   }, [loading, hasNextPage, page, fetchOptions]);
 
-  // Infinite scroll via IntersectionObserver on the sentinel element
   useEffect(() => {
     const sentinel = sentinelRef.current;
     if (!sentinel) return;
@@ -122,12 +116,10 @@ export function AsyncSelectForm<T extends FieldValues>({
     return () => observer.disconnect();
   }, [loadMore]);
 
-  // Focus search input when dropdown opens
   useEffect(() => {
     if (open) setTimeout(() => inputRef.current?.focus(), 0);
   }, [open]);
 
-  // Close on outside click
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
@@ -140,7 +132,6 @@ export function AsyncSelectForm<T extends FieldValues>({
     return () => document.removeEventListener("mousedown", handler);
   }, [open]);
 
-  // Close on Escape
   useEffect(() => {
     if (!open) return;
     const handler = (e: KeyboardEvent) => {

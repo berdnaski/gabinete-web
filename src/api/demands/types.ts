@@ -52,6 +52,11 @@ export interface Demand {
 	reporterId: string;
 	guestEmail?: string;
 	cabinetId?: string;
+	cabinet?: {
+		name: string;
+		slug: string;
+		avatarUrl: string | null;
+	} | null;
 	date?: string;
 	categoryId: string;
 	assigneeMemberId?: string;
@@ -103,6 +108,34 @@ export interface ListDemandsParams {
 	priority?: DemandPriority;
 	startDate?: string;
 	endDate?: string;
+	neighborhood?: string;
+}
+
+export interface HeatmapPoint {
+	id: string;
+	lat: number;
+	lng: number;
+	weight: number;
+	title: string;
+	status: string;
+	categoryName: string;
+	neighborhood: string | null;
+}
+
+export interface HeatmapInsight {
+	topNeighborhood: string;
+	occurrenceCount: number;
+	text: string;
+}
+
+export interface HeatmapResponse {
+	points: HeatmapPoint[];
+	insight: HeatmapInsight | null;
+}
+
+export interface NeighborhoodCount {
+	neighborhood: string;
+	count: number;
 }
 
 export interface ListDemandsByCabinetSlugParams extends ListDemandsParams {

@@ -46,7 +46,6 @@ export function VirtualSelectForm<T extends FieldValues>({
     return options.filter((opt) => opt.label.toLowerCase().includes(lower));
   }, [options, search]);
 
-  // Virtual list calculations
   const totalHeight = filteredOptions.length * ITEM_HEIGHT;
   const startIndex = Math.max(
     0,
@@ -83,12 +82,10 @@ export function VirtualSelectForm<T extends FieldValues>({
     setScrollTop(e.currentTarget.scrollTop);
   }, []);
 
-  // Focus search input when dropdown opens (DOM side effect only)
   useEffect(() => {
     if (open) setTimeout(() => inputRef.current?.focus(), 0);
   }, [open]);
 
-  // Close on outside click
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
@@ -101,7 +98,6 @@ export function VirtualSelectForm<T extends FieldValues>({
     return () => document.removeEventListener("mousedown", handler);
   }, [open]);
 
-  // Close on Escape
   useEffect(() => {
     if (!open) return;
     const handler = (e: KeyboardEvent) => {

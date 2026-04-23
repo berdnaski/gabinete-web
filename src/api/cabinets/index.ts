@@ -1,5 +1,5 @@
 import { apiClient } from "..";
-import type { Cabinet } from "./types";
+import type { Cabinet, CabinetMember, CabinetMetrics } from "./types";
 
 const baseURL = "/cabinets";
 
@@ -10,12 +10,25 @@ export const CabinetsApi = {
   },
 
   list: async (): Promise<Cabinet[]> => {
-    const response = await apiClient.get<Cabinet[]>(baseURL);
-    return response.data;
+    const response = await apiClient.get(baseURL);
+    const data = response.data;
+    if (Array.isArray(data)) return data;
+    if (data?.items && Array.isArray(data.items)) return data.items;
+    return [];
   },
 
   getBySlug: async (slug: string): Promise<Cabinet> => {
     const response = await apiClient.get<Cabinet>(`${baseURL}/${slug}`);
+    return response.data;
+  },
+
+  getMembers: async (slug: string): Promise<CabinetMember[]> => {
+    const response = await apiClient.get<CabinetMember[]>(`/cabinets/${slug}/members`);
+    return Array.isArray(response.data) ? response.data : [];
+  },
+
+  getMetrics: async (slug: string): Promise<CabinetMetrics> => {
+    const response = await apiClient.get<CabinetMetrics>(`/demands/cabinet/${slug}/metrics`);
     return response.data;
   },
 

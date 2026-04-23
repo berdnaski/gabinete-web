@@ -1,4 +1,4 @@
-import { ClipboardListIcon, Home, Newspaper } from "lucide-react";
+import { ClipboardListIcon, Home, Newspaper, Users } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import Logo from "../../../assets/logo.png";
 import {
@@ -34,6 +34,12 @@ const routes = {
       label: "Demandas",
       tooltip: "Demandas",
       icon: ClipboardListIcon,
+    },
+    {
+      to: "/equipe",
+      label: "Equipe",
+      tooltip: "Equipe",
+      icon: Users,
     },
   ],
 };

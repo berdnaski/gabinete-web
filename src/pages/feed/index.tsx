@@ -15,6 +15,7 @@ export function Feed() {
     categories: [],
     priority: null,
     dateRange: undefined,
+    neighborhood: null,
   })
 
   const sentinelRef = useRef<HTMLDivElement>(null)
@@ -24,6 +25,7 @@ export function Feed() {
     priority: filters.priority ?? undefined,
     startDate: filters.dateRange?.from?.toISOString(),
     endDate: filters.dateRange?.to?.toISOString(),
+    neighborhood: filters.neighborhood ?? undefined,
     limit: 20,
   })
 

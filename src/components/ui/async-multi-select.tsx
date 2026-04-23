@@ -51,7 +51,6 @@ export function AsyncMultiSelect({
     return options.filter((opt) => opt.label.toLowerCase().includes(lower));
   }, [options, search]);
 
-  // Fetch first page whenever the dropdown opens
   useEffect(() => {
     if (!open) return;
 
@@ -83,7 +82,6 @@ export function AsyncMultiSelect({
     };
   }, [open, fetchOptions]);
 
-  // Load the next page (called by the intersection observer)
   const loadMore = useCallback(() => {
     if (loading || !hasNextPage) return;
     const nextPage = page + 1;
@@ -103,7 +101,6 @@ export function AsyncMultiSelect({
       .finally(() => setLoading(false));
   }, [loading, hasNextPage, page, fetchOptions]);
 
-  // Infinite scroll via IntersectionObserver on the sentinel element
   useEffect(() => {
     const sentinel = sentinelRef.current;
     if (!sentinel) return;
@@ -118,12 +115,10 @@ export function AsyncMultiSelect({
     return () => observer.disconnect();
   }, [loadMore]);
 
-  // Focus search input when dropdown opens
   useEffect(() => {
     if (open) setTimeout(() => inputRef.current?.focus(), 0);
   }, [open]);
 
-  // Close on outside click
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
@@ -136,7 +131,6 @@ export function AsyncMultiSelect({
     return () => document.removeEventListener("mousedown", handler);
   }, [open]);
 
-  // Close on Escape
   useEffect(() => {
     if (!open) return;
     const handler = (e: KeyboardEvent) => {
@@ -155,7 +149,6 @@ export function AsyncMultiSelect({
     } else {
       onChange([...value, option.value]);
     }
-    // dropdown stays open, search is preserved
   };
 
   const handleRemoveBadge = (val: string, e: React.MouseEvent) => {

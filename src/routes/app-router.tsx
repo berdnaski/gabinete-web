@@ -12,8 +12,13 @@ import { Route, Routes } from "react-router-dom";
 import { Feed } from "@/pages/feed";
 import { Settings } from "@/pages/settings";
 import { DemandComments } from "@/pages/demand-comments";
+import { Profile } from "@/pages/profile";
+import { Cabinets } from "@/pages/cabinets";
+import { CabinetDetail } from "@/pages/cabinet-detail";
+import { Map } from "@/pages/map";
 import { Demands } from "@/pages/private/demands";
 import { Home } from "@/pages/private/home";
+import { Team } from "@/pages/private/team";
 import { UserRole } from "@/api/users/types";
 
 const adminAndMember = [UserRole.ADMIN, UserRole.MEMBER];
@@ -34,6 +39,11 @@ export function AppRouter() {
         <Route index element={<Feed />} />
         <Route path="settings" element={<Settings />} />
         <Route path="comments/:demandId" element={<DemandComments />} />
+        <Route path="demands/:demandId" element={<DemandComments />} />
+        <Route path="profile/:userId" element={<Profile />} />
+        <Route path="gabinetes" element={<Cabinets />} />
+        <Route path="gabinetes/:slug" element={<CabinetDetail />} />
+        <Route path="mapa" element={<Map />} />
 
         <Route
           path="home"
@@ -48,6 +58,14 @@ export function AppRouter() {
           element={
             <ProtectedRoute allowedRoles={adminAndMember}>
               <Demands />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="equipe"
+          element={
+            <ProtectedRoute allowedRoles={adminAndMember}>
+              <Team />
             </ProtectedRoute>
           }
         />

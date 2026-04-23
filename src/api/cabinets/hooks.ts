@@ -17,6 +17,24 @@ export function useGetCabinetBySlug(slug: string | undefined) {
   });
 }
 
+export function useGetCabinetMembers(slug: string | undefined) {
+  return useQuery({
+    queryKey: ["cabinet-members", slug],
+    queryFn: () => CabinetsApi.getMembers(slug!),
+    enabled: !!slug,
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
+export function useGetCabinetMetrics(slug: string | undefined) {
+  return useQuery({
+    queryKey: ["cabinet-metrics", slug],
+    queryFn: () => CabinetsApi.getMetrics(slug!),
+    enabled: !!slug,
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
 export function useUpdateCabinet() {
   return useMutation({
     mutationFn: ({ slug, data, file }: { slug: string; data: Partial<Cabinet>; file?: File }) =>

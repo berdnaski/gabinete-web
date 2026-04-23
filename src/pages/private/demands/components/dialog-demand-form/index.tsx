@@ -16,6 +16,7 @@ import { User, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { Link } from "react-router-dom";
 
 export function DialogDemandForm() {
   const { isAuthenticated, user } = useAuth()
@@ -109,14 +110,22 @@ export function DialogDemandForm() {
   return (
     <div className="bg-white rounded shadow-sm flex p-4 gap-2 items-center ">
 
-      <Avatar size="lg">
-        <AvatarImage src={user?.avatarUrl} />
-        <AvatarFallback className="bg-primary/10 text-primary font-semibold text-sm">
-          {isAuthenticated && user ? getFirstLettersFromNames(user?.name) :
+      {isAuthenticated && user ? (
+        <Link to={`/profile/${user.id}`} className="shrink-0">
+          <Avatar size="lg">
+            <AvatarImage src={user.avatarUrl} />
+            <AvatarFallback className="bg-primary/10 text-primary font-semibold text-sm">
+              {getFirstLettersFromNames(user.name)}
+            </AvatarFallback>
+          </Avatar>
+        </Link>
+      ) : (
+        <Avatar size="lg">
+          <AvatarFallback className="bg-primary/10 text-primary font-semibold text-sm">
             <User />
-          }
-        </AvatarFallback>
-      </Avatar>
+          </AvatarFallback>
+        </Avatar>
+      )}
 
       <Dialog open={open} onOpenChange={onOpenChangeDialog}>
         <DialogTrigger asChild>

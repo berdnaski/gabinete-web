@@ -9,6 +9,7 @@ import { useAuth } from "./hooks/use-auth";
 import { PageTitleProvider } from "./contexts/page-title-context";
 import { AppRouter } from "./routes/app-router";
 import { AuthProvider } from "./contexts/auth-context";
+import { SocketProvider } from "./contexts/socket-context";
 
 function AppContent() {
   const { isInitializing } = useAuth();
@@ -36,11 +37,13 @@ export function App() {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <AuthProvider>
-          <TooltipProvider>
-            <PageTitleProvider>
-              <AppContent />
-            </PageTitleProvider>
-          </TooltipProvider>
+          <SocketProvider>
+            <TooltipProvider>
+              <PageTitleProvider>
+                <AppContent />
+              </PageTitleProvider>
+            </TooltipProvider>
+          </SocketProvider>
         </AuthProvider>
       </BrowserRouter>
     </QueryClientProvider>

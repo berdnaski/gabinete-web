@@ -8,8 +8,6 @@ export function useNotifications(params?: ListNotificationsParams) {
   return useQuery({
     queryKey: [NOTIFICATIONS_KEY, params],
     queryFn: () => NotificationsApi.list(params),
-    refetchInterval: 15_000,
-    staleTime: 10_000,
   });
 }
 

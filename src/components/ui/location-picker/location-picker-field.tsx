@@ -23,7 +23,6 @@ export interface LocationPickerValue {
   state?: string
 }
 
-// ── Inner component so hooks are valid ──────────────────────────────────────
 
 interface InnerProps {
   value: LocationPickerValue | undefined
@@ -95,7 +94,6 @@ function LocationPickerInner({ value, onChange, error, disabled }: InnerProps) {
         })
       }
     } catch {
-      // Keep coords without address label
     } finally {
       setIsReverseGeocoding(false)
     }

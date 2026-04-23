@@ -50,7 +50,7 @@ export function DemandComments() {
 
   return (
     <section className="max-w-3xl mx-auto">
-      <Post demand={demand} hideComment>
+      <Post demand={demand} hideComment showStatus>
         <div>
           <div className="px-4 pt-4 pb-2">
             <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">

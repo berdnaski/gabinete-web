@@ -263,7 +263,7 @@ export function NotificationPopover() {
         <div className="px-4 py-2 border-t border-border/30 bg-muted/20 flex items-center gap-1.5">
           <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
           <p className="text-[10px] text-muted-foreground/50">
-            Atualiza automaticamente a cada 15s
+            Sincronizado em tempo real
           </p>
         </div>
       </PopoverContent>
