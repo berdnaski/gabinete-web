@@ -223,7 +223,7 @@ export function FeedFilter({ value, onChange, resultCount }: DemandsFilterProps)
           <SlidersHorizontalIcon className="size-3.5" />
           <span>Filtros</span>
           {mobileActiveCount > 0 && (
-            <span className="absolute -top-1.5 -right-1.5 size-4.5 rounded-full bg-background text-primary text-[10px] font-bold border border-primary/30 flex items-center justify-center leading-none">
+            <span className="absolute -top-1.5 -right-1.5 size-4.5 rounded-full bg-background text-primary text-2xs font-bold border border-primary/30 flex items-center justify-center leading-none">
               {mobileActiveCount}
             </span>
           )}

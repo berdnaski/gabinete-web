@@ -59,7 +59,7 @@ export function AuthRequiredModal({
 
         {/* Actions */}
         <div className="px-5 py-5 space-y-4">
-          <p className="text-[11px] text-center text-muted-foreground leading-relaxed">
+          <p className="text-xs text-center text-muted-foreground leading-relaxed">
             Junte-se à comunidade e participe<br />das decisões da sua cidade.
           </p>
           <div className="grid grid-cols-2 gap-2">

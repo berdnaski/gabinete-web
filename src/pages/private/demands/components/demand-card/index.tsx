@@ -45,20 +45,20 @@ export function DemandCard({ demand }: DemandCardProps) {
             <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
               {demand.category?.name && (
                 <>
-                  <span className="text-[11px] font-medium">
+                  <span className="text-xs font-medium">
                     {demand.category.name}
                   </span>
-                  <span className="text-zinc-200 text-[10px]">·</span>
+                  <span className="text-zinc-200 text-2xs">·</span>
                 </>
               )}
-              <span className="text-[11px] text-zinc-400">{relativeDate}</span>
+              <span className="text-xs text-zinc-400">{relativeDate}</span>
             </div>
           </div>
         </div>
       </div>
 
       <div className="px-5 pb-4 flex flex-col gap-2.5">
-        <h3 className="font-semibold text-zinc-900 text-[15px] leading-snug tracking-tight">
+        <h3 className="font-semibold text-zinc-900 text-sm leading-snug tracking-tight">
           {demand.title}
         </h3>
         <p className="text-sm text-zinc-500 leading-relaxed line-clamp-3">

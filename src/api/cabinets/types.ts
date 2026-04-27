@@ -16,6 +16,7 @@ export interface CabinetMember {
   role: "OWNER" | "STAFF";
   userName: string;
   userAvatarUrl: string | null;
+  userEmail: string | null;
 }
 
 export interface CabinetMetrics {

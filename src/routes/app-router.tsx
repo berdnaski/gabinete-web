@@ -19,6 +19,7 @@ import { Map } from "@/pages/map";
 import { Demands } from "@/pages/private/demands";
 import { Home } from "@/pages/private/home";
 import { Team } from "@/pages/private/team";
+import { MyTasks } from "@/pages/private/my-tasks";
 import { UserRole } from "@/api/users/types";
 
 const adminAndMember = [UserRole.ADMIN, UserRole.MEMBER];
@@ -58,6 +59,14 @@ export function AppRouter() {
           element={
             <ProtectedRoute allowedRoles={adminAndMember}>
               <Demands />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="minhas-tarefas"
+          element={
+            <ProtectedRoute allowedRoles={adminAndMember}>
+              <MyTasks />
             </ProtectedRoute>
           }
         />

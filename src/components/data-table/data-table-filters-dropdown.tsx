@@ -32,7 +32,7 @@ export function DataTableFiltersDropdown({
 					<Filter data-icon="inline-start" className="size-3.5" />
 					Ver filtros
 					{activeCount > 0 && (
-						<span className="-mr-0.5 flex size-4.5 items-center justify-center rounded-full bg-primary text-[10px] font-semibold tabular-nums text-primary-foreground">
+						<span className="-mr-0.5 flex size-4.5 items-center justify-center rounded-full bg-primary text-2xs font-semibold tabular-nums text-primary-foreground">
 							{activeCount}
 						</span>
 					)}

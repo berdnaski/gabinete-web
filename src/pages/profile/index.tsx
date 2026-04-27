@@ -135,7 +135,7 @@ export function Profile() {
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-3">
             <Separator className="flex-1" />
-            <span className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground whitespace-nowrap">
+            <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground whitespace-nowrap">
               Minhas Demandas
             </span>
             <Separator className="flex-1" />

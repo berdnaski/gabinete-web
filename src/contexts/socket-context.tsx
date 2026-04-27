@@ -19,23 +19,18 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (user && !socketRef.current) {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
       const socketUrl = apiUrl.replace(/\/api$/, '');
-      
+
       const socket = io(socketUrl, {
         query: { userId: user.id },
         transports: ['websocket'],
       });
 
-      socket.on('connect', () => {
-        console.log('Socket connected');
-      });
-
       socket.on('notification', (notification) => {
-        console.log('Received notification:', notification);
         queryClient.invalidateQueries({ queryKey: ['notifications'] });
-      });
-
-      socket.on('disconnect', () => {
-        console.log('Socket disconnected');
+        const link: string = notification?.link ?? '';
+        if (link.startsWith('/demands/') || link.startsWith('/comments/')) {
+          queryClient.invalidateQueries({ queryKey: ['demands'] });
+        }
       });
 
       socketRef.current = socket;

@@ -149,12 +149,12 @@ export function AssignMemberDialog({ demand, open, onOpenChange }: AssignMemberD
         </DialogHeader>
 
         <div className="rounded-xl border border-border bg-muted/40 px-4 py-3">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">Demanda</p>
+          <p className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground mb-1">Demanda</p>
           <p className="text-sm font-semibold text-foreground line-clamp-2">{demand.title}</p>
         </div>
 
         <div className="flex flex-col gap-2">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+          <p className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground">
             {isUnlinked ? "Atribuir membro (opcional)" : "Responsável"}
           </p>
 

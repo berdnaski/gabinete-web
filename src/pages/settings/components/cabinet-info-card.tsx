@@ -91,7 +91,7 @@ export function CabinetInfoCard() {
 
             <Field label="Link Público do Gabinete">
               <div className="flex bg-muted/40 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-primary/20 transition-all border border-transparent">
-                <div className="bg-slate-100/50 dark:bg-slate-800/50 px-4 h-12 flex items-center text-[10px] font-bold text-muted-foreground uppercase tracking-wider border-r border-border/20">
+                <div className="bg-slate-100/50 dark:bg-slate-800/50 px-4 h-12 flex items-center text-2xs font-bold text-muted-foreground uppercase tracking-wider border-r border-border/20">
                   <Globe className="w-3.5 h-3.5 mr-2 opacity-50" />
                   plataforma.gov/
                 </div>
@@ -105,7 +105,7 @@ export function CabinetInfoCard() {
               <textarea
                 {...register("description")}
                 placeholder="Uma breve descrição do seu mandato e objetivos..."
-                className="w-full min-h-[120px] p-4 text-sm rounded-xl bg-muted/40 border-none outline-none focus-visible:ring-2 focus-visible:ring-primary/20 resize-none font-medium leading-relaxed transition-all"
+                className="w-full min-h-30 p-4 text-sm rounded-xl bg-muted/40 border-none outline-none focus-visible:ring-2 focus-visible:ring-primary/20 resize-none font-medium leading-relaxed transition-all"
               />
             </Field>
           </div>

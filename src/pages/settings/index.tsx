@@ -76,7 +76,7 @@ export function Settings() {
                 })}
 
                 {/* <div className="mt-8 pt-6 border-t border-border/40">
-                  <p className="text-[11px] text-muted-foreground/60 leading-relaxed px-3">
+                  <p className="text-xs text-muted-foreground/60 leading-relaxed px-3">
                     Precisa de ajuda?{" "}
                     <a
                       href="#"

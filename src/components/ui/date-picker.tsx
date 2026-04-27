@@ -60,7 +60,7 @@ export function DatePicker({ placeholder = "Selecionar período", className, sel
                 sideOffset={8}
             >
                 <div className="px-4 pt-4 pb-3 border-b border-zinc-100 bg-zinc-50/60">
-                    <p className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">Selecionar período</p>
+                    <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Selecionar período</p>
                     {selected?.from ? (
                         <p className="text-sm font-semibold text-zinc-900 mt-0.5">
                             {format(selected.from, "dd 'de' MMM", { locale: ptBR })}

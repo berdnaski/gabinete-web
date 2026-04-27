@@ -140,7 +140,7 @@ export function ClaimDemandFlow({ demand, open, onOpenChange }: ClaimDemandFlowP
 
             <div className="flex flex-col gap-3">
               <div className="rounded-xl border border-border bg-muted/40 px-4 py-3">
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">Demanda</p>
+                <p className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground mb-1">Demanda</p>
                 <p className="text-sm font-semibold text-foreground line-clamp-2">{demand.title}</p>
                 {demand.category && (
                   <p className="text-xs text-muted-foreground mt-0.5">{demand.category.name}</p>
@@ -156,7 +156,7 @@ export function ClaimDemandFlow({ demand, open, onOpenChange }: ClaimDemandFlowP
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-0.5">Seu gabinete</p>
+                    <p className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground mb-0.5">Seu gabinete</p>
                     <p className="text-sm font-semibold text-foreground truncate">{cabinet.name}</p>
                   </div>
                 </div>
@@ -186,7 +186,7 @@ export function ClaimDemandFlow({ demand, open, onOpenChange }: ClaimDemandFlowP
             </DialogHeader>
 
             <div className="flex flex-col gap-2">
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+              <p className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground">
                 Membros do gabinete
               </p>
 

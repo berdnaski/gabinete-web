@@ -28,7 +28,7 @@ function TopCabinetCard({ cabinet, rank }: { cabinet: Cabinet; rank: number }) {
       )}
     >
       <div className={cn(
-        "absolute -top-3 left-1/2 -translate-x-1/2 flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest",
+        "absolute -top-3 left-1/2 -translate-x-1/2 flex items-center gap-1 px-2.5 py-0.5 rounded-full text-2xs font-bold uppercase tracking-widest",
         color.bg, color.label
       )}>
         <Trophy className="size-3" />
@@ -178,7 +178,7 @@ export function Cabinets() {
           {/* Podium top 3 */}
           {top3.length > 0 && (
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-3 flex items-center gap-1.5">
+              <p className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground mb-3 flex items-center gap-1.5">
                 <Trophy className="size-3" />
                 Ranking
               </p>
@@ -199,7 +199,7 @@ export function Cabinets() {
           {rest.length > 0 && (
             <div className="flex flex-col gap-2">
               {!search.trim() && top3.length > 0 && (
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1 flex items-center gap-1.5">
+                <p className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground mb-1 flex items-center gap-1.5">
                   <Building2 className="size-3" />
                   Demais gabinetes
                 </p>

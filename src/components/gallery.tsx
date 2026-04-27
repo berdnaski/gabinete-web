@@ -188,8 +188,8 @@ function GalleryGrid({ images, onOpen, className }: GalleryGridProps) {
     return (
       <div className={cn("grid grid-cols-2 gap-1 rounded-lg overflow-hidden", className)}>
         <GridImage {...shared} index={0} className="row-span-2 h-56" />
-        <GridImage {...shared} index={1} className="h-27.5" />
-        <GridImage {...shared} index={2} className="h-27.5" />
+        <GridImage {...shared} index={1} className="h-28" />
+        <GridImage {...shared} index={2} className="h-28" />
       </div>
     );
   }
@@ -197,10 +197,10 @@ function GalleryGrid({ images, onOpen, className }: GalleryGridProps) {
   if (count === 4) {
     return (
       <div className={cn("grid grid-cols-2 gap-1 rounded-lg overflow-hidden", className)}>
-        <GridImage {...shared} index={0} className="h-27.5" />
-        <GridImage {...shared} index={1} className="h-27.5" />
-        <GridImage {...shared} index={2} className="h-27.5" />
-        <GridImage {...shared} index={3} className="h-27.5" />
+        <GridImage {...shared} index={0} className="h-28" />
+        <GridImage {...shared} index={1} className="h-28" />
+        <GridImage {...shared} index={2} className="h-28" />
+        <GridImage {...shared} index={3} className="h-28" />
       </div>
     );
   }
@@ -209,8 +209,8 @@ function GalleryGrid({ images, onOpen, className }: GalleryGridProps) {
   return (
     <div className={cn("grid grid-cols-2 gap-1 rounded-lg overflow-hidden", className)}>
       <div className="grid grid-rows-2 gap-1">
-        <GridImage {...shared} index={0} className="h-27.5" />
-        <GridImage {...shared} index={1} className="h-27.5" />
+        <GridImage {...shared} index={0} className="h-28" />
+        <GridImage {...shared} index={1} className="h-28" />
       </div>
       <div className="grid grid-rows-3 gap-1">
         <GridImage {...shared} index={2} className="h-18" />

@@ -4,6 +4,7 @@ export const DemandStatus = {
 	IN_PROGRESS: "IN_PROGRESS",
 	RESOLVED: "RESOLVED",
 	REJECTED: "REJECTED",
+	CANCELED: "CANCELED",
 } as const
 
 export type DemandStatus = (typeof DemandStatus)[keyof typeof DemandStatus]
@@ -11,9 +12,10 @@ export type DemandStatus = (typeof DemandStatus)[keyof typeof DemandStatus]
 export const DemandStatusLabel: Record<DemandStatus, string> = {
 	SUBMITTED: "Enviada",
 	IN_ANALYSIS: "Em análise",
-	IN_PROGRESS: "Em andamento",
+	IN_PROGRESS: "Em progresso",
 	RESOLVED: "Resolvida",
 	REJECTED: "Rejeitada",
+	CANCELED: "Cancelada",
 }
 
 export const DemandPriority = {
@@ -140,6 +142,7 @@ export interface NeighborhoodCount {
 
 export interface ListDemandsByCabinetSlugParams extends ListDemandsParams {
 	slug: string;
+	assigneeMemberId?: string;
 }
 export interface PaginationMeta {
 	limit: number;
@@ -162,6 +165,7 @@ export interface DemandComments {
 	authorName: string;
 	authorAvatarUrl: string;
 	isCabinetResponse: boolean;
+	isStatusUpdate: boolean;
 }
 
 export interface ListDemandCommentsParams {

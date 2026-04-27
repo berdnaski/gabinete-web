@@ -36,7 +36,7 @@ function PointMarker({ point }: { point: HeatmapPoint }) {
             <div className={cn("h-1 w-full", isUrgent ? "bg-red-500" : "bg-blue-500")} />
 
             <div className="px-3.5 py-3">
-              <p className="text-[13px] font-semibold text-foreground leading-snug line-clamp-2 mb-2.5">
+              <p className="text-sm font-semibold text-foreground leading-snug line-clamp-2 mb-2.5">
                 {point.title}
               </p>
 
@@ -44,17 +44,17 @@ function PointMarker({ point }: { point: HeatmapPoint }) {
 
               <div className="flex items-center gap-1.5 flex-wrap pt-2 border-t border-border">
                 <Layers className="size-3 text-muted-foreground shrink-0" />
-                <span className="text-[11px] text-muted-foreground">{point.categoryName}</span>
+                <span className="text-xs text-muted-foreground">{point.categoryName}</span>
                 {point.neighborhood && (
                   <>
                     <span className="text-muted-foreground/30">·</span>
                     <MapPin className="size-3 text-muted-foreground shrink-0" />
-                    <span className="text-[11px] text-muted-foreground">{point.neighborhood}</span>
+                    <span className="text-xs text-muted-foreground">{point.neighborhood}</span>
                   </>
                 )}
               </div>
 
-              <p className="text-[10px] text-muted-foreground/50 mt-2">Clique para abrir a demanda</p>
+              <p className="text-2xs text-muted-foreground/50 mt-2">Clique para abrir a demanda</p>
             </div>
 
             {/* Arrow */}
@@ -119,7 +119,7 @@ export function Map() {
       {!isLoading && insight && (
         <div className="grid grid-cols-1 sm:grid-cols-3 rounded-xl border border-border overflow-hidden shadow-sm bg-card">
           <div className="sm:col-span-2 px-5 py-4 flex flex-col justify-center border-b sm:border-b-0 sm:border-r border-border">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">
+            <p className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground mb-1">
               Bairro com mais demandas
             </p>
             <p className="text-2xl font-bold text-foreground tracking-tight leading-none">
@@ -131,7 +131,7 @@ export function Map() {
           </div>
 
           <div className="px-5 py-4 flex flex-col items-start sm:items-center justify-center gap-1">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+            <p className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground">
               Ocorrências
             </p>
             <p className="text-4xl font-extrabold text-primary tabular-nums leading-none">
@@ -175,7 +175,7 @@ export function Map() {
         {/* Legend */}
         {!isLoading && (
           <div className="absolute bottom-8 right-3 z-10 bg-white/95 backdrop-blur-sm border border-border rounded-xl shadow-lg px-3.5 py-3 min-w-36">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-2.5">
+            <p className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground mb-2.5">
               Legenda
             </p>
             <div className="flex flex-col gap-2">

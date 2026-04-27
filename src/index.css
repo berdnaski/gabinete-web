@@ -133,6 +133,11 @@
   --sidebar-ring: oklch(0.552 0.016 285.938);
 }
 
+@utility text-2xs {
+  font-size: 0.625rem;
+  line-height: 1rem;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

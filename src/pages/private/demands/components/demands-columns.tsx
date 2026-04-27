@@ -1,6 +1,8 @@
 import { useUpdateDemand, useUpdateDemandStatus } from "@/api/demands/hooks"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { UpdateProgressDialog } from "@/components/update-progress-dialog"
+import { DemandDetailSheet } from "@/components/demand-detail-sheet"
 import { useNavigate } from "react-router-dom"
 import {
 	DropdownMenu,
@@ -26,6 +28,7 @@ import {
 	PencilIcon,
 	TagsIcon,
 	Trash2Icon,
+	TrendingUp,
 	UserCheck,
 } from "lucide-react"
 import { DemandPriority } from "./demand-priority"
@@ -162,6 +165,8 @@ function AssigneeCell({ row }: { row: Row<Demand> }) {
 function ActionsCell({ row }: { row: Row<Demand> }) {
 	const demand = row.original
 	const navigate = useNavigate()
+	const [progressOpen, setProgressOpen] = useState(false)
+	const [detailOpen, setDetailOpen] = useState(false)
 
 	return (
 		<div className="flex items-center justify-center">
@@ -175,22 +180,18 @@ function ActionsCell({ row }: { row: Row<Demand> }) {
 						<MoreHorizontalIcon className="size-4" />
 					</Button>
 				</DropdownMenuTrigger>
-				<DropdownMenuContent align="end" className="w-44">
-					<DropdownMenuItem onClick={() => navigate(`/comments/${demand.id}`)}>
+				<DropdownMenuContent align="end" className="w-48">
+					<DropdownMenuItem onClick={() => setDetailOpen(true)}>
 						<EyeIcon className="size-3.5 text-zinc-400" />
 						Ver detalhes
+					</DropdownMenuItem>
+					<DropdownMenuItem onClick={() => setProgressOpen(true)}>
+						<TrendingUp className="size-3.5 text-zinc-400" />
+						Atualizar progresso
 					</DropdownMenuItem>
 					<DropdownMenuItem onClick={() => navigate(`/comments/${demand.id}`)}>
 						<MessageSquareIcon className="size-3.5 text-zinc-400" />
 						Comentar
-					</DropdownMenuItem>
-					<DropdownMenuItem>
-						<PencilIcon className="size-3.5 text-zinc-400" />
-						Editar
-					</DropdownMenuItem>
-					<DropdownMenuItem>
-						<CopyIcon className="size-3.5 text-zinc-400" />
-						Duplicar
 					</DropdownMenuItem>
 					<DropdownMenuSeparator />
 					<DropdownMenuItem variant="destructive">
@@ -199,6 +200,20 @@ function ActionsCell({ row }: { row: Row<Demand> }) {
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
+
+			<UpdateProgressDialog
+				demandId={demand.id}
+				demandTitle={demand.title}
+				currentStatus={demand.status}
+				open={progressOpen}
+				onOpenChange={setProgressOpen}
+			/>
+
+			<DemandDetailSheet
+				demand={demand}
+				open={detailOpen}
+				onOpenChange={setDetailOpen}
+			/>
 		</div>
 	)
 }
@@ -256,7 +271,7 @@ export const demandsColumns: ColumnDef<Demand>[] = [
 					<div className="size-8 rounded-full flex items-center justify-center text-sm font-bold bg-zinc-100 text-zinc-600">
 						{r.name.charAt(0)}
 					</div>
-					<span className="text-muted-foregground">{r.name}</span>
+					<span className="text-muted-foreground">{r.name}</span>
 				</div>
 			)
 		},

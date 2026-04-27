@@ -34,7 +34,7 @@ export function SettingsCardHeader({
       <div className="flex items-center gap-3 mb-1">
         <h2 className="text-xl font-bold text-foreground tracking-tight">{title}</h2>
         {badge && (
-          <span className="bg-primary/10 text-primary text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+          <span className="bg-primary/10 text-primary text-2xs font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
             {badge}
           </span>
         )}
@@ -99,7 +99,7 @@ export function Field({ label, children, error, className, ...props }: FieldProp
       </label>
       {children}
       {error && (
-        <span className="text-[10px] text-red-500 font-medium ml-1 animate-in slide-in-from-top-1">
+        <span className="text-2xs text-red-500 font-medium ml-1 animate-in slide-in-from-top-1">
           {error}
         </span>
       )}

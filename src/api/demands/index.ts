@@ -97,6 +97,11 @@ export const DemandsApi = {
 		return response.data;
 	},
 
+	updateProgress: async (id: string, status: DemandStatus, note?: string): Promise<Demand> => {
+		const response = await apiClient.patch<Demand>(`${baseURL}/${id}/progress`, { status, note });
+		return response.data;
+	},
+
 	confirmEvidenceUpload: async (
 		id: string,
 		storageKey: string,

@@ -11,7 +11,7 @@ import { Link, useParams } from "react-router-dom";
 function StatItem({ label, value, sub }: { label: string; value: number | string; sub?: string }) {
   return (
     <div className="flex flex-col gap-1 px-4 py-3.5 rounded-xl border border-border bg-card">
-      <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{label}</p>
+      <p className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground">{label}</p>
       <p className="text-2xl font-bold tabular-nums leading-none text-foreground">{value}</p>
       {sub && <p className="text-xs text-muted-foreground">{sub}</p>}
     </div>

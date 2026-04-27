@@ -116,7 +116,8 @@ export function useLikeDemand() {
     onSuccess: async (_, variables) => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["demands"] }),
-        queryClient.invalidateQueries({ queryKey: ["demands", variables] })
+        queryClient.invalidateQueries({ queryKey: ["demands", variables] }),
+        queryClient.invalidateQueries({ queryKey: ["demands-infinite"] }),
       ])
     },
   });
@@ -167,6 +168,18 @@ export function useUnlinkDemand() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["demands"] });
       queryClient.invalidateQueries({ queryKey: ["demands-infinite"] });
+    },
+  });
+}
+
+export function useUpdateDemandProgress() {
+  return useMutation({
+    mutationFn: ({ id, status, note }: { id: string; status: DemandStatus; note?: string }) =>
+      DemandsApi.updateProgress(id, status, note),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["demands"] });
+      queryClient.invalidateQueries({ queryKey: ["demands-infinite"] });
+      queryClient.invalidateQueries({ queryKey: ["comments"] });
     },
   });
 }

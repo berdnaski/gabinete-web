@@ -127,7 +127,7 @@ function NotificationItem({
         >
           {notification.message}
         </p>
-        <p className="text-[10px] text-muted-foreground/50 font-medium mt-0.5">
+        <p className="text-2xs text-muted-foreground/50 font-medium mt-0.5">
           {formatDistanceToNow(new Date(notification.createdAt), {
             addSuffix: true,
             locale: ptBR,
@@ -162,7 +162,7 @@ export function NotificationPopover() {
         <button className="relative p-2 rounded-full hover:bg-muted transition-colors group">
           <Bell className="size-5 text-muted-foreground group-hover:text-foreground transition-colors" />
           {unreadCount > 0 && (
-            <span className="absolute top-1 right-1 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground border-2 border-background">
+            <span className="absolute top-1 right-1 flex size-4 items-center justify-center rounded-full bg-primary text-2xs font-bold text-primary-foreground border-2 border-background">
               {unreadCount > 9 ? "9+" : unreadCount}
             </span>
           )}
@@ -181,7 +181,7 @@ export function NotificationPopover() {
           <div className="flex items-center gap-2">
             <h3 className="font-bold text-base text-foreground">Notificações</h3>
             {unreadCount > 0 && (
-              <span className="inline-flex items-center justify-center h-5 min-w-5 px-1.5 rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+              <span className="inline-flex items-center justify-center h-5 min-w-5 px-1.5 rounded-full bg-primary text-2xs font-bold text-primary-foreground">
                 {unreadCount}
               </span>
             )}
@@ -262,7 +262,7 @@ export function NotificationPopover() {
         {/* Footer */}
         <div className="px-4 py-2 border-t border-border/30 bg-muted/20 flex items-center gap-1.5">
           <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          <p className="text-[10px] text-muted-foreground/50">
+          <p className="text-2xs text-muted-foreground/50">
             Sincronizado em tempo real
           </p>
         </div>

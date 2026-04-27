@@ -2,7 +2,7 @@ import { useLikeDemand, useUnlinkDemand } from "@/api/demands/hooks";
 import type { Demand } from "@/api/demands/types";
 import { Building2, ExternalLinkIcon, MapPinIcon, MessageCircle, MoreHorizontal, ThumbsUp, Unlink, UserCheck } from "lucide-react";
 import type { ComponentProps } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { cn } from "@/lib/utils";
@@ -66,8 +66,14 @@ export function Post({
   const { mutate: likeDemand } = useLikeDemand();
   const { mutate: unlinkDemand, isPending: isUnlinking } = useUnlinkDemand();
 
-  const liked = demand.isLiked;
-  const likeCount = demand.likesCount;
+  const [liked, setLiked] = useState(demand.isLiked);
+  const [likeCount, setLikeCount] = useState(demand.likesCount);
+
+  useEffect(() => {
+    setLiked(demand.isLiked);
+    setLikeCount(demand.likesCount);
+  }, [demand.isLiked, demand.likesCount]);
+
   const authorName = demand.reporter?.name || demand.guestEmail as string;
   const profilePath = demand.reporterId ? `/profile/${demand.reporterId}` : null;
 
@@ -78,7 +84,15 @@ export function Post({
       setShowAuthModal(true);
       return;
     }
-    likeDemand(demand.id);
+    const wasLiked = liked;
+    setLiked(!wasLiked);
+    setLikeCount((c) => wasLiked ? c - 1 : c + 1);
+    likeDemand(demand.id, {
+      onError: () => {
+        setLiked(wasLiked);
+        setLikeCount(demand.likesCount);
+      },
+    });
   }
 
   function handleComment(e: React.MouseEvent) {
@@ -153,11 +167,11 @@ export function Post({
             <Link
               to={`/gabinetes/${demand.cabinet.slug}`}
               onClick={(e) => e.stopPropagation()}
-              className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold leading-none bg-muted text-muted-foreground hover:text-foreground border border-border transition-colors"
+              className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold leading-none bg-muted text-muted-foreground hover:text-foreground border border-border transition-colors"
             >
               <Avatar className="size-3.5 shrink-0">
                 <AvatarImage src={demand.cabinet.avatarUrl ?? undefined} />
-                <AvatarFallback className="text-[8px] bg-primary/10 text-primary">
+                <AvatarFallback className="text-2xs bg-primary/10 text-primary">
                   {getFirstLettersFromNames(demand.cabinet.name)}
                 </AvatarFallback>
               </Avatar>
@@ -165,7 +179,7 @@ export function Post({
             </Link>
           )}
 
-          {userOwnsDemand ? (
+          {userOwnsDemand && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -193,16 +207,6 @@ export function Post({
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          ) : (
-            <Button
-              size="icon"
-              variant="ghost"
-              aria-label="Mais opções"
-              className="text-muted-foreground rounded-full -mt-0.5 -mr-1 size-8"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <MoreHorizontal />
-            </Button>
           )}
         </div>
       </div>
@@ -218,7 +222,7 @@ export function Post({
 
       {demand.address && (
         <div className="p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground mb-2">
+          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-2">
             Localização Geográfica
           </p>
           <div className="flex items-center justify-between">
@@ -344,7 +348,7 @@ export function Post({
                 </DialogDescription>
               </DialogHeader>
               <div className="rounded-xl border border-border bg-muted/40 px-4 py-3">
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">Demanda</p>
+                <p className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground mb-1">Demanda</p>
                 <p className="text-sm font-semibold text-foreground line-clamp-2">{demand.title}</p>
               </div>
               <DialogFooter>
