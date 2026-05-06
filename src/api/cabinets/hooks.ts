@@ -35,6 +35,24 @@ export function useGetCabinetMetrics(slug: string | undefined) {
   });
 }
 
+export function useGetCabinetTrend(slug: string | undefined, days = 14) {
+  return useQuery({
+    queryKey: ["cabinet-trend", slug, days],
+    queryFn: () => CabinetsApi.getTrend(slug!, days),
+    enabled: !!slug,
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
+export function useGetCabinetTrendDetailed(slug: string | undefined, days = 14) {
+  return useQuery({
+    queryKey: ["cabinet-trend-detailed", slug, days],
+    queryFn: () => CabinetsApi.getTrendDetailed(slug!, days),
+    enabled: !!slug,
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
 export function useUpdateCabinet() {
   return useMutation({
     mutationFn: ({ slug, data, file }: { slug: string; data: Partial<Cabinet>; file?: File }) =>

@@ -53,12 +53,12 @@ interface SharedFieldsProps {
 function CategoryAndStatusFields({ value, onChange, fetchCategories }: SharedFieldsProps) {
   const { data: neighborhoods } = useGetNeighborhoods();
 
-  const toggleStatus = (status: DemandStatus) => {
+  function toggleStatus(status: DemandStatus) {
     const next = value.status.includes(status)
       ? value.status.filter((s) => s !== status)
       : [...value.status, status];
     onChange({ ...value, status: next });
-  };
+  }
 
   return (
     <>
@@ -93,7 +93,7 @@ function CategoryAndStatusFields({ value, onChange, fetchCategories }: SharedFie
                   "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border transition-all",
                   isActive
                     ? cn(cfg.className, "ring-2 ring-offset-1 ring-current/30")
-                    : "bg-zinc-50 text-zinc-400 border-zinc-200 hover:border-zinc-300 hover:text-zinc-600",
+                    : "bg-muted/50 text-muted-foreground border-border hover:border-border hover:text-foreground",
                 )}
               >
                 {DemandStatusLabel[status]}
@@ -147,9 +147,9 @@ export function FeedFilter({ value, onChange, resultCount }: DemandsFilterProps)
     };
   }, []);
 
-  const clearMobileFilters = () => {
+  function clearMobileFilters() {
     onChange({ ...value, status: [], categories: [], priority: null, dateRange: undefined, neighborhood: null });
-  };
+  }
 
   const mobileActiveCount = [
     value.status.length > 0,
@@ -161,11 +161,11 @@ export function FeedFilter({ value, onChange, resultCount }: DemandsFilterProps)
 
   return (
     <>
-      <aside className="hidden md:flex flex-col gap-4 w-64 shrink-0 sticky top-20 self-start">
-        <div className="bg-white rounded-2xl border border-zinc-100 p-4 flex flex-col gap-3 shadow">
+      <aside className="hidden md:flex flex-col gap-4 w-60 shrink-0 sticky top-20 self-start">
+        <div className="rounded-xl border border-border bg-card p-4 flex flex-col gap-3">
           <header className="flex items-center gap-2">
-            <Filter className="size-3.5 text-primary" />
-            <h4 className="font-semibold">Filtros</h4>
+            <Filter className="size-3.5 text-muted-foreground" />
+            <h4 className="text-sm font-semibold text-foreground">Filtros</h4>
           </header>
           <FieldGroup>
             <Field>
@@ -194,17 +194,17 @@ export function FeedFilter({ value, onChange, resultCount }: DemandsFilterProps)
 
       <div className="md:hidden flex items-center gap-2">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-zinc-400 pointer-events-none" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
           <Input
             value={value.search}
             placeholder="Buscar demandas"
             onChange={(e) => onChange({ ...value, search: e.target.value })}
-            className="bg-white pl-8 pr-8 py-2.5 text-sm text-zinc-700 placeholder:text-zinc-400 focus:border-primary/50 focus:ring-2 focus:ring-primary/10 transition-all shadow"
+            className="pl-8 pr-8"
           />
           {value.search && (
             <button
               onClick={() => onChange({ ...value, search: "" })}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
             >
               <XIcon className="size-3.5" />
             </button>
@@ -212,18 +212,15 @@ export function FeedFilter({ value, onChange, resultCount }: DemandsFilterProps)
         </div>
 
         <Button
+          variant={mobileActiveCount > 0 ? "default" : "outline"}
+          size="sm"
           onClick={() => setSheetOpen(true)}
-          className={cn(
-            "relative shadow",
-            mobileActiveCount > 0
-              ? "bg-primary text-primary-foreground border-primary"
-              : "bg-white text-zinc-600 border-zinc-200 hover:border-zinc-300",
-          )}
+          className="relative gap-1.5"
         >
           <SlidersHorizontalIcon className="size-3.5" />
           <span>Filtros</span>
           {mobileActiveCount > 0 && (
-            <span className="absolute -top-1.5 -right-1.5 size-4.5 rounded-full bg-background text-primary text-2xs font-bold border border-primary/30 flex items-center justify-center leading-none">
+            <span className="absolute -top-1.5 -right-1.5 size-4 rounded-full bg-background text-primary text-2xs font-bold border border-primary/30 flex items-center justify-center leading-none">
               {mobileActiveCount}
             </span>
           )}
@@ -233,26 +230,26 @@ export function FeedFilter({ value, onChange, resultCount }: DemandsFilterProps)
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
         <SheetContent side="bottom" showCloseButton={false} className="md:hidden rounded-t-3xl px-0 pb-0 gap-0 min-h-1/2">
           <div className="flex justify-center pt-3 pb-1">
-            <div className="w-9 h-1 rounded-full bg-zinc-200" />
+            <div className="w-9 h-1 rounded-full bg-muted" />
           </div>
 
-          <SheetHeader className="border-b border-zinc-100">
+          <SheetHeader className="border-b border-border">
             <div className="flex items-center justify-between">
               <SheetTitle className="text-base font-semibold">Filtros</SheetTitle>
               <div className="flex items-center gap-3">
                 {mobileActiveCount > 0 && (
                   <button
                     onClick={clearMobileFilters}
-                    className="text-xs text-zinc-400 hover:text-red-500 transition-colors"
+                    className="text-xs text-muted-foreground hover:text-destructive transition-colors"
                   >
                     Limpar
                   </button>
                 )}
                 <button
                   onClick={() => setSheetOpen(false)}
-                  className="size-7 rounded-lg flex items-center justify-center bg-zinc-100 hover:bg-zinc-200 transition-colors"
+                  className="size-7 rounded-lg flex items-center justify-center bg-muted hover:bg-muted/80 transition-colors"
                 >
-                  <XIcon className="size-3.5 text-zinc-500" />
+                  <XIcon className="size-3.5 text-muted-foreground" />
                 </button>
               </div>
             </div>
@@ -268,10 +265,10 @@ export function FeedFilter({ value, onChange, resultCount }: DemandsFilterProps)
             </FieldGroup>
           </div>
 
-          <SheetFooter className="pb-6">
+          <SheetFooter className="pb-6 px-5">
             <Button
               onClick={() => setSheetOpen(false)}
-              className="w-full py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors"
+              className="w-full"
             >
               {resultCount !== undefined
                 ? `Ver ${resultCount} ${resultCount === 1 ? "resultado" : "resultados"}`

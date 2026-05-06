@@ -100,6 +100,12 @@ export function LoginForm() {
 					<FieldDescription className="text-center">
 						Ainda não tem uma conta? <Link to="/sign-up">Cadastre-se</Link>
 					</FieldDescription>
+          <p className="text-[10px] text-center text-muted-foreground mt-2 px-6">
+            Ao continuar, você concorda com nossos{" "}
+            <Link to="/termos-de-uso" className="underline hover:text-primary">Termos de Uso</Link>{" "}
+            e{" "}
+            <Link to="/politica-de-privacidade" className="underline hover:text-primary">Política de Privacidade</Link>.
+          </p>
 				</Field>
 			</FieldGroup>
 		</form >

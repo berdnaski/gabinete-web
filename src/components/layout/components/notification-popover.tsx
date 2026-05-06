@@ -87,7 +87,7 @@ function NotificationItem({
       className={cn(
         "w-full flex items-start gap-3 px-4 py-3.5 transition-colors text-left border-b border-border/40 last:border-0",
         isUnread || notification.link
-          ? "hover:bg-muted/60 bg-primary/[0.025] cursor-pointer"
+          ? "hover:bg-muted/60 bg-primary/2.5 cursor-pointer"
           : "hover:bg-muted/30 cursor-default"
       )}
     >
@@ -174,7 +174,7 @@ export function NotificationPopover() {
 
       <PopoverContent
         align="end"
-        className="w-95 p-0 rounded-2xl shadow-xl overflow-hidden border-border/50"
+        className="w-96 p-0 rounded-2xl shadow-xl overflow-hidden border-border/50"
       >
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-border/50 bg-background">
@@ -208,7 +208,7 @@ export function NotificationPopover() {
         </div>
 
         {/* Body */}
-        <div className="max-h-[460px] overflow-y-auto">
+        <div className="max-h-115 overflow-y-auto">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-12 gap-3">
               <Loader2 className="size-5 animate-spin text-muted-foreground/50" />
@@ -228,13 +228,18 @@ export function NotificationPopover() {
             </div>
           ) : (
             <div className="flex flex-col">
-              {notifications.map((notification) => (
-                <NotificationItem
+              {notifications.map((notification, i) => (
+                <div
                   key={notification.id}
-                  notification={notification}
-                  onRead={markAsRead}
-                  onClose={() => handleOpenChange(false)}
-                />
+                  className="animate-fade-slide-in"
+                  style={{ animationDelay: `${Math.min(i, 7) * 30}ms` }}
+                >
+                  <NotificationItem
+                    notification={notification}
+                    onRead={markAsRead}
+                    onClose={() => handleOpenChange(false)}
+                  />
+                </div>
               ))}
 
               {hasMore && (

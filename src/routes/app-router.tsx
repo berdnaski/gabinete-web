@@ -8,6 +8,9 @@ import { Sandbox } from "@/pages/public/sandbox";
 import { SignUp } from "@/pages/public/sign-up";
 import { GoogleCallback } from "@/pages/public/google-callback";
 import { ConfirmPasswordPage } from "@/pages/public/confirm-password";
+import { TermsOfUsePage } from "@/pages/public/terms-of-use";
+import { PrivacyPolicyPage } from "@/pages/public/privacy-policy";
+import { LandingPage } from "@/pages/public/landing";
 import { Route, Routes } from "react-router-dom";
 import { Feed } from "@/pages/feed";
 import { Settings } from "@/pages/settings";
@@ -35,6 +38,9 @@ export function AppRouter() {
       <Route path="/sandbox" element={<Sandbox />} />
       <Route path="/auth/callback" element={<GoogleCallback />} />
       <Route path="/confirm-password" element={<ConfirmPasswordPage />} />
+      <Route path="/termos-de-uso" element={<TermsOfUsePage />} />
+      <Route path="/politica-de-privacidade" element={<PrivacyPolicyPage />} />
+      <Route path="/landingpage" element={<LandingPage />} />
 
       <Route path="/" element={<Layout />}>
         <Route index element={<Feed />} />

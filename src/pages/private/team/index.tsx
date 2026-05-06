@@ -10,19 +10,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
 import { useAuth } from "@/hooks/use-auth"
 import { usePageTitle } from "@/hooks/use-page-title"
 import { cn } from "@/lib/utils"
 import { getFirstLettersFromNames } from "@/utils/get-first-letters-from-names"
-import { Crown, LayoutList, MailIcon, MoreHorizontal, Search, Shield, UserRound } from "lucide-react"
+import { Crown, LayoutList, MoreHorizontal, Search, Shield, UserRound } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
@@ -43,30 +35,63 @@ const ROLE_CONFIG = {
   },
 } as const
 
-function MemberActionsCell({ member }: { member: CabinetMember }) {
+function MemberRow({ member }: { member: CabinetMember }) {
   const navigate = useNavigate()
+  const config = ROLE_CONFIG[member.role]
+  const Icon = config.icon
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="size-8 rounded-lg text-muted-foreground hover:text-foreground"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <MoreHorizontal className="size-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48">
-        <DropdownMenuItem
-          onClick={() => navigate(`/demands?assigneeMemberId=${member.id}`)}
-        >
-          <LayoutList className="size-3.5" />
-          Ver demandas atribuídas
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <div className="flex items-center gap-3 px-4 py-3.5">
+      <Avatar className="size-9 shrink-0">
+        <AvatarImage src={member.userAvatarUrl ?? undefined} />
+        <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">
+          {getFirstLettersFromNames(member.userName)}
+        </AvatarFallback>
+      </Avatar>
+
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-sm font-medium text-foreground truncate">
+            {member.userName}
+          </span>
+          <span
+            className={cn(
+              "inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-2xs font-medium border shrink-0",
+              config.className,
+            )}
+          >
+            <Icon className={cn("size-2.5", config.iconClass)} />
+            {config.label}
+          </span>
+        </div>
+        {member.userEmail && (
+          <p className="text-xs text-muted-foreground mt-0.5 truncate">
+            {member.userEmail}
+          </p>
+        )}
+      </div>
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-8 text-muted-foreground hover:text-foreground shrink-0"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <MoreHorizontal className="size-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-48">
+          <DropdownMenuItem
+            onClick={() => navigate(`/demands?assigneeMemberId=${member.id}`)}
+          >
+            <LayoutList className="size-3.5" />
+            Ver demandas atribuídas
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   )
 }
 
@@ -93,25 +118,20 @@ export function Team() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-start justify-between flex-wrap gap-2">
-        <div>
-          <h1 className="text-base font-semibold text-foreground">Equipe</h1>
-          <p className="text-sm text-muted-foreground">
-            Membros ativos do gabinete {cabinet?.name ?? ""}.
-          </p>
-        </div>
-        {!isLoading && (
-          <div className="text-right shrink-0">
-            <p className="text-xl font-bold text-foreground">{members.length}</p>
-            <p className="text-xs text-muted-foreground">
-              {members.length === 1 ? "membro" : "membros"}
-            </p>
-          </div>
-        )}
+      <div>
+        <h1 className="text-base font-semibold text-foreground">Equipe</h1>
+        <p className="text-xs text-muted-foreground mt-0.5">
+          {cabinet?.name ?? ""}
+          {!isLoading && members.length > 0 && (
+            <span>
+              {" "}· {members.length} {members.length === 1 ? "membro" : "membros"}
+            </span>
+          )}
+        </p>
       </div>
 
-      <div className="rounded-xl border border-border overflow-hidden bg-card">
-        <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-card">
+      <div className="rounded-lg border border-border bg-card overflow-hidden">
+        <div className="flex items-center gap-3 px-4 py-3 border-b border-border/60">
           <div className="relative flex-1 max-w-xs">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
             <Input
@@ -121,6 +141,11 @@ export function Team() {
               className="pl-8 h-8 text-sm"
             />
           </div>
+          {!isLoading && members.length > 0 && (
+            <span className="font-mono text-xs tabular-nums text-muted-foreground/40 shrink-0">
+              {String(filtered.length).padStart(2, "0")}
+            </span>
+          )}
         </div>
 
         {isLoading ? (
@@ -129,10 +154,10 @@ export function Team() {
           </div>
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="size-12 rounded-full bg-muted flex items-center justify-center mb-3">
-              <UserRound className="size-5 text-muted-foreground" />
+            <div className="size-10 rounded-lg bg-muted flex items-center justify-center mb-3">
+              <UserRound className="size-4 text-muted-foreground" />
             </div>
-            <p className="text-sm font-semibold text-foreground">
+            <p className="text-sm font-medium text-foreground">
               {search ? "Nenhum resultado encontrado" : "Nenhum membro encontrado"}
             </p>
             <p className="text-xs text-muted-foreground mt-1">
@@ -140,63 +165,11 @@ export function Team() {
             </p>
           </div>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="pl-4 w-70">Membro</TableHead>
-                <TableHead className="w-30">Cargo</TableHead>
-                <TableHead>E-mail</TableHead>
-                <TableHead className="w-15" />
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filtered.map((member) => {
-                const config = ROLE_CONFIG[member.role]
-                const Icon = config.icon
-                return (
-                  <TableRow key={member.id}>
-                    <TableCell className="pl-4">
-                      <div className="flex items-center gap-3">
-                        <Avatar className="size-8 shrink-0">
-                          <AvatarImage src={member.userAvatarUrl ?? undefined} />
-                          <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">
-                            {getFirstLettersFromNames(member.userName)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <span className="text-sm font-medium text-foreground">
-                          {member.userName}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <span
-                        className={cn(
-                          "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border",
-                          config.className,
-                        )}
-                      >
-                        <Icon className={cn("size-3", config.iconClass)} />
-                        {config.label}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      {member.userEmail ? (
-                        <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                          <MailIcon className="size-3.5 shrink-0" />
-                          <span className="truncate max-w-55">{member.userEmail}</span>
-                        </div>
-                      ) : (
-                        <span className="text-xs text-muted-foreground/50">—</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <MemberActionsCell member={member} />
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
+          <div className="divide-y divide-border/60">
+            {filtered.map((member) => (
+              <MemberRow key={member.id} member={member} />
+            ))}
+          </div>
         )}
       </div>
     </div>

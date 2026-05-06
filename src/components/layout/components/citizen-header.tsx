@@ -16,7 +16,7 @@ export function CitizenHeader() {
   const { isAuthenticated } = useAuth()
 
   return (
-    <header className="fixed bg-white top-0 inset-x-0 z-50 flex items-center justify-between px-4 sm:px-6 py-2 border-b border-muted shadow-sm">
+    <header className="fixed bg-background top-0 inset-x-0 z-50 flex items-center justify-between px-4 sm:px-6 py-2 border-b border-border">
       <div className="flex items-center gap-4">
         <Link to="/">
           <img src={GIcon} alt="Ícone do Gabinete" className="size-12" />
@@ -30,10 +30,10 @@ export function CitizenHeader() {
                   variant="ghost"
                   size="sm"
                   className={cn(
-                    "gap-1.5 rounded-full text-xs font-medium transition-colors",
+                    "gap-1.5 rounded-md text-xs font-medium transition-colors",
                     isActive
-                      ? "bg-primary/10 text-primary hover:bg-primary/15"
-                      : "text-muted-foreground hover:text-foreground",
+                      ? "bg-muted text-foreground"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/60",
                   )}
                 >
                   <Icon className="size-3.5" />

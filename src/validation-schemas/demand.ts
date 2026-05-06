@@ -24,10 +24,10 @@ export const demandSchema = z.object({
   files: z
     .array(z.instanceof(File), { error: "Envie pelo menos um arquivo" })
     .min(1, "Envie pelo menos um arquivo"),
-  guestEmail: z
-    .email("Digite um e-mail válido")
-    .optional()
-    .or(z.literal("")),
+  guestEmail: z.string().email("Digite um e-mail válido").optional().or(z.literal("")),
+  termsAccepted: z.literal(true, {
+    error: "Você deve aceitar os termos de uso.",
+  }),
 });
 
 export type DemandFormData = z.infer<typeof demandSchema>;
@@ -48,4 +48,5 @@ export const defaultDemandValues: DemandFormData = {
   },
   files: [],
   guestEmail: "",
+  termsAccepted: false as unknown as true,
 };

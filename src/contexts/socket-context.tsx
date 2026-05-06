@@ -16,31 +16,29 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
-    if (user && !socketRef.current) {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      const socketUrl = apiUrl.replace(/\/api$/, '');
+    if (!user) return;
 
-      const socket = io(socketUrl, {
-        query: { userId: user.id },
-        transports: ['websocket'],
-      });
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+    const socketUrl = apiUrl.replace(/\/api$/, '');
 
-      socket.on('notification', (notification) => {
-        queryClient.invalidateQueries({ queryKey: ['notifications'] });
-        const link: string = notification?.link ?? '';
-        if (link.startsWith('/demands/') || link.startsWith('/comments/')) {
-          queryClient.invalidateQueries({ queryKey: ['demands'] });
-        }
-      });
+    const socket = io(socketUrl, {
+      query: { userId: user.id },
+      transports: ['websocket'],
+    });
 
-      socketRef.current = socket;
-    }
+    socket.on('notification', (notification) => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      const link: string = notification?.link ?? '';
+      if (link.startsWith('/demands/') || link.startsWith('/comments/')) {
+        queryClient.invalidateQueries({ queryKey: ['demands'] });
+      }
+    });
+
+    socketRef.current = socket;
 
     return () => {
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-        socketRef.current = null;
-      }
+      socket.disconnect();
+      socketRef.current = null;
     };
   }, [user]);
 

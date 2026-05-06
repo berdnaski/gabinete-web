@@ -3,6 +3,15 @@ import { DemandsApi } from ".";
 import { queryClient } from "../queryClient";
 import { DemandStatus, type CreateDemandCommentProps, type CreateDemandProps, type Demand, type ListDemandCommentsParams, type ListDemandsByCabinetSlugParams, type ListDemandsParams } from "./types";
 
+export function useGetCabinetDashboardSummary(slug?: string) {
+  return useQuery({
+    queryKey: ["cabinet-dashboard-summary", slug],
+    queryFn: () => DemandsApi.getDashboardSummary(slug!),
+    enabled: !!slug,
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
 export function useGetHeatmap() {
   return useQuery({
     queryKey: ["demands-heatmap"],
@@ -49,11 +58,13 @@ export function useGetDemands(params: ListDemandsParams) {
   });
 }
 
-export function useGetDemandsByCabinetSlug(params: ListDemandsByCabinetSlugParams) {
+export function useGetDemandsByCabinetSlug(params: ListDemandsByCabinetSlugParams & { enabled?: boolean }) {
+  const { enabled = true, ...queryParams } = params
   return useQuery({
-    queryKey: ["demands", params],
-    queryFn: () => DemandsApi.listDemandsByCabinetSlug(params),
+    queryKey: ["demands", queryParams],
+    queryFn: () => DemandsApi.listDemandsByCabinetSlug(queryParams),
     placeholderData: (previousData) => previousData,
+    enabled: enabled && !!queryParams.slug,
   });
 }
 

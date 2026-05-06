@@ -10,6 +10,7 @@ export interface RegisterRequest {
 	name: string;
 	email: string;
 	password: string;
+	termsAccepted: boolean;
 }
 
 export interface LoginResponse {
@@ -47,4 +48,5 @@ export interface GetUserProfileResponse {
 	phone: string | null;
 	hasSetPassword: boolean;
 	isCabinetMember: boolean;
+	termsAcceptedAt: string | null;
 }

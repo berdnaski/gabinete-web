@@ -42,6 +42,15 @@ export function DemandsTable() {
 
   const isMyTasks = assigneeMemberIdParam === currentMember?.id
 
+  function showAllTasks() {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev)
+      next.delete("assigneeMemberId")
+      next.delete("page")
+      return next
+    })
+  }
+
   function toggleMyTasks() {
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev)
@@ -85,14 +94,7 @@ export function DemandsTable() {
                 ? "bg-background text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground",
             )}
-            onClick={() => {
-              setSearchParams((prev) => {
-                const next = new URLSearchParams(prev)
-                next.delete("assigneeMemberId")
-                next.delete("page")
-                return next
-              })
-            }}
+            onClick={showAllTasks}
           >
             Todas
           </Button>

@@ -107,6 +107,8 @@ export interface ListDemandsParams {
 	limit?: number;
 	search?: string;
 	status?: DemandStatus;
+	statuses?: DemandStatus[];
+	categories?: string[];
 	priority?: DemandPriority;
 	startDate?: string;
 	endDate?: string;
@@ -182,4 +184,22 @@ export interface DemandCommmentsPaginatedResponse {
 export interface CreateDemandCommentProps {
 	content: string;
 	demandId: string;
+}
+
+export interface DashboardCategoryStat {
+	id: string;
+	name: string;
+	total: number;
+}
+
+export interface DashboardNeighborhoodStat {
+	name: string;
+	total: number;
+}
+
+export interface CabinetDashboardSummary {
+	total: number;
+	resolved: number;
+	mainNeighborhoods: DashboardNeighborhoodStat[];
+	categories: DashboardCategoryStat[];
 }

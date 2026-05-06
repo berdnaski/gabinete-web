@@ -5,6 +5,7 @@ import { AppSidebar } from "./components/app-sidebar";
 import { Header } from "./components/header";
 import { CitizenHeader } from "./components/citizen-header";
 import { UserRole } from "@/api/users/types";
+import { ConsentOverlay } from "../auth/consent-overlay";
 
 const rolesWithSidebar = [UserRole.ADMIN, UserRole.MEMBER]
 
@@ -28,6 +29,7 @@ export function Layout() {
             <Outlet />
           </div>
         </SidebarInset>
+        <ConsentOverlay />
       </SidebarProvider>
     )
   }
@@ -38,6 +40,7 @@ export function Layout() {
       <div className="pt-20 p-6 min-h-screen bg-[#F8F8F8]">
         <Outlet />
       </div>
+      <ConsentOverlay />
     </div>
   );
 }

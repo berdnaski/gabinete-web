@@ -1,10 +1,7 @@
 import { useGetDemands } from "@/api/demands/hooks"
-import type { Demand } from "@/api/demands/types"
 import { Separator } from "@/components/ui/separator"
-import {
-  PencilLineIcon
-} from "lucide-react"
-import { useMemo, useState } from "react"
+import { PencilLineIcon } from "lucide-react"
+import { useState } from "react"
 import { DemandCard } from "../demand-card"
 import { DemandsFilterV2, type DemandsFilterValue } from "../demands-filter-v2"
 import { DialogDemandForm } from "../dialog-demand-form"
@@ -13,14 +10,14 @@ import { DialogDemandForm } from "../dialog-demand-form"
 function EmptyState({ search }: { search: string }) {
   return (
     <div className="flex flex-col items-center justify-center py-24 text-center">
-      <div className="size-16 rounded-2xl bg-zinc-100 flex items-center justify-center mb-4">
-        <PencilLineIcon className="size-6 text-zinc-300" />
+      <div className="size-12 rounded-xl bg-muted flex items-center justify-center mb-3">
+        <PencilLineIcon className="size-5 text-muted-foreground" />
       </div>
-      <p className="text-sm font-semibold text-zinc-700">
+      <p className="text-sm font-semibold text-foreground">
         {search ? `Nenhum resultado para "${search}"` : "Nenhuma demanda encontrada"}
       </p>
-      <p className="text-xs text-zinc-400 mt-1.5 max-w-55 leading-relaxed">
-        Ajuste os filtros ou registre uma nova demanda na sua comunidade.
+      <p className="text-xs text-muted-foreground mt-1 max-w-56 leading-relaxed">
+        Ajuste os filtros ou registre uma nova demanda.
       </p>
     </div>
   )
@@ -38,29 +35,18 @@ export function DemandsFeed() {
   const { data, isLoading } = useGetDemands({
     search: filters.search.trim() || undefined,
     priority: filters.priority ?? undefined,
+    statuses: filters.status.length > 0 ? filters.status : undefined,
+    categories: filters.categories.length > 0 ? filters.categories : undefined,
     startDate: filters.dateRange?.from?.toISOString(),
     endDate: filters.dateRange?.to?.toISOString(),
     limit: 100,
   })
 
-  const filtered = useMemo(() => {
-    const priorityOrder: Record<string, number> = { URGENT: 0, HIGH: 1, MEDIUM: 2, LOW: 3 }
-    let result: Demand[] = (data?.items ?? []).sort((a, b) => {
-      const pa = priorityOrder[a.priority ?? "LOW"]
-      const pb = priorityOrder[b.priority ?? "LOW"]
-      if (pa !== pb) return pa - pb
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    })
-    if (filters.status.length > 0)
-      result = result.filter((d) => filters.status.includes(d.status))
-    if (filters.categories.length > 0)
-      result = result.filter((d) => filters.categories.includes(d.categoryId))
-    return result
-  }, [data, filters])
+  const demands = data?.items ?? []
 
   return (
     <div className="max-w-4xl mx-auto md:flex items-start gap-6">
-      <DemandsFilterV2 value={filters} onChange={setFilters} resultCount={filtered.length} />
+      <DemandsFilterV2 value={filters} onChange={setFilters} resultCount={demands.length} />
 
       <Separator className="my-4 md:hidden" />
 
@@ -68,11 +54,11 @@ export function DemandsFeed() {
         <DialogDemandForm />
 
         {isLoading ? (
-          <div className="flex justify-center py-24 text-sm text-zinc-400">Carregando...</div>
-        ) : filtered.length === 0 ? (
+          <div className="flex justify-center py-24 text-sm text-muted-foreground">Carregando...</div>
+        ) : demands.length === 0 ? (
           <EmptyState search={filters.search} />
         ) : (
-          filtered.map((demand) => (
+          demands.map((demand) => (
             <DemandCard key={demand.id} demand={demand} />
           ))
         )}

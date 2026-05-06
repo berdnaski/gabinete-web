@@ -1,5 +1,5 @@
 import { apiClient } from "..";
-import type { Cabinet, CabinetMember, CabinetMetrics } from "./types";
+import type { Cabinet, CabinetMember, CabinetMetrics, CabinetTrendDetailedPoint, CabinetTrendPoint } from "./types";
 
 const baseURL = "/cabinets";
 
@@ -29,6 +29,21 @@ export const CabinetsApi = {
 
   getMetrics: async (slug: string): Promise<CabinetMetrics> => {
     const response = await apiClient.get<CabinetMetrics>(`/demands/cabinet/${slug}/metrics`);
+    return response.data;
+  },
+
+  getTrend: async (slug: string, days = 14): Promise<CabinetTrendPoint[]> => {
+    const response = await apiClient.get<CabinetTrendPoint[]>(`/demands/cabinet/${slug}/trend`, {
+      params: { days },
+    });
+    return response.data;
+  },
+
+  getTrendDetailed: async (slug: string, days = 14): Promise<CabinetTrendDetailedPoint[]> => {
+    const response = await apiClient.get<CabinetTrendDetailedPoint[]>(
+      `/demands/cabinet/${slug}/trend-detailed`,
+      { params: { days } },
+    );
     return response.data;
   },
 

@@ -1,5 +1,5 @@
 import { apiClient } from "..";
-import type { CreateDemandCommentProps, CreateDemandProps, Demand, DemandCommmentsPaginatedResponse, DemandStatus, HeatmapResponse, ListDemandCommentsParams, ListDemandsByCabinetSlugParams, ListDemandsParams, NeighborhoodCount, PaginatedResponse } from "./types";
+import type { CabinetDashboardSummary, CreateDemandCommentProps, CreateDemandProps, Demand, DemandCommmentsPaginatedResponse, DemandStatus, HeatmapResponse, ListDemandCommentsParams, ListDemandsByCabinetSlugParams, ListDemandsParams, NeighborhoodCount, PaginatedResponse } from "./types";
 
 export type { CreateDemandProps } from "./types";
 
@@ -18,6 +18,8 @@ export const DemandsApi = {
 				page: params.page,
 				limit: params.limit,
 				status: params.status,
+				statuses: params.statuses?.join(','),
+				categories: params.categories?.join(','),
 				search: params.search,
 				endDate: params.endDate,
 				priority: params.priority,
@@ -42,7 +44,7 @@ export const DemandsApi = {
 	},
 
 	updateStatus: async (id: string, status: DemandStatus): Promise<Demand> => {
-		const response = await apiClient.patch<Demand>(`${baseURL}/${id}/status`, { status });
+		const response = await apiClient.patch<Demand>(`${baseURL}/${id}/progress`, { status });
 		return response.data;
 	},
 
@@ -116,6 +118,13 @@ export const DemandsApi = {
 	listDemandComments: async ({ demandId, page, limit }: ListDemandCommentsParams): Promise<DemandCommmentsPaginatedResponse> => {
 		const response = await apiClient.get<DemandCommmentsPaginatedResponse>(`/demands/${demandId}/comments`, {
 			params: { page, limit },
+		});
+		return response.data;
+	},
+
+	getDashboardSummary: async (slug: string, month?: number, year?: number): Promise<CabinetDashboardSummary> => {
+		const response = await apiClient.get<CabinetDashboardSummary>(`${baseURL}/cabinet/${slug}/dashboard/summary`, {
+			params: { month, year },
 		});
 		return response.data;
 	},

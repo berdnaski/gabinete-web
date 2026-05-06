@@ -12,6 +12,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Controller } from 'react-hook-form'
 
 export function SignUpForm() {
 	const navigate = useNavigate();
@@ -27,6 +29,7 @@ export function SignUpForm() {
 			name: "",
 			email: "",
 			password: "",
+			termsAccepted: false as unknown as true,
 		},
 	});
 
@@ -97,6 +100,41 @@ export function SignUpForm() {
 					/>
 				</Field>
 
+				<div className="flex flex-col gap-2">
+					<div className="flex items-center gap-3">
+						<Controller
+							control={control}
+							name="termsAccepted"
+							render={({ field }) => (
+								<Checkbox
+									id="terms"
+									checked={field.value}
+									onCheckedChange={field.onChange}
+									disabled={isFormSubmittingOrIsPending}
+								/>
+							)}
+						/>
+						<label 
+							htmlFor="terms" 
+							className="text-sm font-medium leading-none cursor-pointer text-zinc-600"
+						>
+							Aceito os{" "}
+							<Link to="/termos-de-uso" target="_blank" className="text-primary hover:underline">
+								Termos de Uso
+							</Link>{" "}
+							e a{" "}
+							<Link to="/politica-de-privacidade" target="_blank" className="text-primary hover:underline">
+								Política de Privacidade
+							</Link>
+						</label>
+					</div>
+					{form.formState.errors.termsAccepted && (
+						<p className="text-xs font-medium text-destructive">
+							{form.formState.errors.termsAccepted.message}
+						</p>
+					)}
+				</div>
+
 				<Button
 					type="submit"
 					disabled={isFormSubmittingOrIsPending}
@@ -132,6 +170,13 @@ export function SignUpForm() {
 					</svg>
 					Continuar com o Google
 				</Button>
+
+				<p className="text-[10px] text-center text-muted-foreground mt-2 px-6">
+					Ao continuar, você concorda com nossos{" "}
+					<Link to="/termos-de-uso" className="underline hover:text-primary" target="_blank">Termos de Uso</Link>{" "}
+					e{" "}
+					<Link to="/politica-de-privacidade" className="underline hover:text-primary" target="_blank">Política de Privacidade</Link>.
+				</p>
 
 				<p className="text-center text-zinc-500 text-sm mt-2">
 					Já possui uma conta?{" "}

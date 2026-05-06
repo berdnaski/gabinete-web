@@ -1,7 +1,10 @@
 import type { Demand } from "@/api/demands/types"
+import { useDeleteResult, useGetDemandResults } from "@/api/results/hooks"
+import type { Result, ResultType } from "@/api/results/types"
+import { CreateResultDialog } from "./create-result-dialog"
 import { DemandStatusBadge } from "./demand-status-badge"
-import { UpdateProgressDialog } from "./update-progress-dialog"
 import { Gallery } from "./gallery"
+import { UpdateProgressDialog } from "./update-progress-dialog"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { Button } from "./ui/button"
 import { Separator } from "./ui/separator"
@@ -12,19 +15,39 @@ import {
   SheetTitle,
 } from "./ui/sheet"
 import { useAuth } from "@/hooks/use-auth"
+import { useCurrentMember } from "@/hooks/use-current-member"
+import { cn } from "@/lib/utils"
 import { getFirstLettersFromNames } from "@/utils/get-first-letters-from-names"
 import { formatDateToNow } from "@/utils/format-date-to-now"
 import {
   CalendarIcon,
   ExternalLinkIcon,
+  Loader2,
   MapPinIcon,
+  Plus,
   TagIcon,
+  Trash2,
   TrendingUp,
   UserRound,
 } from "lucide-react"
 import { useState } from "react"
 import { Link } from "react-router-dom"
 import { DemandPriority } from "@/pages/private/demands/components/demand-priority"
+import { toast } from "sonner"
+
+const RESULT_TYPE_LABELS: Record<ResultType, string> = {
+  INFRASTRUCTURE: "Infraestrutura",
+  SOCIAL: "Social",
+  LEGISLATIVE: "Legislativo",
+  OTHER: "Outro",
+}
+
+const RESULT_TYPE_DOT: Record<ResultType, string> = {
+  INFRASTRUCTURE: "bg-blue-500",
+  SOCIAL: "bg-emerald-500",
+  LEGISLATIVE: "bg-purple-500",
+  OTHER: "bg-muted-foreground/40",
+}
 
 interface DemandDetailSheetProps {
   demand: Demand | null
@@ -32,14 +55,25 @@ interface DemandDetailSheetProps {
   onOpenChange: (open: boolean) => void
 }
 
-export function DemandDetailSheet({ demand, open, onOpenChange }: DemandDetailSheetProps) {
+export function DemandDetailSheet({
+  demand,
+  open,
+  onOpenChange,
+}: DemandDetailSheetProps) {
   const { user, cabinet } = useAuth()
+  const { currentMember } = useCurrentMember()
   const [progressOpen, setProgressOpen] = useState(false)
+  const [resultOpen, setResultOpen] = useState(false)
+
+  const { data: resultsData, isLoading: resultsLoading } = useGetDemandResults(demand?.id)
+  const results = resultsData?.items ?? []
 
   if (!demand) return null
 
   const isCabinetMember = user?.isCabinetMember ?? false
-  const isMyDemand = demand.cabinetId && cabinet?.id === demand.cabinetId
+  const isMyDemand = !!demand.cabinetId && cabinet?.id === demand.cabinetId
+  const isAssignedMember = !!demand.assigneeMemberId && currentMember?.id === demand.assigneeMemberId
+  const canManage = isCabinetMember && isMyDemand
 
   const mapsUrl =
     demand.lat && demand.long
@@ -68,10 +102,11 @@ export function DemandDetailSheet({ demand, open, onOpenChange }: DemandDetailSh
 
           <div className="flex-1 overflow-y-auto">
             <div className="px-5 py-4 flex flex-col gap-5">
-
               <section>
                 <SectionLabel>Descrição</SectionLabel>
-                <p className="text-sm text-foreground/80 leading-relaxed">{demand.description}</p>
+                <p className="text-sm text-foreground/80 leading-relaxed">
+                  {demand.description}
+                </p>
               </section>
 
               <section className="grid grid-cols-2 gap-3">
@@ -85,7 +120,7 @@ export function DemandDetailSheet({ demand, open, onOpenChange }: DemandDetailSh
                 </InfoItem>
               </section>
 
-              {demand.reporter && (
+              {demand.reporter ? (
                 <section>
                   <SectionLabel>Relatado por</SectionLabel>
                   <div className="flex items-center gap-2.5">
@@ -96,7 +131,9 @@ export function DemandDetailSheet({ demand, open, onOpenChange }: DemandDetailSh
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="text-sm font-medium text-foreground">{demand.reporter.name}</p>
+                      <p className="text-sm font-medium text-foreground">
+                        {demand.reporter.name}
+                      </p>
                       {demand.reporterId && (
                         <Link
                           to={`/profile/${demand.reporterId}`}
@@ -109,9 +146,7 @@ export function DemandDetailSheet({ demand, open, onOpenChange }: DemandDetailSh
                     </div>
                   </div>
                 </section>
-              )}
-
-              {!demand.reporter && demand.guestEmail && (
+              ) : demand.guestEmail ? (
                 <section>
                   <SectionLabel>Relatado por</SectionLabel>
                   <div className="flex items-center gap-2.5">
@@ -121,7 +156,7 @@ export function DemandDetailSheet({ demand, open, onOpenChange }: DemandDetailSh
                     <p className="text-sm text-muted-foreground">{demand.guestEmail}</p>
                   </div>
                 </section>
-              )}
+              ) : null}
 
               {demand.address && (
                 <section>
@@ -148,10 +183,49 @@ export function DemandDetailSheet({ demand, open, onOpenChange }: DemandDetailSh
 
               {demand.evidences && demand.evidences.length > 0 && (
                 <section>
-                  <SectionLabel>Evidências ({demand.evidences.length})</SectionLabel>
+                  <SectionLabel>
+                    Evidências do cidadão ({demand.evidences.length})
+                  </SectionLabel>
                   <Gallery images={demand.evidences} />
                 </section>
               )}
+
+              <section>
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <SectionLabel noMargin>
+                    Resultados{results.length > 0 ? ` (${results.length})` : ""}
+                  </SectionLabel>
+                  {isAssignedMember && (
+                    <button
+                      onClick={() => setResultOpen(true)}
+                      className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:text-primary/80 transition-colors"
+                    >
+                      <Plus className="size-3.5" />
+                      Adicionar
+                    </button>
+                  )}
+                </div>
+
+                {resultsLoading ? (
+                  <div className="flex justify-center py-6">
+                    <Loader2 className="size-4 text-muted-foreground animate-spin" />
+                  </div>
+                ) : results.length > 0 ? (
+                  <div className="flex flex-col gap-2">
+                    {results.map((result) => (
+                      <ResultCard key={result.id} result={result} canDelete={canManage} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="rounded-lg border border-border/60 bg-muted/20 px-4 py-5 text-center">
+                    <p className="text-sm text-muted-foreground">
+                      {isAssignedMember
+                        ? "Nenhum resultado ainda. Registre o que foi feito."
+                        : "Nenhum resultado registrado."}
+                    </p>
+                  </div>
+                )}
+              </section>
 
               {demand.cabinet && (
                 <section>
@@ -167,14 +241,16 @@ export function DemandDetailSheet({ demand, open, onOpenChange }: DemandDetailSh
                         {getFirstLettersFromNames(demand.cabinet.name)}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="text-sm font-medium text-foreground">{demand.cabinet.name}</span>
+                    <span className="text-sm font-medium text-foreground">
+                      {demand.cabinet.name}
+                    </span>
                   </Link>
                 </section>
               )}
             </div>
           </div>
 
-          {isCabinetMember && isMyDemand && (
+          {canManage && (
             <>
               <Separator />
               <div className="px-5 py-4 shrink-0 flex items-center gap-2">
@@ -185,12 +261,10 @@ export function DemandDetailSheet({ demand, open, onOpenChange }: DemandDetailSh
                   <TrendingUp className="size-4" />
                   Atualizar progresso
                 </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => onOpenChange(false)}
-                  asChild
-                >
-                  <Link to={`/comments/${demand.id}`}>Ver comentários</Link>
+                <Button variant="outline" asChild>
+                  <Link to={`/comments/${demand.id}`} onClick={() => onOpenChange(false)}>
+                    Ver comentários
+                  </Link>
                 </Button>
               </div>
             </>
@@ -198,7 +272,7 @@ export function DemandDetailSheet({ demand, open, onOpenChange }: DemandDetailSh
         </SheetContent>
       </Sheet>
 
-      {isCabinetMember && isMyDemand && (
+      {canManage && (
         <UpdateProgressDialog
           demandId={demand.id}
           demandTitle={demand.title}
@@ -208,13 +282,113 @@ export function DemandDetailSheet({ demand, open, onOpenChange }: DemandDetailSh
           onSuccess={() => onOpenChange(false)}
         />
       )}
+
+      {isAssignedMember && (
+        <CreateResultDialog
+          demand={demand}
+          open={resultOpen}
+          onOpenChange={setResultOpen}
+        />
+      )}
     </>
   )
 }
 
-function SectionLabel({ children }: { children: React.ReactNode }) {
+function ResultCard({ result, canDelete }: { result: Result; canDelete?: boolean }) {
+  const { mutate: deleteResult, isPending: isDeleting } = useDeleteResult(result.demandId)
+  const [confirming, setConfirming] = useState(false)
+
+  function handleDelete() {
+    deleteResult(result.id, {
+      onError: () => toast.error("Erro ao excluir resultado"),
+    })
+  }
+
   return (
-    <p className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground mb-2">
+    <div className="rounded-lg border border-border/60 bg-card px-4 py-3 flex flex-col gap-2">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-1.5">
+          <span className={cn("size-1.5 rounded-full shrink-0", RESULT_TYPE_DOT[result.type])} />
+          <span className="text-xs font-medium text-muted-foreground">
+            {RESULT_TYPE_LABELS[result.type]}
+          </span>
+        </div>
+
+        {canDelete ? (
+          confirming ? (
+            <div className="flex items-center gap-2.5">
+              <button
+                onClick={() => setConfirming(false)}
+                className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="text-xs text-destructive font-medium hover:text-destructive/70 transition-colors disabled:opacity-50"
+              >
+                {isDeleting ? "Excluindo..." : "Excluir"}
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground shrink-0">
+                {formatDateToNow(result.createdAt)}
+              </span>
+              <button
+                onClick={() => setConfirming(true)}
+                className="text-muted-foreground/30 hover:text-destructive transition-colors"
+                title="Excluir resultado"
+              >
+                <Trash2 className="size-3.5" />
+              </button>
+            </div>
+          )
+        ) : (
+          <span className="text-xs text-muted-foreground shrink-0">
+            {formatDateToNow(result.createdAt)}
+          </span>
+        )}
+      </div>
+
+      <p className="text-sm font-medium text-foreground leading-snug">{result.title}</p>
+      <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3">
+        {result.description}
+      </p>
+
+      {result.images && result.images.length > 0 && (
+        <div className="grid grid-cols-4 gap-1 mt-1">
+          {result.images.map((img) => (
+            <a
+              key={img.id}
+              href={img.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="aspect-square rounded-md overflow-hidden border border-border bg-muted block"
+            >
+              <img
+                src={img.url}
+                alt=""
+                className="w-full h-full object-cover hover:opacity-80 transition-opacity"
+              />
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function SectionLabel({
+  children,
+  noMargin = false,
+}: {
+  children: React.ReactNode
+  noMargin?: boolean
+}) {
+  return (
+    <p className={cn("text-xs font-medium text-muted-foreground", !noMargin && "mb-2")}>
       {children}
     </p>
   )
@@ -233,7 +407,7 @@ function InfoItem({
     <div className="flex flex-col gap-1">
       <div className="flex items-center gap-1.5 text-muted-foreground">
         {icon}
-        <span className="text-2xs font-semibold uppercase tracking-widest">{label}</span>
+        <span className="text-xs font-medium">{label}</span>
       </div>
       <span className="text-sm text-foreground">{children}</span>
     </div>

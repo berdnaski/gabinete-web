@@ -7,6 +7,8 @@ export interface Cabinet {
   email?: string;
   score: number;
   demand_count: number;
+  in_progress_count: number;
+  resolved_count: number;
 }
 
 export interface CabinetMember {
@@ -19,9 +21,30 @@ export interface CabinetMember {
   userEmail: string | null;
 }
 
+export interface CabinetStatusCounts {
+  SUBMITTED: number;
+  IN_ANALYSIS: number;
+  IN_PROGRESS: number;
+  RESOLVED: number;
+  REJECTED: number;
+  CANCELED: number;
+}
+
 export interface CabinetMetrics {
   new: number;
   urgent: number;
   total: number;
+  resolved: number;
+  statusCounts: CabinetStatusCounts;
+}
+
+export interface CabinetTrendPoint {
+  date: string;
+  count: number;
+}
+
+export interface CabinetTrendDetailedPoint {
+  date: string;
+  created: number;
   resolved: number;
 }

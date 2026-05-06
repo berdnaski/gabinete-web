@@ -9,6 +9,7 @@ export interface User {
   role: string;
   avatarUrl?: string;
   phone?: string;
+  termsAcceptedAt?: string | Date;
 }
 
 export const UsersApi = {
@@ -21,6 +22,9 @@ export const UsersApi = {
     const formData = new FormData();
     if (data.name) formData.append("name", data.name);
     if (data.phone) formData.append("phone", data.phone);
+    if (data.termsAcceptedAt) {
+      formData.append("termsAcceptedAt", typeof data.termsAcceptedAt === 'string' ? data.termsAcceptedAt : data.termsAcceptedAt.toISOString());
+    }
     if (file) formData.append("avatar", file);
 
     const response = await apiClient.patch<User>(`${baseURL}/${id}`, formData, {

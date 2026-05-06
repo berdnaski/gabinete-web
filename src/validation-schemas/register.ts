@@ -8,6 +8,9 @@ export const registerFormSchema = z.object({
   password: z.string().min(6, {
     error: "Insira uma senha com no mínimo 6 caracteres.",
   }),
+  termsAccepted: z.literal(true, {
+    error: "Você deve aceitar os termos de uso.",
+  }),
 });
 
 export type RegisterFormData = z.infer<typeof registerFormSchema>

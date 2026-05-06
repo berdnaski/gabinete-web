@@ -11,25 +11,17 @@ import {
 } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
-import {
-  CheckCircle2,
-  CircleDot,
-  Clock,
-  Loader2,
-  Search,
-  XCircle,
-  Ban,
-} from "lucide-react"
+import { Loader2 } from "lucide-react"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 
-const STATUS_ICONS: Record<DemandStatusType, React.ElementType> = {
-  [DemandStatus.SUBMITTED]: CircleDot,
-  [DemandStatus.IN_ANALYSIS]: Search,
-  [DemandStatus.IN_PROGRESS]: Clock,
-  [DemandStatus.RESOLVED]: CheckCircle2,
-  [DemandStatus.REJECTED]: XCircle,
-  [DemandStatus.CANCELED]: Ban,
+const STATUS_DOT: Record<DemandStatusType, string> = {
+  [DemandStatus.SUBMITTED]: "bg-slate-400",
+  [DemandStatus.IN_ANALYSIS]: "bg-blue-500",
+  [DemandStatus.IN_PROGRESS]: "bg-amber-500",
+  [DemandStatus.RESOLVED]: "bg-emerald-500",
+  [DemandStatus.REJECTED]: "bg-red-500",
+  [DemandStatus.CANCELED]: "bg-zinc-400",
 }
 
 const STATUS_DESCRIPTIONS: Record<DemandStatusType, string> = {
@@ -39,15 +31,6 @@ const STATUS_DESCRIPTIONS: Record<DemandStatusType, string> = {
   [DemandStatus.RESOLVED]: "Concluída com sucesso",
   [DemandStatus.REJECTED]: "Não será atendida",
   [DemandStatus.CANCELED]: "Encerrada sem resolução",
-}
-
-const STATUS_DOT: Record<DemandStatusType, string> = {
-  [DemandStatus.SUBMITTED]: "bg-slate-400",
-  [DemandStatus.IN_ANALYSIS]: "bg-blue-500",
-  [DemandStatus.IN_PROGRESS]: "bg-amber-500",
-  [DemandStatus.RESOLVED]: "bg-emerald-500",
-  [DemandStatus.REJECTED]: "bg-red-500",
-  [DemandStatus.CANCELED]: "bg-zinc-400",
 }
 
 const STATUSES_REQUIRING_NOTE: DemandStatusType[] = [
@@ -129,55 +112,50 @@ export function UpdateProgressDialog({
         </DialogHeader>
 
         <div className="rounded-lg border border-border bg-muted/40 px-3.5 py-2.5">
-          <p className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground mb-0.5">
-            Demanda
-          </p>
+          <p className="text-xs text-muted-foreground mb-0.5">Demanda</p>
           <p className="text-sm font-medium text-foreground line-clamp-2">{demandTitle}</p>
         </div>
 
         <div className="flex flex-col gap-2">
-          <p className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground">
-            Novo status
-          </p>
-          <div className="grid grid-cols-1 gap-1.5">
+          <p className="text-xs font-medium text-muted-foreground">Status</p>
+          <div className="flex flex-col gap-1">
             {Object.values(DemandStatus).map((status) => {
               const config = DEMAND_STATUS_CONFIG[status]
-              const Icon = STATUS_ICONS[status]
               const isSelected = selectedStatus === status
               const isCurrent = currentStatus === status
               return (
                 <button
                   key={status}
                   type="button"
-                  data-selected={isSelected}
                   onClick={() => setSelectedStatus(status)}
                   className={cn(
-                    "flex items-center gap-3 w-full rounded-lg border px-3.5 py-2.5 text-left transition-all",
-                    config.className,
-                    isSelected && "ring-1 ring-inset ring-current/20",
+                    "flex items-center gap-3 w-full rounded-lg border px-3.5 py-2.5 text-left transition-colors",
+                    isSelected
+                      ? "border-foreground/20 bg-muted"
+                      : "border-border hover:bg-muted/40",
                   )}
                 >
-                  <span className={cn("size-2 rounded-full shrink-0", STATUS_DOT[status])} />
+                  <span className={cn("size-1.5 rounded-full shrink-0", STATUS_DOT[status])} />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
                       <span className="text-sm font-medium text-foreground">{config.label}</span>
                       {isCurrent && (
-                        <span className="text-2xs font-medium text-muted-foreground bg-muted rounded-full px-1.5 py-0.5">
+                        <span className="text-2xs font-medium text-muted-foreground bg-background rounded px-1.5 py-0.5 border border-border/60">
                           atual
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-muted-foreground">{STATUS_DESCRIPTIONS[status]}</p>
+                    <p className="text-xs text-muted-foreground leading-none mt-0.5">
+                      {STATUS_DESCRIPTIONS[status]}
+                    </p>
                   </div>
-                  <div className={cn(
-                    "size-4 rounded-full border-2 shrink-0 transition-all",
-                    isSelected ? "border-current bg-current scale-110" : "border-border",
-                  )}>
-                    {isSelected && (
-                      <div className="size-full rounded-full flex items-center justify-center">
-                        <div className="size-1.5 rounded-full bg-white" />
-                      </div>
+                  <div
+                    className={cn(
+                      "size-3.5 rounded-full border shrink-0 flex items-center justify-center transition-all",
+                      isSelected ? "border-foreground/30" : "border-border",
                     )}
+                  >
+                    {isSelected && <div className="size-1.5 rounded-full bg-foreground/60" />}
                   </div>
                 </button>
               )
@@ -186,13 +164,14 @@ export function UpdateProgressDialog({
         </div>
 
         <div className="flex flex-col gap-2">
-          <p className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground">
-            Motivo / Nota{" "}
-            {requiresNote
-              ? <span className="normal-case font-normal text-destructive/70">(obrigatório)</span>
-              : <span className="normal-case font-normal text-muted-foreground/70">(opcional)</span>
-            }
-          </p>
+          <div className="flex items-center gap-1.5">
+            <p className="text-xs font-medium text-muted-foreground">Nota</p>
+            {requiresNote ? (
+              <span className="text-xs text-destructive/70">(obrigatório)</span>
+            ) : (
+              <span className="text-xs text-muted-foreground/60">(opcional)</span>
+            )}
+          </div>
           <Textarea
             placeholder={
               requiresNote
@@ -209,7 +188,7 @@ export function UpdateProgressDialog({
             )}
           />
           {note.length > 400 && (
-            <p className="text-xs text-muted-foreground text-right">{note.length}/500</p>
+            <p className="text-xs text-muted-foreground text-right tabular-nums">{note.length}/500</p>
           )}
         </div>
 
