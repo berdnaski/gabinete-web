@@ -28,9 +28,6 @@ import { Loader2, PlusIcon } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Controller } from "react-hook-form";
-import { Link } from "react-router-dom";
 
 interface DemandFormProps {
   sizeTrigger: "default" | "xs" | "sm" | "lg" | "icon" | "icon-xs" | "icon-sm" | "icon-lg" | null | undefined;
@@ -49,7 +46,6 @@ export function DemandsForm({ sizeTrigger }: DemandFormProps) {
       description: "",
       location: undefined,
       categoryId: undefined,
-      termsAccepted: false,
     },
   });
 
@@ -80,11 +76,6 @@ export function DemandsForm({ sizeTrigger }: DemandFormProps) {
       return;
     }
 
-    if (!data.termsAccepted) {
-      form.setError("termsAccepted", { message: "Você deve aceitar os termos de uso." });
-      return;
-    }
-
     try {
       setIsUploading(true);
 
@@ -102,7 +93,6 @@ export function DemandsForm({ sizeTrigger }: DemandFormProps) {
         state: data.location?.state,
         guestEmail: !isAuthenticated ? data.guestEmail : undefined,
         cabinetId: isAuthenticated && cabinet ? cabinet.id : undefined,
-        termsAccepted: data.termsAccepted,
       });
 
       if (data.files?.length) {
@@ -248,41 +238,6 @@ export function DemandsForm({ sizeTrigger }: DemandFormProps) {
               <FieldLabel>Evidências</FieldLabel>
               <ImageDropzoneForm name="files" control={control} />
             </Field>
-
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-3">
-                <Controller
-                  control={control}
-                  name="termsAccepted"
-                  render={({ field }) => (
-                    <Checkbox
-                      id="terms-demand"
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                      disabled={isFormSubmitting}
-                    />
-                  )}
-                />
-                <label 
-                  htmlFor="terms-demand" 
-                  className="text-sm font-medium leading-none cursor-pointer"
-                >
-                  Aceito os{" "}
-                  <Link to="/termos-de-uso" target="_blank" className="text-primary hover:underline">
-                    Termos de Uso
-                  </Link>{" "}
-                  e a{" "}
-                  <Link to="/politica-de-privacidade" target="_blank" className="text-primary hover:underline">
-                    Política de Privacidade
-                  </Link>
-                </label>
-              </div>
-              {form.formState.errors.termsAccepted && (
-                <p className="text-xs font-medium text-destructive">
-                  {form.formState.errors.termsAccepted.message}
-                </p>
-              )}
-            </div>
           </FieldGroup>
 
           <SheetFooter>

@@ -23,7 +23,6 @@ export const demandSchema = z.object({
   location: locationSchema,
   files: z.array(z.instanceof(File)).optional().default([]),
   guestEmail: z.string().email("Digite um e-mail válido").optional().or(z.literal("")),
-  termsAccepted: z.union([z.literal(true), z.boolean()]).optional().default(false),
 });
 
 export type DemandFormData = z.infer<typeof demandSchema>;
@@ -44,5 +43,4 @@ export const defaultDemandValues: DemandFormData = {
   },
   files: [],
   guestEmail: "",
-  termsAccepted: false,
 };

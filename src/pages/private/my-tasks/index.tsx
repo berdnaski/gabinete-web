@@ -433,6 +433,7 @@ export function MyTasks() {
     assigneeMemberId: currentMember?.id,
     limit: 100,
     page: 1,
+    enabled: !!cabinet?.slug && !!currentMember?.id,
   })
 
   const allDemands = demands?.items ?? []
@@ -447,10 +448,26 @@ export function MyTasks() {
     [allDemands],
   )
 
-  if (isLoading) {
+  if (isLoading && !demands) {
     return (
-      <div className="flex justify-center items-center py-32">
-        <Loader2 className="size-6 text-muted-foreground animate-spin" />
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex flex-col gap-1.5">
+            <div className="h-4 w-32 rounded-md bg-muted animate-pulse" />
+            <div className="h-3 w-48 rounded-md bg-muted/60 animate-pulse" />
+          </div>
+        </div>
+        <div className="rounded-lg border border-border bg-card overflow-hidden">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="flex items-center gap-3 px-5 py-3 border-b border-border/40 last:border-0">
+              <div className="size-7 rounded-full bg-muted animate-pulse shrink-0" />
+              <div className="flex-1 flex flex-col gap-1.5">
+                <div className="h-3.5 rounded-md bg-muted animate-pulse" style={{ width: `${55 + (i % 3) * 15}%` }} />
+                <div className="h-3 w-32 rounded-md bg-muted/60 animate-pulse" />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     )
   }

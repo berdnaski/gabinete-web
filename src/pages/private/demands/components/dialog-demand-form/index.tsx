@@ -19,7 +19,7 @@ import { toast } from "sonner";
 import { Link } from "react-router-dom";
 
 export function DialogDemandForm() {
-  const { isAuthenticated, user } = useAuth()
+  const { isAuthenticated, user, cabinet } = useAuth()
   const [open, setOpen] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState({ current: 0, total: 0 })
@@ -63,6 +63,7 @@ export function DialogDemandForm() {
         city: data.location?.city,
         state: data.location?.state,
         guestEmail: !isAuthenticated ? data.guestEmail : undefined,
+        cabinetId: isAuthenticated && cabinet ? cabinet.id : undefined,
       });
 
       if (data.files?.length) {
