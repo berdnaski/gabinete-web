@@ -49,7 +49,7 @@ export function DemandsForm({ sizeTrigger }: DemandFormProps) {
       description: "",
       location: undefined,
       categoryId: undefined,
-      termsAccepted: false as unknown as true,
+      termsAccepted: false,
     },
   });
 
@@ -77,6 +77,11 @@ export function DemandsForm({ sizeTrigger }: DemandFormProps) {
   const onSubmit = handleSubmit(async (data: DemandFormData) => {
     if (!isAuthenticated && !data.guestEmail) {
       form.setError("guestEmail", { message: "Digite seu e-mail para continuar" });
+      return;
+    }
+
+    if (!data.termsAccepted) {
+      form.setError("termsAccepted", { message: "Você deve aceitar os termos de uso." });
       return;
     }
 
