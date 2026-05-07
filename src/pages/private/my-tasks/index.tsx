@@ -18,7 +18,6 @@ import {
   ClipboardList,
   Kanban,
   List,
-  Loader2,
   TagIcon,
   TrendingUp,
 } from "lucide-react"
