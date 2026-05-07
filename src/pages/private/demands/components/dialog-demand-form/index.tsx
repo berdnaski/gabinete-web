@@ -4,6 +4,7 @@ import {
   useUploadToR2,
   useConfirmEvidenceUpload,
 } from "@/api/demands/hooks";
+import { queryClient } from "@/api/queryClient";
 import { DemandForm } from "@/components/forms/demand";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -92,6 +93,8 @@ export function DialogDemandForm() {
         }
       }
 
+      await queryClient.invalidateQueries({ queryKey: ["demands"] });
+      await queryClient.invalidateQueries({ queryKey: ["demands-infinite"] });
       toast.success("Demanda criada com sucesso!");
       onOpenChangeDialog()
       form.reset();

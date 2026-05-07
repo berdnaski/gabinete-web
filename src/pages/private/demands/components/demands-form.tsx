@@ -5,6 +5,7 @@ import {
   useUploadToR2,
   useConfirmEvidenceUpload,
 } from "@/api/demands/hooks";
+import { queryClient } from "@/api/queryClient";
 import { AsyncSelectForm } from "@/components/form/async-select-form";
 import { ImageDropzoneForm } from "@/components/form/image-dropzone-form";
 import { InputForm } from "@/components/form/input-form";
@@ -121,6 +122,8 @@ export function DemandsForm({ sizeTrigger }: DemandFormProps) {
         }
       }
 
+      await queryClient.invalidateQueries({ queryKey: ["demands"] });
+      await queryClient.invalidateQueries({ queryKey: ["demands-infinite"] });
       toast.success("Demanda criada com sucesso!");
       setOpenSheet(false);
       form.reset();

@@ -44,10 +44,6 @@ export function useGetDemandById({ id }: { id: string }) {
 export function useCreateDemand() {
   return useMutation({
     mutationFn: (data: CreateDemandProps) => DemandsApi.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["demands"] });
-      queryClient.invalidateQueries({ queryKey: ["demands-infinite"] });
-    },
   });
 }
 
