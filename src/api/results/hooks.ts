@@ -31,3 +31,14 @@ export function useCreateResult() {
     },
   })
 }
+
+export function useUploadResultProtocol(demandId?: string | null) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, file }: { id: string; file: File }) =>
+      ResultsApi.uploadProtocol(id, file),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["results", { demandId }] })
+    },
+  })
+}

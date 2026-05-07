@@ -16,6 +16,7 @@ export interface Result {
   demandId: string | null
   protocolFileUrl: string | null
   protocolFileName: string | null
+  protocolFileSize: number | null
   createdAt: string
   images: ResultImage[]
 }
@@ -27,6 +28,7 @@ export interface CreateResultRequest {
   cabinetSlug: string
   demandId?: string
   images?: File[]
+  protocol?: File
 }
 
 export interface ListResultsParams {
