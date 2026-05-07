@@ -101,7 +101,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const handleGoogleLogin = async () => {
     setIsLoading(true);
     try {
-      const refreshResponse = await apiClient.post('/auth/refresh');
+
+      const hashParams = new URLSearchParams(window.location.hash.slice(1));
+      const hashRefreshToken = hashParams.get('rt');
+      if (hashRefreshToken) {
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+
+      const refreshResponse = await apiClient.post(
+        '/auth/refresh',
+        hashRefreshToken ? { refreshToken: hashRefreshToken } : {},
+      );
       if (refreshResponse.data?.accessToken) {
         localStorage.setItem(ACCESS_TOKEN_KEY, refreshResponse.data.accessToken);
       }
