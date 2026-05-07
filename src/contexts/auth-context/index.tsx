@@ -101,16 +101,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const handleGoogleLogin = async () => {
     setIsLoading(true);
     try {
-      await syncProfile();
-      try {
-        const refreshResponse = await apiClient.post('/auth/refresh');
-        if (refreshResponse.data?.accessToken) {
-          localStorage.setItem(ACCESS_TOKEN_KEY, refreshResponse.data.accessToken);
-          console.log("Google login token armazenado em localStorage");
-        }
-      } catch (err) {
-        console.warn("Não foi possível armazenar token do Google login", err);
+
+      const hashParams = new URLSearchParams(window.location.hash.slice(1));
+      const hashRefreshToken = hashParams.get('rt');
+      if (hashRefreshToken) {
+        window.history.replaceState({}, '', window.location.pathname);
       }
+
+      const refreshResponse = await apiClient.post(
+        '/auth/refresh',
+        hashRefreshToken ? { refreshToken: hashRefreshToken } : {},
+      );
+      if (refreshResponse.data?.accessToken) {
+        localStorage.setItem(ACCESS_TOKEN_KEY, refreshResponse.data.accessToken);
+      }
+      await syncProfile();
       toast.success("Login com Google realizado com sucesso!");
       navigate("/");
     } catch (error) {

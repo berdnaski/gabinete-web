@@ -4,6 +4,7 @@ import {
   useUploadToR2,
   useConfirmEvidenceUpload,
 } from "@/api/demands/hooks";
+import { queryClient } from "@/api/queryClient";
 import { DemandForm } from "@/components/forms/demand";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -19,7 +20,7 @@ import { toast } from "sonner";
 import { Link } from "react-router-dom";
 
 export function DialogDemandForm() {
-  const { isAuthenticated, user } = useAuth()
+  const { isAuthenticated, user, cabinet } = useAuth()
   const [open, setOpen] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState({ current: 0, total: 0 })
@@ -63,6 +64,7 @@ export function DialogDemandForm() {
         city: data.location?.city,
         state: data.location?.state,
         guestEmail: !isAuthenticated ? data.guestEmail : undefined,
+        cabinetId: isAuthenticated && cabinet ? cabinet.id : undefined,
       });
 
       if (data.files?.length) {
@@ -91,6 +93,8 @@ export function DialogDemandForm() {
         }
       }
 
+      await queryClient.invalidateQueries({ queryKey: ["demands"] });
+      await queryClient.invalidateQueries({ queryKey: ["demands-infinite"] });
       toast.success("Demanda criada com sucesso!");
       onOpenChangeDialog()
       form.reset();

@@ -32,9 +32,9 @@ export function DemandCard({ demand }: DemandCardProps) {
     >
       <div className="flex items-start gap-3 px-4 pt-3 pb-2.5">
         <Avatar className="size-7 shrink-0 mt-0.5">
-          <AvatarImage src={demand.reporter.avatarUrl} />
+          <AvatarImage src={demand.reporter?.avatarUrl} />
           <AvatarFallback className="font-medium text-xs bg-muted text-muted-foreground">
-            {demand.guestEmail ? <User className="size-3.5" /> : getFirstLettersFromNames(demand.reporter.name)}
+            {demand.guestEmail ? <User className="size-3.5" /> : getFirstLettersFromNames(demand.reporter?.name ?? "")}
           </AvatarFallback>
         </Avatar>
 

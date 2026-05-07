@@ -7,7 +7,7 @@ import { CitizenHeader } from "./components/citizen-header";
 import { UserRole } from "@/api/users/types";
 import { ConsentOverlay } from "../auth/consent-overlay";
 
-const rolesWithSidebar = [UserRole.ADMIN, UserRole.MEMBER]
+const rolesWithSidebar: UserRole[] = [UserRole.ADMIN, UserRole.MEMBER]
 
 export function Layout() {
   const { user } = useAuth();
