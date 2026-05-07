@@ -21,11 +21,11 @@ export const demandSchema = z.object({
   }),
   priority: z.enum(Object.values(DemandPriority) as [string, ...string[]]).optional(),
   location: locationSchema,
-  files: z.array(z.instanceof(File)).optional().default([]),
+  files: z.array(z.instanceof(File)).default([]),
   guestEmail: z.string().email("Digite um e-mail válido").optional().or(z.literal("")),
 });
 
-export type DemandFormData = z.infer<typeof demandSchema>;
+export type DemandFormData = z.input<typeof demandSchema>;
 
 export const defaultDemandValues: DemandFormData = {
   title: "",

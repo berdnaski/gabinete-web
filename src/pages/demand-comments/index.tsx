@@ -9,7 +9,6 @@ import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import { useAuth } from "@/hooks/use-auth"
 import { cn } from "@/lib/utils"
-import { formatDateToNow } from "@/utils/format-date-to-now"
 import { Building2, CheckCircle2, MessageCircle, Send, TrendingUp } from "lucide-react"
 import { ResultEntry } from "./components/result-entry"
 import { useRef, useState } from "react"
@@ -43,7 +42,7 @@ export function DemandComments() {
   const { data: resultsData, isLoading: isLoadingResults } = useGetDemandResults(demandId)
 
   const isCabinetMember = user?.isCabinetMember ?? false
-  const isMyDemand = isCabinetMember && demand?.cabinetId && cabinet?.id === demand.cabinetId
+  const isMyDemand = isCabinetMember && !!demand?.cabinetId && cabinet?.id === demand.cabinetId
 
   function handleSubmit() {
     const content = message.trim()

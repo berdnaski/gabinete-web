@@ -74,7 +74,7 @@ function MemberOption({
 
 export function AssignMemberDialog({ demand, open, onOpenChange }: AssignMemberDialogProps) {
   const { cabinet } = useAuth()
-  const [selectedMemberId, setSelectedMemberId] = useState<string | null>(demand.assigneeMemberId)
+  const [selectedMemberId, setSelectedMemberId] = useState<string | null>(demand.assigneeMemberId ?? null)
 
   const { data: members = [], isLoading: isLoadingMembers } = useGetCabinetMembers(cabinet?.slug)
   const { mutate: claimDemand, isPending: isClaiming } = useClaimDemand()

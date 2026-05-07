@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { CabinetsApi, type Cabinet } from ".";
+import { CabinetsApi } from ".";
+import type { Cabinet } from "./types";
 import { queryClient } from "../queryClient";
 
 export function useGetCabinets() {
