@@ -48,3 +48,13 @@ export interface CabinetTrendDetailedPoint {
   created: number;
   resolved: number;
 }
+
+export interface CabinetInvitation {
+  id: string;
+  email: string;
+  cabinetId: string;
+  role: "OWNER" | "STAFF";
+  token: string;
+  expiresAt: string;
+  createdAt: string;
+}

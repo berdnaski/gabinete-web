@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CabinetsApi } from ".";
 import type { Cabinet } from "./types";
 import { queryClient } from "../queryClient";
@@ -61,6 +61,57 @@ export function useUpdateCabinet() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["cabinet", variables.slug] });
       queryClient.invalidateQueries({ queryKey: ["cabinets"] });
+    },
+  });
+}
+
+export function useListCabinetInvitations(slug: string | undefined) {
+  return useQuery({
+    queryKey: ["cabinet-invitations", slug],
+    queryFn: () => CabinetsApi.listInvitations(slug!),
+    enabled: !!slug,
+    staleTime: 1000 * 30,
+  });
+}
+
+export function useInviteMember(slug: string | undefined) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { email: string; role: "OWNER" | "STAFF" }) =>
+      CabinetsApi.inviteMember(slug!, data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["cabinet-invitations", slug] });
+    },
+  });
+}
+
+export function useCancelInvitation(slug: string | undefined) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => CabinetsApi.cancelInvitation(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["cabinet-invitations", slug] });
+    },
+  });
+}
+
+export function useRemoveMember(slug: string | undefined) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (userId: string) => CabinetsApi.removeMember(slug!, userId),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["cabinet-members", slug] });
+    },
+  });
+}
+
+export function useUpdateMemberRole(slug: string | undefined) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ userId, role }: { userId: string; role: "OWNER" | "STAFF" }) =>
+      CabinetsApi.updateMemberRole(slug!, userId, role),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["cabinet-members", slug] });
     },
   });
 }
