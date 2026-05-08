@@ -90,15 +90,20 @@ export function CabinetInfoCard() {
             </Field>
 
             <Field label="Link Público do Gabinete">
-              <div className="flex bg-muted/40 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-primary/20 transition-all border border-transparent">
-                <div className="bg-slate-100/50 dark:bg-slate-800/50 px-4 h-12 flex items-center text-2xs font-bold text-muted-foreground uppercase tracking-wider border-r border-border/20">
+              <a
+                href={`/${cabinet.slug}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex bg-muted/40 rounded-xl overflow-hidden hover:ring-2 hover:ring-primary/20 transition-all border border-transparent group"
+              >
+                <div className="bg-slate-100/50 dark:bg-slate-800/50 px-4 h-12 flex items-center text-2xs font-bold text-muted-foreground uppercase tracking-wider border-r border-border/20 shrink-0">
                   <Globe className="w-3.5 h-3.5 mr-2 opacity-50" />
-                  plataforma.gov/
+                  {typeof window !== "undefined" ? window.location.host : "gabineteapp.com.br"}/
                 </div>
-                <div className="flex-1 flex items-center px-4 h-12 text-sm text-foreground font-medium opacity-60">
+                <div className="flex-1 flex items-center px-4 h-12 text-sm text-primary font-medium group-hover:underline">
                   {cabinet.slug}
                 </div>
-              </div>
+              </a>
             </Field>
 
             <Field label="Mensagem Pública (Bio)" className="md:col-span-2" error={errors.description?.message}>

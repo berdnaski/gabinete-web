@@ -18,6 +18,7 @@ import { AdminUsers } from "@/pages/admin/users";
 import { AcceptInvite } from "@/pages/public/accept-invite";
 
 const Sandbox = lazy(() => import("@/pages/public/sandbox").then((m) => ({ default: m.Sandbox })));
+const PublicCabinetProfile = lazy(() => import("@/pages/public/cabinet-profile").then((m) => ({ default: m.PublicCabinetProfile })));
 const TermsOfUsePage = lazy(() => import("@/pages/public/terms-of-use").then((m) => ({ default: m.TermsOfUsePage })));
 const PrivacyPolicyPage = lazy(() => import("@/pages/public/privacy-policy").then((m) => ({ default: m.PrivacyPolicyPage })));
 const LandingPage = lazy(() => import("@/pages/public/landing").then((m) => ({ default: m.LandingPage })));
@@ -184,6 +185,12 @@ export function AppRouter() {
           }
         />
       </Route>
+
+      {/* Public cabinet profile — must be last so static routes take priority */}
+      <Route
+        path="/:slug"
+        element={<Suspense fallback={<PageLoader />}><PublicCabinetProfile /></Suspense>}
+      />
     </Routes>
   );
 }
