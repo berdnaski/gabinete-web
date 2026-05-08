@@ -13,6 +13,11 @@ export interface User {
 }
 
 export const UsersApi = {
+  list: async (params: { page: number; limit: number; search?: string; role?: string }): Promise<{ items: User[]; total: number }> => {
+    const response = await apiClient.get<{ items: User[]; total: number }>(baseURL, { params });
+    return response.data;
+  },
+
   getById: async (id: string): Promise<User> => {
     const response = await apiClient.get<User>(`${baseURL}/${id}`);
     return response.data;

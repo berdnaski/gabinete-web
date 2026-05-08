@@ -23,9 +23,11 @@ import { Demands } from "@/pages/private/demands";
 import { Home } from "@/pages/private/home";
 import { Team } from "@/pages/private/team";
 import { MyTasks } from "@/pages/private/my-tasks";
+import { Admin } from "@/pages/admin";
 import { UserRole } from "@/api/users/types";
 
-const adminAndMember = [UserRole.ADMIN, UserRole.MEMBER];
+const onlyMember = [UserRole.MEMBER];
+const onlyAdmin = [UserRole.ADMIN];
 
 export function AppRouter() {
   return (
@@ -51,11 +53,19 @@ export function AppRouter() {
         <Route path="gabinetes" element={<Cabinets />} />
         <Route path="gabinetes/:slug" element={<CabinetDetail />} />
         <Route path="mapa" element={<Map />} />
+        <Route
+          path="admin"
+          element={
+            <ProtectedRoute allowedRoles={onlyAdmin}>
+              <Admin />
+            </ProtectedRoute>
+          }
+        />
 
         <Route
           path="home"
           element={
-            <ProtectedRoute allowedRoles={adminAndMember}>
+            <ProtectedRoute allowedRoles={onlyMember}>
               <Home />
             </ProtectedRoute>
           }
@@ -63,7 +73,7 @@ export function AppRouter() {
         <Route
           path="demands"
           element={
-            <ProtectedRoute allowedRoles={adminAndMember}>
+            <ProtectedRoute allowedRoles={onlyMember}>
               <Demands />
             </ProtectedRoute>
           }
@@ -71,7 +81,7 @@ export function AppRouter() {
         <Route
           path="minhas-tarefas"
           element={
-            <ProtectedRoute allowedRoles={adminAndMember}>
+            <ProtectedRoute allowedRoles={onlyMember}>
               <MyTasks />
             </ProtectedRoute>
           }
@@ -79,7 +89,7 @@ export function AppRouter() {
         <Route
           path="equipe"
           element={
-            <ProtectedRoute allowedRoles={adminAndMember}>
+            <ProtectedRoute allowedRoles={onlyMember}>
               <Team />
             </ProtectedRoute>
           }

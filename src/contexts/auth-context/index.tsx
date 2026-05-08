@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { AuthContext } from "./context";
 import type { Cabinet } from "@/api/cabinets/types";
+import { UserRole } from "@/api/users/types";
 
 const USER_KEY = "@gabinete:user";
 const ACCESS_TOKEN_KEY = "@gabinete:access_token";
@@ -157,6 +158,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
+  const hasRoleAdmin = useCallback(() => user?.role === UserRole.ADMIN, [user?.role]);
+
   return (
     <AuthContext.Provider
       value={{
@@ -165,6 +168,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         isLoading,
         isInitializing,
         isAuthenticated: !!user,
+        hasRoleAdmin,
         signUp,
         login,
         handleGoogleLogin,

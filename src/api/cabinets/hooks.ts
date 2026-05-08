@@ -1,11 +1,24 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { CabinetsApi, type Cabinet } from ".";
+import { CabinetsApi } from ".";
+import type { Cabinet } from "./types";
 import { queryClient } from "../queryClient";
 
 export function useGetCabinets() {
   return useQuery({
     queryKey: ["cabinets"],
     queryFn: CabinetsApi.list,
+  });
+}
+
+export function useGetCabinetsPaginated(params: {
+  page: number;
+  limit: number;
+  search?: string;
+  hasDemands?: boolean;
+}) {
+  return useQuery({
+    queryKey: ["cabinets", "paginated", params],
+    queryFn: () => CabinetsApi.listPaginated(params),
   });
 }
 

@@ -2,7 +2,7 @@ import { useGetDemandsByCabinetSlug } from "@/api/demands/hooks"
 import { useAuth } from "@/hooks/use-auth"
 import { useCurrentMember } from "@/hooks/use-current-member"
 import { cn } from "@/lib/utils"
-import { CheckSquare, ClipboardListIcon, Home, Newspaper, Users } from "lucide-react"
+import { Building2, CheckSquare, ClipboardListIcon, Home, Newspaper, Users } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
 import Logo from "../../../assets/logo.png"
 import {
@@ -39,6 +39,35 @@ function MyTasksBadge() {
 
 export function AppSidebar() {
   const { pathname } = useLocation()
+  const { hasRoleAdmin } = useAuth()
+  const isAdmin = hasRoleAdmin()
+
+  if (isAdmin) {
+    return (
+      <Sidebar variant="inset">
+        <SidebarHeader>
+          <img src={Logo} alt="Logo" className="w-36" />
+        </SidebarHeader>
+        <SidebarContent>
+          <SidebarGroup>
+            <SidebarGroupLabel className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground">
+              Admin
+            </SidebarGroupLabel>
+            <SidebarMenu className="space-y-0.5">
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip="Gabinetes" isActive={pathname === "/admin"}>
+                  <Link to="/admin">
+                    <Building2 className={cn({ "text-primary": pathname === "/admin" })} />
+                    <span>Gabinetes</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroup>
+        </SidebarContent>
+      </Sidebar>
+    )
+  }
 
   return (
     <Sidebar variant="inset">

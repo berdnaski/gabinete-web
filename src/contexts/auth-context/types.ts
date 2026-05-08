@@ -7,6 +7,7 @@ export interface AuthContextType {
   isLoading: boolean;
   isInitializing: boolean;
   isAuthenticated: boolean;
+  hasRoleAdmin: () => boolean;
   signUp: (data: RegisterRequest) => Promise<void>;
   login: (data: LoginRequest) => Promise<void>;
   handleGoogleLogin: () => Promise<void>;

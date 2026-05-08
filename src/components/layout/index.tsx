@@ -1,16 +1,22 @@
 import { useAuth } from "@/hooks/use-auth";
-import { Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { SidebarInset, SidebarProvider } from "../ui/sidebar";
 import { AppSidebar } from "./components/app-sidebar";
 import { Header } from "./components/header";
 import { CitizenHeader } from "./components/citizen-header";
-import { UserRole } from "@/api/users/types";
 import { ConsentOverlay } from "../auth/consent-overlay";
+
+import { UserRole } from "@/api/users/types";
 
 const rolesWithSidebar = [UserRole.ADMIN, UserRole.MEMBER]
 
 export function Layout() {
-  const { user } = useAuth();
+  const { user, hasRoleAdmin } = useAuth();
+  const { pathname } = useLocation();
+
+  if (hasRoleAdmin() && pathname === "/") {
+    return <Navigate to="/admin" replace />;
+  }
 
   if (user && rolesWithSidebar.includes(user.role)) {
     return (

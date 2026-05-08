@@ -3,6 +3,11 @@ import type { Cabinet, CabinetMember, CabinetMetrics, CabinetTrendDetailedPoint,
 
 const baseURL = "/cabinets";
 
+export interface PaginatedCabinetsResponse {
+  items: Cabinet[];
+  total: number;
+}
+
 export const CabinetsApi = {
   me: async (): Promise<Cabinet | null> => {
     const response = await apiClient.get<Cabinet[]>(`${baseURL}/me`);
@@ -15,6 +20,16 @@ export const CabinetsApi = {
     if (Array.isArray(data)) return data;
     if (data?.items && Array.isArray(data.items)) return data.items;
     return [];
+  },
+
+  listPaginated: async (params: {
+    page: number;
+    limit: number;
+    search?: string;
+    hasDemands?: boolean;
+  }): Promise<PaginatedCabinetsResponse> => {
+    const response = await apiClient.get<PaginatedCabinetsResponse>(baseURL, { params });
+    return response.data;
   },
 
   getBySlug: async (slug: string): Promise<Cabinet> => {
