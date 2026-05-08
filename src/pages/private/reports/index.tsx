@@ -13,7 +13,8 @@ import {
   Loader2,
   BarChart3,
 } from "lucide-react"
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
+
 import {
   Area,
   AreaChart,
@@ -122,8 +123,12 @@ function exportCSV(report: CabinetReport, cabinetName: string) {
 }
 
 export function Reports() {
-  usePageTitle("Relatórios")
+  const { setTitle } = usePageTitle()
   const { cabinet } = useAuth()
+
+  useEffect(() => {
+    setTitle({ title: "Relatórios" })
+  }, [setTitle])
   const [period, setPeriod] = useState<Period>("30d")
   const dates = useMemo(() => getPeriodDates(period), [period])
 
@@ -227,7 +232,7 @@ export function Reports() {
             />
             <KpiCard
               label="Resultados"
-              value={report.summary.resultsInPeriod}
+              value={report.resultsInPeriod}
               icon={<CheckCircle2 className="size-3.5 text-emerald-500" />}
             />
           </div>
@@ -378,8 +383,8 @@ export function Reports() {
                         return (
                           <div className="rounded-lg border border-border bg-background px-3 py-2 shadow-md text-xs">
                             <p className="font-medium text-foreground mb-1">{label}</p>
-                            {payload.map(p => (
-                              <div key={p.dataKey} className="flex items-center gap-1.5">
+                            {payload.map((p, i) => (
+                              <div key={i} className="flex items-center gap-1.5">
                                 <span className="size-1.5 rounded-full shrink-0" style={{ background: p.color }} />
                                 <span className="text-muted-foreground">{p.name}:</span>
                                 <span className="font-medium text-foreground">{p.value}</span>
