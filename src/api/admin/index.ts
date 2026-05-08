@@ -1,4 +1,5 @@
 import { apiClient } from ".."
+import { UserRole } from "@/api/users/types"
 
 export interface CreateCabinetWithOwnerRequest {
   ownerUserId: string
@@ -40,7 +41,7 @@ export interface CreateAdminUserRequest {
   name: string
   email: string
   password: string
-  role: "ADMIN" | "MEMBER" | "CITIZEN"
+  role: UserRole
   avatarUrl?: string
 }
 
@@ -48,7 +49,7 @@ export interface CreateAdminUserResponse {
   id: string
   name: string
   email: string
-  role: string
+  role: UserRole
   avatarUrl: string | null
   phone: string | null
   isVerified: boolean
@@ -56,6 +57,14 @@ export interface CreateAdminUserResponse {
   isCabinetMember: boolean
   termsAcceptedAt: string | null
   disabledAt: string | null
+}
+
+export interface UpdateAdminUserRequest {
+  name: string
+  email: string
+  password?: string
+  role: UserRole
+  avatarUrl?: string
 }
 
 export const AdminApi = {
@@ -127,6 +136,16 @@ export const AdminApi = {
 
   createUser: async (data: CreateAdminUserRequest): Promise<CreateAdminUserResponse> => {
     const response = await apiClient.post<CreateAdminUserResponse>("/admin/users", data)
+    return response.data
+  },
+
+  getUserDetails: async (id: string): Promise<CreateAdminUserResponse> => {
+    const response = await apiClient.get<CreateAdminUserResponse>(`/admin/users/${id}`)
+    return response.data
+  },
+
+  updateUser: async (id: string, data: UpdateAdminUserRequest): Promise<CreateAdminUserResponse> => {
+    const response = await apiClient.patch<CreateAdminUserResponse>(`/admin/users/${id}`, data)
     return response.data
   },
 }

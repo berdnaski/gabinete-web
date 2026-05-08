@@ -1,4 +1,5 @@
 import { useGetUsersPaginated } from "@/api/users/hooks"
+import { UserRole } from "@/api/users/types"
 import { DataTable, type DataTableFilterField } from "@/components/data-table"
 import { TABLE_PARAM_KEYS, useDataTable } from "@/hooks/use-data-table"
 import { useMemo } from "react"
@@ -11,9 +12,9 @@ const filterFields: DataTableFilterField[] = [
     label: "Role",
     type: "select",
     options: [
-      { label: "Admin", value: "ADMIN" },
-      { label: "Membro", value: "MEMBER" },
-      { label: "Cidadão", value: "CITIZEN" },
+      { label: "Admin", value: UserRole.ADMIN },
+      { label: "Membro", value: UserRole.MEMBER },
+      { label: "Cidadão", value: UserRole.CITIZEN },
     ],
   },
 ]
@@ -26,7 +27,10 @@ export function UsersTable() {
   const limit = Math.max(1, Number(searchParams.get(TABLE_PARAM_KEYS.PER_PAGE) ?? 10))
   const rawSearch = (searchParams.get(TABLE_PARAM_KEYS.SEARCH) ?? "").trim()
   const search = rawSearch ? rawSearch : undefined
-  const role = (searchParams.get("role") ?? "").trim() || undefined
+  const rawRole = (searchParams.get("role") ?? "").trim()
+  const role = (Object.values(UserRole) as string[]).includes(rawRole)
+    ? (rawRole as UserRole)
+    : undefined
 
   const { data, isLoading } = useGetUsersPaginated({ page, limit, search, role })
 

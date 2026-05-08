@@ -1,5 +1,5 @@
 import { AdminApi } from "@/api/admin"
-import { useAdminCreateUser } from "@/api/admin/hooks"
+import { useAdminUpdateUser } from "@/api/admin/hooks"
 import { UserRole } from "@/api/users/types"
 import { ImageDropzoneForm } from "@/components/form/image-dropzone-form"
 import { InputForm } from "@/components/form/input-form"
@@ -15,20 +15,23 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { getApiErrorMessage } from "@/lib/utils"
-import { adminUserCreateSchema, type AdminUserCreateFormData } from "@/validation-schemas/admin-user"
+import { adminUserUpdateSchema, type AdminUserUpdateFormData } from "@/validation-schemas/admin-user"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Loader2, PlusIcon } from "lucide-react"
+import { Loader2, PencilIcon } from "lucide-react"
 import { useCallback, useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 
-export function UserCreateSheet() {
+export function UserEditSheet({ userId }: { userId: string }) {
   const [openSheet, setOpenSheet] = useState(false)
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false)
-  const { mutateAsync: createUser, isPending } = useAdminCreateUser()
+  const [isLoading, setIsLoading] = useState(false)
+  const [currentAvatarUrl, setCurrentAvatarUrl] = useState<string | null>(null)
 
-  const form = useForm<AdminUserCreateFormData>({
-    resolver: zodResolver(adminUserCreateSchema),
+  const { mutateAsync: updateUser, isPending } = useAdminUpdateUser()
+
+  const form = useForm<AdminUserUpdateFormData>({
+    resolver: zodResolver(adminUserUpdateSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -39,6 +42,37 @@ export function UserCreateSheet() {
   })
 
   const { handleSubmit, control, reset } = form
+
+  useEffect(() => {
+    if (!openSheet) return
+
+    let cancelled = false
+    setIsLoading(true)
+
+    AdminApi.getUserDetails(userId)
+      .then((data: Awaited<ReturnType<typeof AdminApi.getUserDetails>>) => {
+        if (cancelled) return
+        reset({
+          name: data.name ?? "",
+          email: data.email ?? "",
+          password: "",
+          role: (data.role as AdminUserUpdateFormData["role"]) ?? UserRole.CITIZEN,
+          avatar: [],
+        })
+        setCurrentAvatarUrl(data.avatarUrl ?? null)
+      })
+      .catch((error: unknown) => {
+        toast.error(getApiErrorMessage(error, "Erro ao carregar usuário."))
+        setOpenSheet(false)
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [openSheet, reset, userId])
 
   const onSubmit = handleSubmit(async (data) => {
     try {
@@ -55,24 +89,27 @@ export function UserCreateSheet() {
         avatarUrl = presign.avatarUrl
       }
 
-      await createUser({
-        name: data.name.trim(),
-        email: data.email.trim(),
-        password: data.password,
-        role: data.role,
-        avatarUrl,
+      await updateUser({
+        id: userId,
+        data: {
+          name: data.name.trim(),
+          email: data.email.trim(),
+          password: data.password.trim() || undefined,
+          role: data.role,
+          avatarUrl,
+        },
       })
 
       setOpenSheet(false)
       reset()
-    } catch (error) {
-      toast.error(getApiErrorMessage(error, "Erro ao criar usuário."))
+    } catch (error: unknown) {
+      toast.error(getApiErrorMessage(error, "Erro ao atualizar usuário."))
     } finally {
       setIsUploadingAvatar(false)
     }
   })
 
-  const isFormSubmitting = isPending || isUploadingAvatar
+  const isFormSubmitting = isPending || isUploadingAvatar || isLoading
 
   const toggleOpenChange = useCallback(
     (next?: boolean) => {
@@ -82,17 +119,16 @@ export function UserCreateSheet() {
     [isFormSubmitting],
   )
 
-  useEffect(() => {
-    if (!openSheet) return
-    reset()
-  }, [openSheet, reset])
-
   return (
     <Sheet open={openSheet} onOpenChange={toggleOpenChange}>
       <SheetTrigger asChild>
-        <Button variant="default">
-          <PlusIcon className="size-4" />
-          Novo Usuário
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-7 text-muted-foreground hover:text-foreground"
+          aria-label="Editar usuário"
+        >
+          <PencilIcon className="size-4" />
         </Button>
       </SheetTrigger>
 
@@ -106,7 +142,7 @@ export function UserCreateSheet() {
         }}
       >
         <SheetHeader className="border-b">
-          <SheetTitle>Novo usuário</SheetTitle>
+          <SheetTitle>Editar usuário</SheetTitle>
         </SheetHeader>
 
         <form onSubmit={onSubmit} className="flex min-h-0 flex-1 flex-col overflow-hidden">
@@ -139,7 +175,7 @@ export function UserCreateSheet() {
                 control={control}
                 disabled={isFormSubmitting}
                 type="password"
-                placeholder="Digite a senha"
+                placeholder="Digite a nova senha (opcional)"
               />
             </Field>
 
@@ -160,6 +196,15 @@ export function UserCreateSheet() {
 
             <Field>
               <FieldLabel>Avatar</FieldLabel>
+              {currentAvatarUrl ? (
+                <div className="mb-2 flex items-center justify-center">
+                  <img
+                    src={currentAvatarUrl}
+                    alt=""
+                    className="size-20 rounded-full border border-border object-cover"
+                  />
+                </div>
+              ) : null}
               <ImageDropzoneForm
                 name="avatar"
                 control={control}
@@ -181,7 +226,7 @@ export function UserCreateSheet() {
             </Button>
             <Button type="submit" disabled={isFormSubmitting}>
               {isFormSubmitting && <Loader2 className="size-4 animate-spin" />}
-              Criar usuário
+              Salvar
             </Button>
           </SheetFooter>
         </form>

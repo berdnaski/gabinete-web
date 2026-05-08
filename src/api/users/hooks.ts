@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { UsersApi, type User } from ".";
 import { queryClient } from "../queryClient";
+import type { UserRole } from "./types";
 
 export function useGetUserById(id: string | undefined) {
   return useQuery({
@@ -24,7 +25,7 @@ export function useGetUsersPaginated(params: {
   page: number
   limit: number
   search?: string
-  role?: string
+  role?: UserRole
 }) {
   return useQuery({
     queryKey: ["users", "paginated", params],

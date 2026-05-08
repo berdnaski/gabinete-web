@@ -5,6 +5,7 @@ import { getFirstLettersFromNames } from "@/utils/get-first-letters-from-names"
 import type { ColumnDef } from "@tanstack/react-table"
 import { ArrowRight } from "lucide-react"
 import { Link } from "react-router-dom"
+import { UserEditSheet } from "./user-edit-sheet"
 
 export const usersColumns: ColumnDef<User>[] = [
   {
@@ -57,11 +58,12 @@ export const usersColumns: ColumnDef<User>[] = [
   {
     id: "actions",
     header: "",
-    size: 80,
+    size: 140,
     cell: ({ row }) => {
       const u = row.original
       return (
-        <div className="flex items-center justify-end">
+        <div className="flex items-center justify-end gap-1.5">
+          <UserEditSheet userId={u.id} />
           <Link
             to={`/profile/${u.id}`}
             className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
@@ -73,4 +75,3 @@ export const usersColumns: ColumnDef<User>[] = [
     },
   },
 ]
-

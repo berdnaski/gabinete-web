@@ -1,4 +1,5 @@
 import { apiClient } from "..";
+import { UserRole } from "./types";
 
 const baseURL = "/users";
 
@@ -6,7 +7,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: string;
+  role: UserRole;
   avatarUrl?: string;
   phone?: string;
   isCabinetMember?: boolean;
@@ -14,7 +15,7 @@ export interface User {
 }
 
 export const UsersApi = {
-  list: async (params: { page: number; limit: number; search?: string; role?: string }): Promise<{ items: User[]; total: number }> => {
+  list: async (params: { page: number; limit: number; search?: string; role?: UserRole }): Promise<{ items: User[]; total: number }> => {
     const response = await apiClient.get<{ items: User[]; total: number }>(baseURL, { params });
     return response.data;
   },
