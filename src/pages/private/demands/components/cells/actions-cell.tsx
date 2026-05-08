@@ -9,6 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useCurrentMember } from "@/hooks/use-current-member"
 import type { Row } from "@tanstack/react-table"
 import {
   ExternalLinkIcon,
@@ -23,8 +24,11 @@ import { useNavigate } from "react-router-dom"
 export function ActionsCell({ row }: { row: Row<Demand> }) {
   const demand = row.original
   const navigate = useNavigate()
+  const { currentMember } = useCurrentMember()
   const [progressOpen, setProgressOpen] = useState(false)
   const [detailOpen, setDetailOpen] = useState(false)
+
+  const isAssignedMember = !!demand.assigneeMemberId && currentMember?.id === demand.assigneeMemberId
 
   return (
     <div className="flex items-center justify-center">
@@ -48,10 +52,12 @@ export function ActionsCell({ row }: { row: Row<Demand> }) {
             Ver no painel lateral
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => setProgressOpen(true)}>
-            <TrendingUp className="size-3.5 text-muted-foreground" />
-            Atualizar progresso
-          </DropdownMenuItem>
+          {isAssignedMember && (
+            <DropdownMenuItem onClick={() => setProgressOpen(true)}>
+              <TrendingUp className="size-3.5 text-muted-foreground" />
+              Atualizar progresso
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem onClick={() => navigate(`/comments/${demand.id}`)}>
             <MessageSquareIcon className="size-3.5 text-muted-foreground" />
             Comentar
@@ -59,12 +65,14 @@ export function ActionsCell({ row }: { row: Row<Demand> }) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <UpdateProgressDialog
-        demandId={demand.id}
-        currentStatus={demand.status}
-        open={progressOpen}
-        onOpenChange={setProgressOpen}
-      />
+      {isAssignedMember && (
+        <UpdateProgressDialog
+          demandId={demand.id}
+          currentStatus={demand.status}
+          open={progressOpen}
+          onOpenChange={setProgressOpen}
+        />
+      )}
       <DemandDetailSheet demand={demand} open={detailOpen} onOpenChange={setDetailOpen} />
     </div>
   )
