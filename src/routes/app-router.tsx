@@ -24,6 +24,7 @@ import { Home } from "@/pages/private/home";
 import { Team } from "@/pages/private/team";
 import { MyTasks } from "@/pages/private/my-tasks";
 import { Admin } from "@/pages/admin";
+import { AdminUsers } from "@/pages/admin/users";
 import { UserRole } from "@/api/users/types";
 
 const onlyMember = [UserRole.MEMBER];
@@ -58,6 +59,14 @@ export function AppRouter() {
           element={
             <ProtectedRoute allowedRoles={onlyAdmin}>
               <Admin />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="admin/usuarios"
+          element={
+            <ProtectedRoute allowedRoles={onlyAdmin}>
+              <AdminUsers />
             </ProtectedRoute>
           }
         />

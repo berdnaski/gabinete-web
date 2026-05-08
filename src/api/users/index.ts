@@ -9,6 +9,7 @@ export interface User {
   role: string;
   avatarUrl?: string;
   phone?: string;
+  isCabinetMember?: boolean;
   termsAcceptedAt?: string | Date;
 }
 

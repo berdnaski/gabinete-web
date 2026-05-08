@@ -62,6 +62,18 @@ export function AppSidebar() {
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  tooltip="Usuários"
+                  isActive={pathname === "/admin/usuarios"}
+                >
+                  <Link to="/admin/usuarios">
+                    <Users className={cn({ "text-primary": pathname === "/admin/usuarios" })} />
+                    <span>Usuários</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroup>
         </SidebarContent>

@@ -19,3 +19,15 @@ export function useUpdateUser() {
     },
   });
 }
+
+export function useGetUsersPaginated(params: {
+  page: number
+  limit: number
+  search?: string
+  role?: string
+}) {
+  return useQuery({
+    queryKey: ["users", "paginated", params],
+    queryFn: () => UsersApi.list(params),
+  })
+}
