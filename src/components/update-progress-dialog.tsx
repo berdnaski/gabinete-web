@@ -64,7 +64,7 @@ export function UpdateProgressDialog({
   const requiresNote = STATUSES_REQUIRING_NOTE.includes(selectedStatus)
   const noteIsValid = !requiresNote || note.trim().length > 0
   const hasChanges = selectedStatus !== currentStatus || note.trim().length > 0
-  const isResolvingWithoutResults = selectedStatus === DemandStatus.RESOLVED && hasResults === false
+  const isResolvingWithoutResults = selectedStatus === DemandStatus.RESOLVED && hasResults !== true
 
   function handleClose() {
     if (isPending) return
@@ -73,8 +73,12 @@ export function UpdateProgressDialog({
 
   function handleSubmit() {
     if (isResolvingWithoutResults) {
-      onOpenChange(false)
-      onNeedsResults?.()
+      if (onNeedsResults) {
+        onOpenChange(false)
+        onNeedsResults()
+      } else {
+        toast.error("Registre pelo menos um resultado antes de finalizar a demanda")
+      }
       return
     }
     if (!hasChanges) {
