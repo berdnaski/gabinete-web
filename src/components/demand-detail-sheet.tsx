@@ -258,20 +258,18 @@ export function DemandDetailSheet({
             </div>
           </div>
 
-          {(isAssignedMember || canManage) && (
+          {isAssignedMember && (
             <>
               <Separator />
               <div className="px-5 py-4 shrink-0 flex items-center gap-2">
-                {isAssignedMember && (
-                  <Button
-                    className="flex-1 gap-2"
-                    onClick={() => setProgressOpen(true)}
-                  >
-                    <TrendingUp className="size-4" />
-                    Atualizar progresso
-                  </Button>
-                )}
-                <Button variant="outline" className={cn(!isAssignedMember && "flex-1")} asChild>
+                <Button
+                  className="flex-1 gap-2"
+                  onClick={() => setProgressOpen(true)}
+                >
+                  <TrendingUp className="size-4" />
+                  Atualizar progresso
+                </Button>
+                <Button variant="outline" asChild>
                   <Link to={`/comments/${demand.id}`} onClick={() => onOpenChange(false)}>
                     Ver comentários
                   </Link>
