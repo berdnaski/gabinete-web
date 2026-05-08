@@ -2,7 +2,7 @@ import { useGetDemandsByCabinetSlug } from "@/api/demands/hooks"
 import { useAuth } from "@/hooks/use-auth"
 import { useCurrentMember } from "@/hooks/use-current-member"
 import { cn } from "@/lib/utils"
-import { Building2, CheckSquare, ClipboardListIcon, Home, Newspaper, Users } from "lucide-react"
+import { Building2, CheckSquare, ClipboardListIcon, Home, Newspaper, Users, BarChart3 } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
 import Logo from "../../../assets/logo.png"
 import {
@@ -145,6 +145,15 @@ export function AppSidebar() {
                 <Link to="/equipe">
                   <Users className={cn({ "text-primary": pathname === "/equipe" })} />
                   <span>Equipe</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild tooltip="Relatórios" isActive={pathname === "/relatorios"}>
+                <Link to="/relatorios">
+                  <BarChart3 className={cn({ "text-primary": pathname === "/relatorios" })} />
+                  <span>Relatórios</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

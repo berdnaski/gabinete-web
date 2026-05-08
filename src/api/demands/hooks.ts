@@ -1,7 +1,7 @@
 import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
 import { DemandsApi } from ".";
 import { queryClient } from "../queryClient";
-import { DemandStatus, type CreateDemandCommentProps, type CreateDemandProps, type Demand, type ListDemandCommentsParams, type ListDemandsByCabinetSlugParams, type ListDemandsParams } from "./types";
+import { DemandStatus, type CreateDemandCommentProps, type CreateDemandProps, type Demand, type GetCabinetReportParams, type ListDemandCommentsParams, type ListDemandsByCabinetSlugParams, type ListDemandsParams } from "./types";
 
 export function useGetCabinetDashboardSummary(slug?: string) {
   return useQuery({
@@ -214,5 +214,15 @@ export function useGetMyDemands(params: Omit<ListDemandsParams, "page"> & { enab
       const { page, totalPages } = lastPage.meta;
       return page < totalPages ? page + 1 : undefined;
     },
+  });
+}
+
+export function useGetCabinetReport(params: GetCabinetReportParams & { enabled?: boolean }) {
+  const { enabled = true, ...queryParams } = params
+  return useQuery({
+    queryKey: ["cabinet-report", queryParams.slug, queryParams.startDate, queryParams.endDate],
+    queryFn: () => DemandsApi.getCabinetReport(queryParams),
+    enabled: enabled && !!queryParams.slug,
+    staleTime: 1000 * 60 * 5,
   });
 }

@@ -34,6 +34,7 @@ const Demands = lazy(() => import("@/pages/private/demands").then((m) => ({ defa
 const Home = lazy(() => import("@/pages/private/home").then((m) => ({ default: m.Home })));
 const Team = lazy(() => import("@/pages/private/team").then((m) => ({ default: m.Team })));
 const MyTasks = lazy(() => import("@/pages/private/my-tasks").then((m) => ({ default: m.MyTasks })));
+const Reports = lazy(() => import("@/pages/private/reports").then((m) => ({ default: m.Reports })));
 
 const onlyMember = [UserRole.MEMBER];
 const onlyAdmin = [UserRole.ADMIN];
@@ -168,6 +169,16 @@ export function AppRouter() {
             <ProtectedRoute allowedRoles={onlyMember}>
               <Suspense fallback={<PageLoader />}>
                 <Team />
+              </Suspense>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="relatorios"
+          element={
+            <ProtectedRoute allowedRoles={onlyMember}>
+              <Suspense fallback={<PageLoader />}>
+                <Reports />
               </Suspense>
             </ProtectedRoute>
           }

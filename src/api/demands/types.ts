@@ -203,3 +203,51 @@ export interface CabinetDashboardSummary {
 	mainNeighborhoods: DashboardNeighborhoodStat[];
 	categories: DashboardCategoryStat[];
 }
+
+export interface ReportStatusStat {
+	status: DemandStatus;
+	count: number;
+	percentage: number;
+}
+
+export interface ReportPriorityStat {
+	priority: string;
+	count: number;
+	percentage: number;
+}
+
+export interface ReportCategoryStat {
+	id: string;
+	name: string;
+	count: number;
+	percentage: number;
+}
+
+export interface ReportNeighborhoodStat {
+	neighborhood: string;
+	count: number;
+}
+
+export interface CabinetReport {
+	period: { start: string; end: string; days: number };
+	summary: {
+		totalInPeriod: number;
+		resolvedInPeriod: number;
+		resolutionRate: number;
+		openCount: number;
+		rejectedCount: number;
+		canceledCount: number;
+	};
+	byStatus: ReportStatusStat[];
+	byPriority: ReportPriorityStat[];
+	byCategory: ReportCategoryStat[];
+	byNeighborhood: ReportNeighborhoodStat[];
+	trend: { date: string; created: number; resolved: number }[];
+	resultsInPeriod: number;
+}
+
+export interface GetCabinetReportParams {
+	slug: string;
+	startDate?: string;
+	endDate?: string;
+}
