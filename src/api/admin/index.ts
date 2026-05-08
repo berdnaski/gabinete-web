@@ -30,6 +30,12 @@ export interface CreateCabinetWithOwnerResponse {
   }
 }
 
+export interface AdminCabinetDetailsResponse {
+  cabinet: CreateCabinetWithOwnerResponse["cabinet"]
+  ownerUser: CreateCabinetWithOwnerResponse["ownerUser"] | null
+  ownerMember: CreateCabinetWithOwnerResponse["ownerMember"] | null
+}
+
 export const AdminApi = {
   presignCabinetAvatarUpload: async (data: {
     filename: string
@@ -53,6 +59,13 @@ export const AdminApi = {
     })
   },
 
+  getCabinetDetails: async (id: string): Promise<AdminCabinetDetailsResponse> => {
+    const response = await apiClient.get<AdminCabinetDetailsResponse>(
+      `/admin/cabinets/${id}`,
+    )
+    return response.data
+  },
+
   createCabinetWithOwner: async (
     data: CreateCabinetWithOwnerRequest,
   ): Promise<CreateCabinetWithOwnerResponse> => {
@@ -61,5 +74,20 @@ export const AdminApi = {
       data,
     )
     return response.data
+  },
+
+  updateCabinet: async (
+    id: string,
+    data: CreateCabinetWithOwnerRequest,
+  ): Promise<AdminCabinetDetailsResponse> => {
+    const response = await apiClient.patch<AdminCabinetDetailsResponse>(
+      `/admin/cabinets/${id}`,
+      data,
+    )
+    return response.data
+  },
+
+  deleteCabinet: async (id: string): Promise<void> => {
+    await apiClient.delete(`/admin/cabinets/${id}`)
   },
 }

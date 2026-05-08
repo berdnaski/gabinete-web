@@ -4,6 +4,8 @@ import { getFirstLettersFromNames } from "@/utils/get-first-letters-from-names"
 import type { ColumnDef } from "@tanstack/react-table"
 import { ArrowRight } from "lucide-react"
 import { Link } from "react-router-dom"
+import { CabinetEditSheet } from "./cabinet-edit-sheet"
+import { DisableCabinetDialog } from "./disable-cabinet-dialog"
 
 export const cabinetsColumns: ColumnDef<Cabinet>[] = [
   {
@@ -80,11 +82,13 @@ export const cabinetsColumns: ColumnDef<Cabinet>[] = [
   {
     id: "actions",
     header: "",
-    size: 70,
+    size: 120,
     cell: ({ row }) => {
       const c = row.original
       return (
-        <div className="flex items-center justify-end">
+        <div className="flex items-center justify-end gap-1.5">
+          <CabinetEditSheet cabinetId={c.id} />
+          <DisableCabinetDialog cabinet={c} />
           <Link
             to={`/gabinetes/${c.slug}`}
             className="inline-flex items-center gap-1 text-xs text-primary hover:underline"

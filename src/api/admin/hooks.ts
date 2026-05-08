@@ -14,3 +14,23 @@ export function useAdminCreateCabinetWithOwner() {
   })
 }
 
+export function useAdminUpdateCabinet() {
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: CreateCabinetWithOwnerRequest }) =>
+      AdminApi.updateCabinet(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cabinets"] })
+      toast.success("Gabinete atualizado com sucesso!")
+    },
+  })
+}
+
+export function useAdminDeleteCabinet() {
+  return useMutation({
+    mutationFn: (id: string) => AdminApi.deleteCabinet(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cabinets"] })
+      toast.success("Gabinete desativado com sucesso!")
+    },
+  })
+}

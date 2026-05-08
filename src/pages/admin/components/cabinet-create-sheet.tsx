@@ -63,11 +63,10 @@ export function CabinetsForm({ sizeTrigger }: CabinetsFormProps) {
   const fetchUserOptions = useCallback(async ({ page }: { page: number }) => {
     const limit = 20
     const result = await UsersApi.list({ page, limit, role: UserRole.MEMBER })
-    const options = result.items
-      .map((user) => ({
-        value: user.id,
-        label: `${user.name} (${user.email})`,
-      }))
+    const options = result.items.map((user) => ({
+      value: user.id,
+      label: `${user.name} (${user.email})`,
+    }))
 
     return {
       options,
@@ -150,6 +149,8 @@ export function CabinetsForm({ sizeTrigger }: CabinetsFormProps) {
 
         <form onSubmit={onSubmit} className="flex min-h-0 flex-1 flex-col overflow-hidden">
           <FieldGroup className="flex-1 min-h-0 overflow-y-auto px-4">
+            <FieldSeparator>Responsável</FieldSeparator>
+
             <Field>
               <FieldLabel>Responsável</FieldLabel>
               <AsyncSelectForm
@@ -161,9 +162,7 @@ export function CabinetsForm({ sizeTrigger }: CabinetsFormProps) {
               />
             </Field>
 
-            <FieldSeparator>
-              Gabinete
-            </FieldSeparator>
+            <FieldSeparator>Gabinete</FieldSeparator>
 
             <Field>
               <FieldLabel>Nome</FieldLabel>
@@ -227,3 +226,4 @@ export function CabinetsForm({ sizeTrigger }: CabinetsFormProps) {
     </Sheet>
   )
 }
+

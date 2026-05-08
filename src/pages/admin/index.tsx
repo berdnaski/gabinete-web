@@ -1,7 +1,7 @@
 import { usePageTitle } from "@/hooks/use-page-title"
 import { useEffect } from "react"
 import { CabinetsTable } from "./components/cabinets-table"
-import { CabinetsForm } from "./components/cabinets-form"
+import { CabinetsForm } from "./components/cabinet-create-sheet"
 
 export function Admin() {
   const { setTitle } = usePageTitle()
