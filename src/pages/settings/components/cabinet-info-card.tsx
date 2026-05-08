@@ -1,124 +1,201 @@
-import { useForm, type SubmitHandler } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
-import { Loader2, Globe } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { useGetCabinets, useUpdateCabinet } from "@/api/cabinets/hooks";
-import { SettingsCard, SettingsCardHeader, SettingsCardFooter, Field } from "./settings-ui";
-import { cabinetInfoSchema, type CabinetInfoData } from "./schemas";
+import { useForm, type SubmitHandler } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { toast } from "sonner"
+import { Globe, Lock, Loader2 } from "lucide-react"
+import { Textarea } from "@/components/ui/textarea"
+import { Input } from "@/components/ui/input"
+import { useGetCabinets, useUpdateCabinet } from "@/api/cabinets/hooks"
+import { cabinetInfoSchema, type CabinetInfoData } from "./schemas"
+import { InputForm } from "@/components/form/input-form"
+import { Field, FieldGroup } from "@/components/ui/field"
+import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { useCurrentMember } from "@/hooks/use-current-member"
+import { cn } from "@/lib/utils"
+
+const INPUT_CLASS =
+  "bg-muted/40 border-none rounded-xl px-4 h-12 text-sm focus-visible:ring-2 focus-visible:ring-primary/20 transition-all font-medium"
 
 export function CabinetInfoCard() {
-  const { data: cabinets, isLoading } = useGetCabinets();
-  const { mutateAsync: updateCabinet, isPending } = useUpdateCabinet();
+  const { data: cabinets, isLoading: isLoadingCabinet } = useGetCabinets()
+  const { currentMember, isLoading: isLoadingMember } = useCurrentMember()
+  const { mutateAsync: updateCabinet, isPending } = useUpdateCabinet()
 
-  const cabinet = cabinets?.[0];
+  const cabinet = cabinets?.[0]
+  const isOwner = currentMember?.role === "OWNER"
+  const isLoading = isLoadingCabinet || isLoadingMember
 
-  const { register, handleSubmit, formState: { errors } } = useForm<CabinetInfoData>({
+  const {
+    control,
+    register,
+    handleSubmit,
+    formState: { isSubmitting, errors },
+  } = useForm<CabinetInfoData>({
     resolver: zodResolver(cabinetInfoSchema),
     values: {
       name: cabinet?.name ?? "",
       description: cabinet?.description ?? "",
       email: cabinet?.email ?? "",
     },
-  });
+  })
+
+  const isSubmittingForm = isPending || isSubmitting
+  const disabled = !isOwner || isSubmittingForm
 
   const onSubmit: SubmitHandler<CabinetInfoData> = async (data) => {
-    if (!cabinet) return;
-
+    if (!cabinet || !isOwner) return
     try {
       await updateCabinet({
         slug: cabinet.slug,
-        data: {
-          name: data.name,
-          description: data.description,
-          email: data.email
-        },
-      });
-      toast.success("Informações do Gabinete atualizadas!");
+        data: { name: data.name, description: data.description, email: data.email },
+      })
+      toast.success("Informações do Gabinete atualizadas!")
     } catch {
-      toast.error("Erro ao atualizar informações do Gabinete.");
+      toast.error("Erro ao atualizar informações do Gabinete.")
     }
-  };
+  }
 
   if (isLoading) {
     return (
-      <SettingsCard className="flex items-center justify-center py-20">
-        <Loader2 className="h-8 w-8 text-primary animate-spin opacity-20" />
-      </SettingsCard>
-    );
+      <Card className="bg-card rounded-lg shadow-lg border border-border/30">
+        <CardContent className="flex items-center justify-center py-20">
+          <Loader2 className="size-6 text-muted-foreground/30 animate-spin" />
+        </CardContent>
+      </Card>
+    )
   }
 
   if (!cabinet) {
     return (
-      <SettingsCard className="flex items-center justify-center py-12 text-muted-foreground bg-muted/5 border-dashed">
-        <p className="text-sm font-medium italic">Nenhum gabinete vinculado encontrado.</p>
-      </SettingsCard>
-    );
+      <Card className="bg-card rounded-lg shadow-lg border border-border/30 border-dashed">
+        <CardContent className="flex items-center justify-center py-16">
+          <p className="text-sm text-muted-foreground italic">Nenhum gabinete vinculado encontrado.</p>
+        </CardContent>
+      </Card>
+    )
   }
 
+  const publicHost = typeof window !== "undefined" ? window.location.host : "gabineteapp.com.br"
+
   return (
-    <SettingsCard>
-      <form id="cabinet-info-form" onSubmit={handleSubmit(onSubmit)}>
-        <SettingsCardHeader
-          title="Informações do Gabinete"
-          description="Esses dados são públicos e aparecem no perfil externo do seu gabinete."
-          badge="Público"
-        />
-
-        <div className="px-8 pb-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
-            <Field label="Nome do Gabinete Público" error={errors.name?.message}>
-              <Input
-                {...register("name")}
-                placeholder="Ex: Gabinete Dep. Carlos Mendes"
-                className="bg-muted/40 border-none rounded-xl px-4 h-12 text-sm focus-visible:ring-2 focus-visible:ring-primary/20 transition-all font-medium"
-              />
-            </Field>
-
-            <Field label="E-mail de Contato Oficial" error={errors.email?.message}>
-              <Input 
-                {...register("email")}
-                placeholder="contato@exemplo.com" 
-                className="bg-muted/40 border-none rounded-xl px-4 h-12 text-sm focus-visible:ring-2 focus-visible:ring-primary/20 transition-all font-medium" 
-              />
-            </Field>
-
-            <Field label="Cargo Político">
-              <div className="flex h-12 w-full items-center rounded-xl bg-muted/20 px-4 text-sm opacity-60 cursor-not-allowed font-medium text-foreground/70 italic">
-                Informação vinculada ao mandato
-              </div>
-            </Field>
-
-            <Field label="Link Público do Gabinete">
-              <a
-                href={`/${cabinet.slug}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex bg-muted/40 rounded-xl overflow-hidden hover:ring-2 hover:ring-primary/20 transition-all border border-transparent group"
-              >
-                <div className="bg-slate-100/50 dark:bg-slate-800/50 px-4 h-12 flex items-center text-2xs font-bold text-muted-foreground uppercase tracking-wider border-r border-border/20 shrink-0">
-                  <Globe className="w-3.5 h-3.5 mr-2 opacity-50" />
-                  {typeof window !== "undefined" ? window.location.host : "gabineteapp.com.br"}/
-                </div>
-                <div className="flex-1 flex items-center px-4 h-12 text-sm text-primary font-medium group-hover:underline">
-                  {cabinet.slug}
-                </div>
-              </a>
-            </Field>
-
-            <Field label="Mensagem Pública (Bio)" className="md:col-span-2" error={errors.description?.message}>
-              <textarea
-                {...register("description")}
-                placeholder="Uma breve descrição do seu mandato e objetivos..."
-                className="w-full min-h-30 p-4 text-sm rounded-xl bg-muted/40 border-none outline-none focus-visible:ring-2 focus-visible:ring-primary/20 resize-none font-medium leading-relaxed transition-all"
-              />
-            </Field>
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <Card className="bg-card rounded-lg shadow-lg border border-border/30 animate-in fade-in duration-500">
+        <CardHeader className="px-6 py-5">
+          <div className="flex items-center gap-2.5 mb-0.5">
+            <CardTitle className="text-xl font-bold text-foreground tracking-tight">
+              Informações do Gabinete
+            </CardTitle>
+            <span className="bg-primary/10 text-primary text-2xs font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0">
+              Público
+            </span>
           </div>
-        </div>
+          <CardDescription>
+            Esses dados são públicos e aparecem no perfil externo do seu gabinete.
+          </CardDescription>
+        </CardHeader>
 
-        <SettingsCardFooter formId="cabinet-info-form" isLoading={isPending} />
-      </form>
-    </SettingsCard>
-  );
+        <CardContent className="px-6 py-2">
+          <FieldGroup>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
+              <Field>
+                <Label htmlFor="name">Nome do Gabinete Público</Label>
+                <InputForm
+                  name="name"
+                  control={control}
+                  id="name"
+                  placeholder="Ex: Gabinete Dep. Carlos Mendes"
+                  disabled={disabled}
+                  className={cn(INPUT_CLASS, disabled && "opacity-60 cursor-not-allowed")}
+                />
+              </Field>
+
+              <Field>
+                <Label htmlFor="email">E-mail de Contato Oficial</Label>
+                <InputForm
+                  name="email"
+                  control={control}
+                  id="email"
+                  placeholder="contato@exemplo.com"
+                  disabled={disabled}
+                  className={cn(INPUT_CLASS, disabled && "opacity-60 cursor-not-allowed")}
+                />
+              </Field>
+
+              <Field>
+                <Label>Cargo Político</Label>
+                <Input
+                  disabled
+                  defaultValue="Informação vinculada ao mandato"
+                  className={cn(INPUT_CLASS, "opacity-50 cursor-not-allowed italic")}
+                />
+              </Field>
+
+              <Field>
+                <Label>Link Público do Gabinete</Label>
+                <a
+                  href={`/${cabinet.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-12 rounded-xl bg-muted/40 overflow-hidden hover:ring-2 hover:ring-primary/20 transition-all group"
+                >
+                  <span className="flex items-center gap-1.5 px-4 h-full text-2xs font-bold text-muted-foreground uppercase tracking-wider bg-muted/60 border-r border-border/30 shrink-0">
+                    <Globe className="size-3.5 opacity-50 shrink-0" />
+                    {publicHost}/
+                  </span>
+                  <span className="flex items-center px-4 h-full text-sm font-medium text-primary truncate group-hover:underline">
+                    {cabinet.slug}
+                  </span>
+                </a>
+              </Field>
+
+              <Field className="md:col-span-2">
+                <Label htmlFor="description">Mensagem Pública (Bio)</Label>
+                <Textarea
+                  {...register("description")}
+                  id="description"
+                  placeholder="Uma breve descrição do seu mandato e objetivos..."
+                  disabled={disabled}
+                  rows={4}
+                  className={cn(
+                    "resize-none bg-muted/40 border-none rounded-xl px-4 py-3 text-sm font-medium transition-all focus-visible:ring-2 focus-visible:ring-primary/20",
+                    disabled && "opacity-60 cursor-not-allowed",
+                    errors.description && "border border-destructive/40",
+                  )}
+                />
+                {errors.description && (
+                  <p className="text-xs text-destructive mt-1">{errors.description.message}</p>
+                )}
+              </Field>
+            </div>
+          </FieldGroup>
+        </CardContent>
+
+        <CardFooter className="px-6 py-5 mt-4 border-t border-border/30 flex items-center justify-between">
+          {isOwner ? (
+            <Button
+              type="submit"
+              disabled={isSubmittingForm}
+              className="ml-auto px-8 h-12 rounded-xl font-bold text-sm shadow-lg shadow-primary/10 hover:-translate-y-0.5 transition-all"
+            >
+              {isSubmittingForm && <Loader2 className="size-4 animate-spin" />}
+              Salvar Dados
+            </Button>
+          ) : (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Lock className="size-3.5 shrink-0 opacity-60" />
+              <span>Apenas o responsável pelo gabinete pode editar estas informações.</span>
+            </div>
+          )}
+        </CardFooter>
+      </Card>
+    </form>
+  )
 }
-
