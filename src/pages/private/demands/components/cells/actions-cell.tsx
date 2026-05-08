@@ -61,7 +61,6 @@ export function ActionsCell({ row }: { row: Row<Demand> }) {
 
       <UpdateProgressDialog
         demandId={demand.id}
-        demandTitle={demand.title}
         currentStatus={demand.status}
         open={progressOpen}
         onOpenChange={setProgressOpen}

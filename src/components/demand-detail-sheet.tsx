@@ -258,18 +258,20 @@ export function DemandDetailSheet({
             </div>
           </div>
 
-          {canManage && (
+          {(isAssignedMember || canManage) && (
             <>
               <Separator />
               <div className="px-5 py-4 shrink-0 flex items-center gap-2">
-                <Button
-                  className="flex-1 gap-2"
-                  onClick={() => setProgressOpen(true)}
-                >
-                  <TrendingUp className="size-4" />
-                  Atualizar progresso
-                </Button>
-                <Button variant="outline" asChild>
+                {isAssignedMember && (
+                  <Button
+                    className="flex-1 gap-2"
+                    onClick={() => setProgressOpen(true)}
+                  >
+                    <TrendingUp className="size-4" />
+                    Atualizar progresso
+                  </Button>
+                )}
+                <Button variant="outline" className={cn(!isAssignedMember && "flex-1")} asChild>
                   <Link to={`/comments/${demand.id}`} onClick={() => onOpenChange(false)}>
                     Ver comentários
                   </Link>
@@ -280,13 +282,14 @@ export function DemandDetailSheet({
         </SheetContent>
       </Sheet>
 
-      {canManage && (
+      {isAssignedMember && (
         <UpdateProgressDialog
           demandId={demand.id}
-          demandTitle={demand.title}
           currentStatus={demand.status}
+          hasResults={results.length > 0}
           open={progressOpen}
           onOpenChange={setProgressOpen}
+          onNeedsResults={() => setResultOpen(true)}
           onSuccess={() => onOpenChange(false)}
         />
       )}

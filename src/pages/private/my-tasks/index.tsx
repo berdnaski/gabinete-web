@@ -291,7 +291,6 @@ function KanbanBoard({ demands, onOpenDetail }: KanbanBoardProps) {
       {pendingMove && (
         <UpdateProgressDialog
           demandId={pendingMove.demand.id}
-          demandTitle={pendingMove.demand.title}
           currentStatus={pendingMove.demand.status}
           defaultStatus={pendingMove.toStatus}
           open={!!pendingMove}
@@ -547,7 +546,6 @@ export function MyTasks() {
       {progressDemand && (
         <UpdateProgressDialog
           demandId={progressDemand.id}
-          demandTitle={progressDemand.title}
           currentStatus={progressDemand.status}
           open={!!progressDemand}
           onOpenChange={(open) => !open && setProgressDemand(null)}

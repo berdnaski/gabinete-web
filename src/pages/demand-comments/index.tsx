@@ -127,8 +127,8 @@ export function DemandComments() {
       {isMyDemand && (
         <UpdateProgressDialog
           demandId={demand.id}
-          demandTitle={demand.title}
           currentStatus={demand.status}
+          hasResults={resultList.length > 0}
           open={progressOpen}
           onOpenChange={setProgressOpen}
         />
