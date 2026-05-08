@@ -36,6 +36,28 @@ export interface AdminCabinetDetailsResponse {
   ownerMember: CreateCabinetWithOwnerResponse["ownerMember"] | null
 }
 
+export interface CreateAdminUserRequest {
+  name: string
+  email: string
+  password: string
+  role: "ADMIN" | "MEMBER" | "CITIZEN"
+  avatarUrl?: string
+}
+
+export interface CreateAdminUserResponse {
+  id: string
+  name: string
+  email: string
+  role: string
+  avatarUrl: string | null
+  phone: string | null
+  isVerified: boolean
+  hasSetPassword: boolean
+  isCabinetMember: boolean
+  termsAcceptedAt: string | null
+  disabledAt: string | null
+}
+
 export const AdminApi = {
   presignCabinetAvatarUpload: async (data: {
     filename: string
@@ -46,6 +68,18 @@ export const AdminApi = {
       storageKey: string
       avatarUrl: string
     }>("/admin/cabinets/avatar/presign", data)
+    return response.data
+  },
+
+  presignUserAvatarUpload: async (data: {
+    filename: string
+    mimetype: string
+  }): Promise<{ uploadUrl: string; storageKey: string; avatarUrl: string }> => {
+    const response = await apiClient.post<{
+      uploadUrl: string
+      storageKey: string
+      avatarUrl: string
+    }>("/admin/users/avatar/presign", data)
     return response.data
   },
 
@@ -89,5 +123,10 @@ export const AdminApi = {
 
   deleteCabinet: async (id: string): Promise<void> => {
     await apiClient.delete(`/admin/cabinets/${id}`)
+  },
+
+  createUser: async (data: CreateAdminUserRequest): Promise<CreateAdminUserResponse> => {
+    const response = await apiClient.post<CreateAdminUserResponse>("/admin/users", data)
+    return response.data
   },
 }

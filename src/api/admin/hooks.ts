@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { queryClient } from "../queryClient"
-import { AdminApi, type CreateCabinetWithOwnerRequest } from "."
+import { AdminApi, type CreateAdminUserRequest, type CreateCabinetWithOwnerRequest } from "."
 
 export function useAdminCreateCabinetWithOwner() {
   return useMutation({
@@ -31,6 +31,16 @@ export function useAdminDeleteCabinet() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cabinets"] })
       toast.success("Gabinete desativado com sucesso!")
+    },
+  })
+}
+
+export function useAdminCreateUser() {
+  return useMutation({
+    mutationFn: (data: CreateAdminUserRequest) => AdminApi.createUser(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] })
+      toast.success("Usuário criado com sucesso!")
     },
   })
 }
