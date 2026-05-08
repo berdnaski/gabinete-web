@@ -8,7 +8,7 @@ import { ConsentOverlay } from "../auth/consent-overlay";
 
 import { UserRole } from "@/api/users/types";
 
-const rolesWithSidebar = [UserRole.ADMIN, UserRole.MEMBER]
+const rolesWithSidebar: UserRole[] = [UserRole.ADMIN, UserRole.MEMBER]
 
 export function Layout() {
   const { user, hasRoleAdmin } = useAuth();

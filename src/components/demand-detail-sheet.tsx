@@ -1,5 +1,5 @@
 import type { Demand } from "@/api/demands/types"
-import { useDeleteResult, useGetDemandResults } from "@/api/results/hooks"
+import { useDeleteResult, useGetDemandResults, useUploadResultProtocol } from "@/api/results/hooks"
 import type { Result, ResultType } from "@/api/results/types"
 import { CreateResultDialog } from "./create-result-dialog"
 import { DemandStatusBadge } from "./demand-status-badge"
@@ -22,15 +22,23 @@ import { formatDateToNow } from "@/utils/format-date-to-now"
 import {
   CalendarIcon,
   ExternalLinkIcon,
+  FileTextIcon,
   Loader2,
   MapPinIcon,
+  Paperclip,
   Plus,
   TagIcon,
   Trash2,
   TrendingUp,
   UserRound,
 } from "lucide-react"
-import { useState } from "react"
+import { useRef, useState } from "react"
+
+function formatBytes(bytes: number) {
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
 import { Link } from "react-router-dom"
 import { DemandPriority } from "@/pages/private/demands/components/demand-priority"
 import { toast } from "sonner"
@@ -296,12 +304,31 @@ export function DemandDetailSheet({
 
 function ResultCard({ result, canDelete }: { result: Result; canDelete?: boolean }) {
   const { mutate: deleteResult, isPending: isDeleting } = useDeleteResult(result.demandId)
+  const { mutate: uploadProtocol, isPending: isUploadingProtocol } = useUploadResultProtocol(result.demandId)
+  const protocolInputRef = useRef<HTMLInputElement>(null)
   const [confirming, setConfirming] = useState(false)
 
   function handleDelete() {
     deleteResult(result.id, {
       onError: () => toast.error("Erro ao excluir resultado"),
     })
+  }
+
+  function handleProtocolFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.size > 20 * 1024 * 1024) {
+      toast.error("Arquivo muito grande. Máximo 20MB.")
+      return
+    }
+    uploadProtocol(
+      { id: result.id, file },
+      {
+        onSuccess: () => toast.success("Protocolo anexado com sucesso"),
+        onError: () => toast.error("Erro ao anexar protocolo"),
+      },
+    )
+    e.target.value = ""
   }
 
   return (
@@ -376,6 +403,53 @@ function ResultCard({ result, canDelete }: { result: Result; canDelete?: boolean
           ))}
         </div>
       )}
+
+      {result.protocolFileUrl ? (
+        <a
+          href={result.protocolFileUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2.5 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 hover:bg-primary/10 transition-colors group mt-0.5"
+        >
+          <div className="size-6 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
+            <FileTextIcon className="size-3.5 text-primary" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-medium text-primary truncate">
+              {result.protocolFileName ?? "Protocolo oficial"}
+            </p>
+            {result.protocolFileSize && (
+              <p className="text-2xs text-primary/60">{formatBytes(result.protocolFileSize)} · clique para abrir</p>
+            )}
+          </div>
+          <ExternalLinkIcon className="size-3 text-primary/40 shrink-0 group-hover:text-primary/70 transition-colors" />
+        </a>
+      ) : canDelete ? (
+        <>
+          <button
+            type="button"
+            onClick={() => protocolInputRef.current?.click()}
+            disabled={isUploadingProtocol}
+            className="flex items-center gap-2 rounded-lg border border-dashed border-border/60 px-3 py-2 hover:border-border hover:bg-muted/20 transition-all text-left mt-0.5 disabled:opacity-50"
+          >
+            {isUploadingProtocol ? (
+              <Loader2 className="size-3.5 text-muted-foreground animate-spin shrink-0" />
+            ) : (
+              <Paperclip className="size-3.5 text-muted-foreground shrink-0" />
+            )}
+            <span className="text-xs text-muted-foreground">
+              {isUploadingProtocol ? "Enviando protocolo..." : "Anexar protocolo oficial"}
+            </span>
+          </button>
+          <input
+            ref={protocolInputRef}
+            type="file"
+            accept=".pdf,.doc,.docx,image/*"
+            className="hidden"
+            onChange={handleProtocolFile}
+          />
+        </>
+      ) : null}
     </div>
   )
 }

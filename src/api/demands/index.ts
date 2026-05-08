@@ -30,8 +30,8 @@ export const DemandsApi = {
 		return response.data;
 	},
 
-	listDemandsByCabinetSlug: async ({ slug, ...params }: ListDemandsByCabinetSlugParams) => {
-		const response = await apiClient.get(`${baseURL}/cabinet/${slug}`, {
+	listDemandsByCabinetSlug: async ({ slug, ...params }: ListDemandsByCabinetSlugParams): Promise<PaginatedResponse<Demand>> => {
+		const response = await apiClient.get<PaginatedResponse<Demand>>(`${baseURL}/cabinet/${slug}`, {
 			params
 		})
 

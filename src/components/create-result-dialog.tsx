@@ -13,9 +13,17 @@ import {
 } from "@/components/ui/dialog"
 import { useAuth } from "@/hooks/use-auth"
 import { cn } from "@/lib/utils"
-import { ImageIcon, Loader2, X } from "lucide-react"
+import { FileTextIcon, ImageIcon, Loader2, X } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
+
+const MAX_PROTOCOL_SIZE_MB = 20
+
+function formatBytes(bytes: number) {
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
 
 const RESULT_TYPE_OPTIONS: {
   value: ResultType
@@ -61,12 +69,14 @@ export function CreateResultDialog({
   const { cabinet } = useAuth()
   const { mutate, isPending } = useCreateResult()
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const protocolInputRef = useRef<HTMLInputElement>(null)
 
   const [type, setType] = useState<ResultType>("INFRASTRUCTURE")
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
   const [images, setImages] = useState<File[]>([])
   const [previews, setPreviews] = useState<string[]>([])
+  const [protocol, setProtocol] = useState<File | null>(null)
 
   useEffect(() => {
     if (open) {
@@ -75,6 +85,7 @@ export function CreateResultDialog({
       setDescription("")
       setImages([])
       setPreviews([])
+      setProtocol(null)
     }
   }, [open])
 
@@ -130,6 +141,7 @@ export function CreateResultDialog({
         cabinetSlug: cabinet.slug,
         demandId: demand.id,
         images: images.length > 0 ? images : undefined,
+        protocol: protocol ?? undefined,
       },
       {
         onSuccess: () => {
@@ -284,6 +296,69 @@ export function CreateResultDialog({
                 multiple
                 className="hidden"
                 onChange={(e) => handleFiles(e.target.files)}
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-1.5">
+                <p className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground">
+                  Protocolo oficial
+                </p>
+                <span className="text-2xs text-muted-foreground/50 normal-case tracking-normal font-normal">
+                  — opcional
+                </span>
+              </div>
+
+              {protocol ? (
+                <div className="flex items-center gap-2.5 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2.5">
+                  <div className="size-7 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
+                    <FileTextIcon className="size-3.5 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">{protocol.name}</p>
+                    <p className="text-xs text-muted-foreground">{formatBytes(protocol.size)}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setProtocol(null)}
+                    className="shrink-0 text-muted-foreground/40 hover:text-muted-foreground transition-colors"
+                  >
+                    <X className="size-4" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => protocolInputRef.current?.click()}
+                  className="flex items-center gap-2.5 rounded-lg border border-dashed border-border px-3 py-2.5 hover:bg-muted/30 transition-colors text-left"
+                >
+                  <div className="size-7 rounded-md bg-muted flex items-center justify-center shrink-0">
+                    <FileTextIcon className="size-3.5 text-muted-foreground" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">Anexar protocolo</p>
+                    <p className="text-xs text-muted-foreground">
+                      PDF, DOC ou imagem · max {MAX_PROTOCOL_SIZE_MB}MB
+                    </p>
+                  </div>
+                </button>
+              )}
+
+              <input
+                ref={protocolInputRef}
+                type="file"
+                accept=".pdf,.doc,.docx,image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0]
+                  if (!file) return
+                  if (file.size > MAX_PROTOCOL_SIZE_MB * 1024 * 1024) {
+                    toast.error(`Arquivo muito grande. Máximo ${MAX_PROTOCOL_SIZE_MB}MB.`)
+                    return
+                  }
+                  setProtocol(file)
+                  e.target.value = ""
+                }}
               />
             </div>
           </form>

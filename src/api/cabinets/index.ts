@@ -1,5 +1,5 @@
 import { apiClient } from "..";
-import type { Cabinet, CabinetMember, CabinetMetrics, CabinetTrendDetailedPoint, CabinetTrendPoint } from "./types";
+import type { Cabinet, CabinetInvitation, CabinetInvitationDetails, CabinetMember, CabinetMetrics, CabinetTrendDetailedPoint, CabinetTrendPoint } from "./types";
 
 const baseURL = "/cabinets";
 
@@ -58,6 +58,53 @@ export const CabinetsApi = {
     const response = await apiClient.get<CabinetTrendDetailedPoint[]>(
       `/demands/cabinet/${slug}/trend-detailed`,
       { params: { days } },
+    );
+    return response.data;
+  },
+
+  getInvitationByToken: async (token: string): Promise<CabinetInvitationDetails> => {
+    const response = await apiClient.get<CabinetInvitationDetails>(
+      `${baseURL}/invites/${token}`,
+    );
+    return response.data;
+  },
+
+  acceptInvitation: async (token: string): Promise<{ message: string }> => {
+    const response = await apiClient.post<{ message: string }>(
+      `${baseURL}/invites/${token}/accept`,
+    );
+    return response.data;
+  },
+
+  inviteMember: async (
+    slug: string,
+    data: { email: string; role: "OWNER" | "STAFF" },
+  ): Promise<{ message: string }> => {
+    const response = await apiClient.post(`${baseURL}/${slug}/invites`, data);
+    return response.data;
+  },
+
+  listInvitations: async (slug: string): Promise<CabinetInvitation[]> => {
+    const response = await apiClient.get<CabinetInvitation[]>(`${baseURL}/${slug}/invites`);
+    return Array.isArray(response.data) ? response.data : [];
+  },
+
+  cancelInvitation: async (id: string): Promise<void> => {
+    await apiClient.delete(`${baseURL}/invites/${id}`);
+  },
+
+  removeMember: async (slug: string, userId: string): Promise<void> => {
+    await apiClient.delete(`${baseURL}/${slug}/members/${userId}`);
+  },
+
+  updateMemberRole: async (
+    slug: string,
+    userId: string,
+    role: "OWNER" | "STAFF",
+  ): Promise<CabinetMember> => {
+    const response = await apiClient.patch<CabinetMember>(
+      `${baseURL}/${slug}/members/${userId}`,
+      { role },
     );
     return response.data;
   },

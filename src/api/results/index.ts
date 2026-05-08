@@ -19,7 +19,17 @@ export const ResultsApi = {
         formData.append("images", file)
       }
     }
+    if (data.protocol) formData.append("protocol", data.protocol)
     const response = await apiClient.post<Result>("/results", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    })
+    return response.data
+  },
+
+  async uploadProtocol(id: string, file: File): Promise<Result> {
+    const formData = new FormData()
+    formData.append("protocol", file)
+    const response = await apiClient.post<Result>(`/results/${id}/protocol`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     })
     return response.data
