@@ -65,6 +65,25 @@ export function useUpdateCabinet() {
   });
 }
 
+export function useGetInvitationByToken(token: string | undefined) {
+  return useQuery({
+    queryKey: ["cabinet-invite-token", token],
+    queryFn: () => CabinetsApi.getInvitationByToken(token!),
+    enabled: !!token,
+    retry: false,
+  });
+}
+
+export function useAcceptInvitation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (token: string) => CabinetsApi.acceptInvitation(token),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["cabinets"] });
+    },
+  });
+}
+
 export function useListCabinetInvitations(slug: string | undefined) {
   return useQuery({
     queryKey: ["cabinet-invitations", slug],

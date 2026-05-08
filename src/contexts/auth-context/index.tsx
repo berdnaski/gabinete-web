@@ -89,7 +89,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       localStorage.setItem(ACCESS_TOKEN_KEY, response.accessToken);
       await syncProfile();
       toast.success("Login realizado com sucesso!");
-      navigate("/");
+      const params = new URLSearchParams(window.location.search);
+      const redirect = params.get("redirect");
+      navigate(redirect?.startsWith("/") ? redirect : "/");
     } catch (error) {
       toast.error("Erro ao realizar login. Verifique suas credenciais.");
       throw error;

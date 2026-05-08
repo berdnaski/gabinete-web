@@ -58,3 +58,10 @@ export interface CabinetInvitation {
   expiresAt: string;
   createdAt: string;
 }
+
+export interface CabinetInvitationDetails {
+  email: string;
+  role: "OWNER" | "STAFF";
+  cabinetName: string;
+  expiresAt: string;
+}

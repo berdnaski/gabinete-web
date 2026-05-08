@@ -13,6 +13,7 @@ import { ResetPassword } from "@/pages/public/reset-password";
 import { VerifyEmail } from "@/pages/public/verify-email";
 import { GoogleCallback } from "@/pages/public/google-callback";
 import { ConfirmPasswordPage } from "@/pages/public/confirm-password";
+import { AcceptInvite } from "@/pages/public/accept-invite";
 
 // Heavier pages — split into their own chunks
 const Sandbox = lazy(() => import("@/pages/public/sandbox").then((m) => ({ default: m.Sandbox })));
@@ -53,6 +54,7 @@ export function AppRouter() {
       <Route path="/verify-email" element={<VerifyEmail />} />
       <Route path="/auth/callback" element={<GoogleCallback />} />
       <Route path="/confirm-password" element={<ConfirmPasswordPage />} />
+      <Route path="/cabinets/invites/:token" element={<AcceptInvite />} />
       <Route
         path="/sandbox"
         element={<Suspense fallback={<PageLoader />}><Sandbox /></Suspense>}

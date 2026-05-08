@@ -1,5 +1,5 @@
 import { apiClient } from "..";
-import type { Cabinet, CabinetInvitation, CabinetMember, CabinetMetrics, CabinetTrendDetailedPoint, CabinetTrendPoint } from "./types";
+import type { Cabinet, CabinetInvitation, CabinetInvitationDetails, CabinetMember, CabinetMetrics, CabinetTrendDetailedPoint, CabinetTrendPoint } from "./types";
 
 const baseURL = "/cabinets";
 
@@ -43,6 +43,20 @@ export const CabinetsApi = {
     const response = await apiClient.get<CabinetTrendDetailedPoint[]>(
       `/demands/cabinet/${slug}/trend-detailed`,
       { params: { days } },
+    );
+    return response.data;
+  },
+
+  getInvitationByToken: async (token: string): Promise<CabinetInvitationDetails> => {
+    const response = await apiClient.get<CabinetInvitationDetails>(
+      `${baseURL}/invites/${token}`,
+    );
+    return response.data;
+  },
+
+  acceptInvitation: async (token: string): Promise<{ message: string }> => {
+    const response = await apiClient.post<{ message: string }>(
+      `${baseURL}/invites/${token}/accept`,
     );
     return response.data;
   },
