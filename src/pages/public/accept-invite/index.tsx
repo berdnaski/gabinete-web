@@ -27,7 +27,7 @@ const ROLE_LABELS = {
 
 export function AcceptInvite() {
   const { token } = useParams<{ token: string }>()
-  const { user, isInitializing } = useAuth()
+  const { user, isInitializing, refreshProfile } = useAuth()
   const navigate = useNavigate()
   const [accepted, setAccepted] = useState(false)
 
@@ -38,12 +38,13 @@ export function AcceptInvite() {
 
   function handleAccept() {
     accept(token!, {
-      onSuccess: () => {
+      onSuccess: async () => {
         setAccepted(true)
+        await refreshProfile()
         setTimeout(() => {
           navigate("/home", { replace: true })
           toast.success("Bem-vindo ao gabinete!")
-        }, 2200)
+        }, 1800)
       },
       onError: (err: any) => {
         const msg = err?.response?.data?.message ?? "Erro ao aceitar convite."

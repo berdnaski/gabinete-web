@@ -177,6 +177,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         handleGoogleLogin,
         logout,
         updateLocalUser,
+        refreshProfile: syncProfile,
       }}
     >
       {children}

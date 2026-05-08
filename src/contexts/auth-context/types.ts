@@ -12,4 +12,5 @@ export interface AuthContextType {
   handleGoogleLogin: () => Promise<void>;
   logout: () => void;
   updateLocalUser: (data: Partial<GetUserProfileResponse>) => void;
+  refreshProfile: () => Promise<void>;
 }
