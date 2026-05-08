@@ -21,9 +21,6 @@ import {
 import { useCurrentMember } from "@/hooks/use-current-member"
 import { cn } from "@/lib/utils"
 
-const INPUT_CLASS =
-  "bg-muted/40 border-none rounded-xl px-4 h-12 text-sm focus-visible:ring-2 focus-visible:ring-primary/20 transition-all font-medium"
-
 export function CabinetInfoCard() {
   const { data: cabinets, isLoading: isLoadingCabinet } = useGetCabinets()
   const { currentMember, isLoading: isLoadingMember } = useCurrentMember()
@@ -65,9 +62,9 @@ export function CabinetInfoCard() {
 
   if (isLoading) {
     return (
-      <Card className="bg-card rounded-lg shadow-lg border border-border/30">
+      <Card className="bg-card rounded-xl border border-border shadow-sm">
         <CardContent className="flex items-center justify-center py-20">
-          <Loader2 className="size-6 text-muted-foreground/30 animate-spin" />
+          <Loader2 className="size-5 text-muted-foreground/30 animate-spin" />
         </CardContent>
       </Card>
     )
@@ -75,7 +72,7 @@ export function CabinetInfoCard() {
 
   if (!cabinet) {
     return (
-      <Card className="bg-card rounded-lg shadow-lg border border-border/30 border-dashed">
+      <Card className="bg-card rounded-xl border border-dashed border-border shadow-sm">
         <CardContent className="flex items-center justify-center py-16">
           <p className="text-sm text-muted-foreground italic">Nenhum gabinete vinculado encontrado.</p>
         </CardContent>
@@ -87,45 +84,45 @@ export function CabinetInfoCard() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <Card className="bg-card rounded-lg shadow-lg border border-border/30 animate-in fade-in duration-500">
-        <CardHeader className="px-6 py-5">
-          <div className="flex items-center gap-2.5 mb-0.5">
-            <CardTitle className="text-xl font-bold text-foreground tracking-tight">
+      <Card className="bg-card rounded-xl border border-border shadow-sm animate-in fade-in duration-300">
+        <CardHeader className="px-6 pt-5 pb-4 border-b border-border">
+          <div className="flex items-center gap-2">
+            <CardTitle className="text-base font-semibold text-foreground">
               Informações do Gabinete
             </CardTitle>
-            <span className="bg-primary/10 text-primary text-2xs font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0">
+            <span className="bg-primary/10 text-primary text-2xs font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0">
               Público
             </span>
           </div>
-          <CardDescription>
-            Esses dados são públicos e aparecem no perfil externo do seu gabinete.
+          <CardDescription className="text-sm text-muted-foreground">
+            Esses dados aparecem no perfil público do seu gabinete.
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="px-6 py-2">
+        <CardContent className="px-6 py-5">
           <FieldGroup>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Field>
-                <Label htmlFor="name">Nome do Gabinete Público</Label>
+                <Label htmlFor="name">Nome do Gabinete</Label>
                 <InputForm
                   name="name"
                   control={control}
                   id="name"
                   placeholder="Ex: Gabinete Dep. Carlos Mendes"
                   disabled={disabled}
-                  className={cn(INPUT_CLASS, disabled && "opacity-60 cursor-not-allowed")}
+                  className={cn(disabled && "opacity-50 cursor-not-allowed")}
                 />
               </Field>
 
               <Field>
-                <Label htmlFor="email">E-mail de Contato Oficial</Label>
+                <Label htmlFor="email">E-mail de Contato</Label>
                 <InputForm
                   name="email"
                   control={control}
                   id="email"
                   placeholder="contato@exemplo.com"
                   disabled={disabled}
-                  className={cn(INPUT_CLASS, disabled && "opacity-60 cursor-not-allowed")}
+                  className={cn(disabled && "opacity-50 cursor-not-allowed")}
                 />
               </Field>
 
@@ -134,23 +131,23 @@ export function CabinetInfoCard() {
                 <Input
                   disabled
                   defaultValue="Informação vinculada ao mandato"
-                  className={cn(INPUT_CLASS, "opacity-50 cursor-not-allowed italic")}
+                  className="opacity-50 cursor-not-allowed italic"
                 />
               </Field>
 
               <Field>
-                <Label>Link Público do Gabinete</Label>
+                <Label>Link Público</Label>
                 <a
                   href={`/${cabinet.slug}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-12 rounded-xl bg-muted/40 overflow-hidden hover:ring-2 hover:ring-primary/20 transition-all group"
+                  className="flex h-9 rounded-md border border-border bg-background overflow-hidden hover:border-primary/40 transition-colors group"
                 >
-                  <span className="flex items-center gap-1.5 px-4 h-full text-2xs font-bold text-muted-foreground uppercase tracking-wider bg-muted/60 border-r border-border/30 shrink-0">
-                    <Globe className="size-3.5 opacity-50 shrink-0" />
+                  <span className="flex items-center gap-1.5 px-3 h-full text-2xs font-medium text-muted-foreground bg-muted border-r border-border shrink-0">
+                    <Globe className="size-3 shrink-0 opacity-60" />
                     {publicHost}/
                   </span>
-                  <span className="flex items-center px-4 h-full text-sm font-medium text-primary truncate group-hover:underline">
+                  <span className="flex items-center px-3 h-full text-sm text-primary truncate group-hover:underline">
                     {cabinet.slug}
                   </span>
                 </a>
@@ -163,34 +160,30 @@ export function CabinetInfoCard() {
                   id="description"
                   placeholder="Uma breve descrição do seu mandato e objetivos..."
                   disabled={disabled}
-                  rows={4}
+                  rows={3}
                   className={cn(
-                    "resize-none bg-muted/40 border-none rounded-xl px-4 py-3 text-sm font-medium transition-all focus-visible:ring-2 focus-visible:ring-primary/20",
-                    disabled && "opacity-60 cursor-not-allowed",
-                    errors.description && "border border-destructive/40",
+                    "resize-none text-sm",
+                    disabled && "opacity-50 cursor-not-allowed",
+                    errors.description && "border-destructive/60",
                   )}
                 />
                 {errors.description && (
-                  <p className="text-xs text-destructive mt-1">{errors.description.message}</p>
+                  <p className="text-xs text-destructive">{errors.description.message}</p>
                 )}
               </Field>
             </div>
           </FieldGroup>
         </CardContent>
 
-        <CardFooter className="px-6 py-5 mt-4 border-t border-border/30 flex items-center justify-between">
+        <CardFooter className="px-6 py-4 border-t border-border flex items-center justify-between">
           {isOwner ? (
-            <Button
-              type="submit"
-              disabled={isSubmittingForm}
-              className="ml-auto px-8 h-12 rounded-xl font-bold text-sm shadow-lg shadow-primary/10 hover:-translate-y-0.5 transition-all"
-            >
-              {isSubmittingForm && <Loader2 className="size-4 animate-spin" />}
-              Salvar Dados
+            <Button type="submit" disabled={isSubmittingForm} size="sm" className="ml-auto">
+              {isSubmittingForm && <Loader2 className="size-3.5 animate-spin" />}
+              Salvar
             </Button>
           ) : (
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <Lock className="size-3.5 shrink-0 opacity-60" />
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <Lock className="size-3.5 shrink-0" />
               <span>Apenas o responsável pelo gabinete pode editar estas informações.</span>
             </div>
           )}
