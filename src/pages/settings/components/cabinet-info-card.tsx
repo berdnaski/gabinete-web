@@ -1,15 +1,17 @@
 import { useForm, type SubmitHandler } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
-import { Globe, Lock, Loader2 } from "lucide-react"
+import { Globe, Lock, Loader2, Instagram, Facebook, Twitter, Link } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { useGetCabinets, useUpdateCabinet } from "@/api/cabinets/hooks"
+import { useAuth } from "@/hooks/use-auth"
 import { cabinetInfoSchema, type CabinetInfoData } from "./schemas"
 import { InputForm } from "@/components/form/input-form"
 import { Field, FieldGroup } from "@/components/ui/field"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
+import { Separator } from "@/components/ui/separator"
 import {
   Card,
   CardContent,
@@ -25,6 +27,7 @@ export function CabinetInfoCard() {
   const { data: cabinets, isLoading: isLoadingCabinet } = useGetCabinets()
   const { currentMember, isLoading: isLoadingMember } = useCurrentMember()
   const { mutateAsync: updateCabinet, isPending } = useUpdateCabinet()
+  const { refreshProfile } = useAuth()
 
   const cabinet = cabinets?.[0]
   const isOwner = currentMember?.role === "OWNER"
@@ -41,6 +44,12 @@ export function CabinetInfoCard() {
       name: cabinet?.name ?? "",
       description: cabinet?.description ?? "",
       email: cabinet?.email ?? "",
+      tagline: cabinet?.tagline ?? "",
+      postDemandMessage: cabinet?.postDemandMessage ?? "",
+      instagramUrl: cabinet?.instagramUrl ?? "",
+      facebookUrl: cabinet?.facebookUrl ?? "",
+      websiteUrl: cabinet?.websiteUrl ?? "",
+      twitterUrl: cabinet?.twitterUrl ?? "",
     },
   })
 
@@ -52,8 +61,19 @@ export function CabinetInfoCard() {
     try {
       await updateCabinet({
         slug: cabinet.slug,
-        data: { name: data.name, description: data.description, email: data.email },
+        data: {
+          name: data.name,
+          description: data.description,
+          email: data.email,
+          tagline: data.tagline,
+          postDemandMessage: data.postDemandMessage,
+          instagramUrl: data.instagramUrl,
+          facebookUrl: data.facebookUrl,
+          websiteUrl: data.websiteUrl,
+          twitterUrl: data.twitterUrl,
+        },
       })
+      await refreshProfile()
       toast.success("Informações do Gabinete atualizadas!")
     } catch {
       toast.error("Erro ao atualizar informações do Gabinete.")
@@ -170,6 +190,101 @@ export function CabinetInfoCard() {
                 {errors.description && (
                   <p className="text-xs text-destructive">{errors.description.message}</p>
                 )}
+              </Field>
+
+              <Field className="md:col-span-2">
+                <Label htmlFor="tagline">Tagline do mandato</Label>
+                <Input
+                  {...register("tagline")}
+                  id="tagline"
+                  placeholder="Ex: Mandato do povo, para o povo"
+                  disabled={disabled}
+                  maxLength={120}
+                  className={cn(disabled && "opacity-50 cursor-not-allowed")}
+                />
+                <p className="text-xs text-muted-foreground">Aparece em destaque no perfil público. Máx. 120 caracteres.</p>
+              </Field>
+
+              <Field className="md:col-span-2">
+                <Label htmlFor="postDemandMessage">Mensagem pós-demanda</Label>
+                <Textarea
+                  {...register("postDemandMessage")}
+                  id="postDemandMessage"
+                  placeholder="Ex: Obrigado pelo seu registro! Nossa equipe entrará em contato em até 5 dias úteis."
+                  disabled={disabled}
+                  rows={2}
+                  maxLength={500}
+                  className={cn(
+                    "resize-none text-sm",
+                    disabled && "opacity-50 cursor-not-allowed",
+                  )}
+                />
+                <p className="text-xs text-muted-foreground">Exibida ao cidadão após envio de uma demanda. Máx. 500 caracteres.</p>
+              </Field>
+            </div>
+
+            <Separator className="my-2" />
+
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Redes sociais</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Field>
+                <Label htmlFor="instagramUrl" className="flex items-center gap-1.5">
+                  <Instagram className="size-3.5 text-muted-foreground" />
+                  Instagram
+                </Label>
+                <Input
+                  {...register("instagramUrl")}
+                  id="instagramUrl"
+                  placeholder="https://instagram.com/seugabinete"
+                  disabled={disabled}
+                  className={cn(disabled && "opacity-50 cursor-not-allowed", errors.instagramUrl && "border-destructive/60")}
+                />
+                {errors.instagramUrl && <p className="text-xs text-destructive">{errors.instagramUrl.message}</p>}
+              </Field>
+
+              <Field>
+                <Label htmlFor="facebookUrl" className="flex items-center gap-1.5">
+                  <Facebook className="size-3.5 text-muted-foreground" />
+                  Facebook
+                </Label>
+                <Input
+                  {...register("facebookUrl")}
+                  id="facebookUrl"
+                  placeholder="https://facebook.com/seugabinete"
+                  disabled={disabled}
+                  className={cn(disabled && "opacity-50 cursor-not-allowed", errors.facebookUrl && "border-destructive/60")}
+                />
+                {errors.facebookUrl && <p className="text-xs text-destructive">{errors.facebookUrl.message}</p>}
+              </Field>
+
+              <Field>
+                <Label htmlFor="twitterUrl" className="flex items-center gap-1.5">
+                  <Twitter className="size-3.5 text-muted-foreground" />
+                  X / Twitter
+                </Label>
+                <Input
+                  {...register("twitterUrl")}
+                  id="twitterUrl"
+                  placeholder="https://x.com/seugabinete"
+                  disabled={disabled}
+                  className={cn(disabled && "opacity-50 cursor-not-allowed", errors.twitterUrl && "border-destructive/60")}
+                />
+                {errors.twitterUrl && <p className="text-xs text-destructive">{errors.twitterUrl.message}</p>}
+              </Field>
+
+              <Field>
+                <Label htmlFor="websiteUrl" className="flex items-center gap-1.5">
+                  <Link className="size-3.5 text-muted-foreground" />
+                  Site oficial
+                </Label>
+                <Input
+                  {...register("websiteUrl")}
+                  id="websiteUrl"
+                  placeholder="https://seugabinete.gov.br"
+                  disabled={disabled}
+                  className={cn(disabled && "opacity-50 cursor-not-allowed", errors.websiteUrl && "border-destructive/60")}
+                />
+                {errors.websiteUrl && <p className="text-xs text-destructive">{errors.websiteUrl.message}</p>}
               </Field>
             </div>
           </FieldGroup>

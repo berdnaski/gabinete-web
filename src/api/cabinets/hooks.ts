@@ -68,8 +68,19 @@ export function useGetCabinetTrendDetailed(slug: string | undefined, days = 14) 
 
 export function useUpdateCabinet() {
   return useMutation({
-    mutationFn: ({ slug, data, file }: { slug: string; data: Partial<Cabinet>; file?: File }) =>
-      CabinetsApi.update(slug, data, file),
+    mutationFn: ({
+      slug,
+      data,
+      file,
+      bannerFile,
+      logoFile,
+    }: {
+      slug: string;
+      data: Partial<Cabinet>;
+      file?: File;
+      bannerFile?: File;
+      logoFile?: File;
+    }) => CabinetsApi.update(slug, data, file, bannerFile, logoFile),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["cabinet", variables.slug] });
       queryClient.invalidateQueries({ queryKey: ["cabinets"] });

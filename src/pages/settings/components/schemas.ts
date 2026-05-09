@@ -10,16 +10,34 @@ export interface PersonalInfoData {
   phone: string;
 }
 
+const optionalUrl = z
+  .string()
+  .url("URL inválida (inclua https://)")
+  .or(z.literal(""))
+  .optional()
+
 export const cabinetInfoSchema = z.object({
   name: z.string().min(3, "O nome do gabinete deve ter pelo menos 3 caracteres"),
   description: z.string().max(1000, "A descrição deve ter no máximo 1000 caracteres"),
   email: z.string().email("E-mail inválido").or(z.literal("")),
+  tagline: z.string().max(120, "Máximo 120 caracteres").optional(),
+  postDemandMessage: z.string().max(500, "Máximo 500 caracteres").optional(),
+  instagramUrl: optionalUrl,
+  facebookUrl: optionalUrl,
+  websiteUrl: optionalUrl,
+  twitterUrl: optionalUrl,
 });
 
 export interface CabinetInfoData {
   name: string;
   description: string;
   email: string;
+  tagline?: string;
+  postDemandMessage?: string;
+  instagramUrl?: string;
+  facebookUrl?: string;
+  websiteUrl?: string;
+  twitterUrl?: string;
 }
 
 export const changePasswordSchema = z.object({

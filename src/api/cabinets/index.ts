@@ -109,17 +109,30 @@ export const CabinetsApi = {
     return response.data;
   },
 
-  update: async (slug: string, data: Partial<Cabinet>, file?: File): Promise<Cabinet> => {
+  update: async (
+    slug: string,
+    data: Partial<Cabinet>,
+    avatarFile?: File,
+    bannerFile?: File,
+    logoFile?: File,
+  ): Promise<Cabinet> => {
     const formData = new FormData();
     if (data.name) formData.append("name", data.name);
-    if (data.description) formData.append("description", data.description);
-    if (data.email) formData.append("email", data.email);
-    if (file) formData.append("avatar", file);
+    if (data.description !== undefined) formData.append("description", data.description ?? "");
+    if (data.email !== undefined) formData.append("email", data.email ?? "");
+    if (data.accentColor !== undefined) formData.append("accentColor", data.accentColor ?? "");
+    if (data.tagline !== undefined) formData.append("tagline", data.tagline ?? "");
+    if (data.postDemandMessage !== undefined) formData.append("postDemandMessage", data.postDemandMessage ?? "");
+    if (data.instagramUrl !== undefined) formData.append("instagramUrl", data.instagramUrl ?? "");
+    if (data.facebookUrl !== undefined) formData.append("facebookUrl", data.facebookUrl ?? "");
+    if (data.websiteUrl !== undefined) formData.append("websiteUrl", data.websiteUrl ?? "");
+    if (data.twitterUrl !== undefined) formData.append("twitterUrl", data.twitterUrl ?? "");
+    if (avatarFile) formData.append("avatar", avatarFile);
+    if (bannerFile) formData.append("banner", bannerFile);
+    if (logoFile) formData.append("logo", logoFile);
 
     const response = await apiClient.patch<Cabinet>(`${baseURL}/${slug}`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
+      headers: { "Content-Type": "multipart/form-data" },
     });
     return response.data;
   },

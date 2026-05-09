@@ -46,7 +46,7 @@ export function AppSidebar() {
     return (
       <Sidebar variant="inset">
         <SidebarHeader>
-          <img src={Logo} alt="Logo" className="w-36" />
+          <img src={Logo} alt="Gabinete Digital" className="w-36" />
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup>
@@ -84,7 +84,7 @@ export function AppSidebar() {
   return (
     <Sidebar variant="inset">
       <SidebarHeader>
-        <img src={Logo} alt="Logo" className="w-36" />
+        <img src={Logo} alt="Gabinete Digital" className="w-36" />
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
