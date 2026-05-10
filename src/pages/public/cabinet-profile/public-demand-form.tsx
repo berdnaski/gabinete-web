@@ -67,6 +67,7 @@ export function PublicDemandForm({ open, onOpenChange, cabinet, accent }: Public
         city: data.location?.city,
         state: data.location?.state,
         guestEmail: data.guestEmail || undefined,
+        guestPhone: data.guestPhone || undefined,
         cabinetId: cabinet.id,
       })
 

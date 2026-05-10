@@ -10,6 +10,7 @@ import { ptBR } from "date-fns/locale"
 import {
   CheckCircle2,
   Download,
+  FileDown,
   Loader2,
   BarChart3,
 } from "lucide-react"
@@ -182,17 +183,26 @@ export function Reports() {
           )}
         </div>
         {report && (
-          <button
-            onClick={() => exportCSV(report, cabinet?.name ?? "gabinete")}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted/60 transition-colors shrink-0"
-          >
-            <Download className="size-3.5" />
-            Exportar CSV
-          </button>
+          <div className="report-controls flex items-center gap-2">
+            <button
+              onClick={() => exportCSV(report, cabinet?.name ?? "gabinete")}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted/60 transition-colors shrink-0"
+            >
+              <Download className="size-3.5" />
+              CSV
+            </button>
+            <button
+              onClick={() => window.print()}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted/60 transition-colors shrink-0"
+            >
+              <FileDown className="size-3.5" />
+              PDF
+            </button>
+          </div>
         )}
       </div>
 
-      <div className="inline-flex items-center rounded-lg border border-border bg-muted/30 p-0.5 gap-0.5">
+      <div className="report-controls inline-flex items-center rounded-lg border border-border bg-muted/30 p-0.5 gap-0.5">
         {PERIODS.map(p => (
           <button
             key={p.key}

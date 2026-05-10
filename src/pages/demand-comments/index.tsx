@@ -9,7 +9,7 @@ import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import { useAuth } from "@/hooks/use-auth"
 import { cn } from "@/lib/utils"
-import { Building2, CheckCircle2, MessageCircle, Send, TrendingUp } from "lucide-react"
+import { Building2, CheckCircle2, MessageCircle, MessageCircleIcon, Send, TrendingUp } from "lucide-react"
 import { ResultEntry } from "./components/result-entry"
 import { useRef, useState } from "react"
 import { useParams } from "react-router-dom"
@@ -93,15 +93,28 @@ export function DemandComments() {
             </div>
 
             {isMyDemand && (
-              <Button
-                size="sm"
-                variant="outline"
-                className="h-7 gap-1.5 text-xs"
-                onClick={() => setProgressOpen(true)}
-              >
-                <TrendingUp className="size-3.5" />
-                Atualizar progresso
-              </Button>
+              <div className="flex items-center gap-2">
+                {demand.guestPhone && (
+                  <a
+                    href={`https://wa.me/${demand.guestPhone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá! Estamos entrando em contato sobre sua demanda "${demand.title}". `)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 h-7 rounded-md border border-emerald-200 bg-emerald-50 px-2.5 text-xs font-medium text-emerald-700 hover:bg-emerald-100 transition-colors dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-400 dark:hover:bg-emerald-900"
+                  >
+                    <MessageCircleIcon className="size-3.5" />
+                    WhatsApp
+                  </a>
+                )}
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-7 gap-1.5 text-xs"
+                  onClick={() => setProgressOpen(true)}
+                >
+                  <TrendingUp className="size-3.5" />
+                  Atualizar progresso
+                </Button>
+              </div>
             )}
           </div>
 

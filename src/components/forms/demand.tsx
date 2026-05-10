@@ -39,18 +39,35 @@ export function DemandForm({ isRequesting }: DemandFormProps) {
   return (
     <FieldGroup>
       {!isAuthenticated && (
-        <Field>
-          <FieldLabel>Seu e-mail</FieldLabel>
-          <InputForm
-            type="email"
-            name="guestEmail"
-            control={control}
-            inputMode="email"
-            autoComplete="off"
-            disabled={isFormSubmitting}
-            placeholder="Digite seu e-mail"
-          />
-        </Field>
+        <>
+          <Field>
+            <FieldLabel>Seu e-mail</FieldLabel>
+            <InputForm
+              type="email"
+              name="guestEmail"
+              control={control}
+              inputMode="email"
+              autoComplete="off"
+              disabled={isFormSubmitting}
+              placeholder="Digite seu e-mail para receber atualizações"
+            />
+          </Field>
+          <Field>
+            <FieldLabel>
+              Seu WhatsApp{" "}
+              <span className="text-muted-foreground font-normal">(opcional)</span>
+            </FieldLabel>
+            <InputForm
+              type="tel"
+              name="guestPhone"
+              control={control}
+              inputMode="tel"
+              autoComplete="tel"
+              disabled={isFormSubmitting}
+              placeholder="+55 (11) 99999-9999"
+            />
+          </Field>
+        </>
       )}
 
       <Field>

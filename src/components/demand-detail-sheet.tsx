@@ -25,6 +25,7 @@ import {
   FileTextIcon,
   Loader2,
   MapPinIcon,
+  MessageCircleIcon,
   Paperclip,
   Plus,
   TagIcon,
@@ -161,7 +162,20 @@ export function DemandDetailSheet({
                     <div className="size-8 rounded-full bg-muted flex items-center justify-center shrink-0">
                       <UserRound className="size-4 text-muted-foreground" />
                     </div>
-                    <p className="text-sm text-muted-foreground">{demand.guestEmail}</p>
+                    <div className="flex flex-col gap-0.5 min-w-0">
+                      <p className="text-sm text-muted-foreground">{demand.guestEmail}</p>
+                      {canManage && demand.guestPhone && (
+                        <a
+                          href={`https://wa.me/${demand.guestPhone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá! Estamos entrando em contato sobre sua demanda "${demand.title}". `)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-600 hover:text-emerald-700 transition-colors w-fit"
+                        >
+                          <MessageCircleIcon className="size-3.5" />
+                          {demand.guestPhone}
+                        </a>
+                      )}
+                    </div>
                   </div>
                 </section>
               ) : null}

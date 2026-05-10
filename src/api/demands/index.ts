@@ -167,4 +167,20 @@ export const DemandsApi = {
 		});
 		return response.data;
 	},
+
+	getSurvey: async (token: string): Promise<{
+		demandId: string;
+		demandTitle: string;
+		cabinetName: string;
+		cabinetSlug: string;
+		alreadySubmitted: boolean;
+		rating: number | null;
+	}> => {
+		const response = await apiClient.get(`${baseURL}/survey/${token}`);
+		return response.data;
+	},
+
+	submitSurvey: async (token: string, rating: number, comment?: string): Promise<void> => {
+		await apiClient.post(`${baseURL}/survey/${token}`, { rating, comment });
+	},
 };

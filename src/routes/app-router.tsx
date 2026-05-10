@@ -19,6 +19,7 @@ import { AcceptInvite } from "@/pages/public/accept-invite";
 
 const Sandbox = lazy(() => import("@/pages/public/sandbox").then((m) => ({ default: m.Sandbox })));
 const PublicCabinetProfile = lazy(() => import("@/pages/public/cabinet-profile").then((m) => ({ default: m.PublicCabinetProfile })));
+const DemandSurveyPage = lazy(() => import("@/pages/public/demand-survey").then((m) => ({ default: m.DemandSurveyPage })));
 const TermsOfUsePage = lazy(() => import("@/pages/public/terms-of-use").then((m) => ({ default: m.TermsOfUsePage })));
 const PrivacyPolicyPage = lazy(() => import("@/pages/public/privacy-policy").then((m) => ({ default: m.PrivacyPolicyPage })));
 const LandingPage = lazy(() => import("@/pages/public/landing").then((m) => ({ default: m.LandingPage })));
@@ -59,6 +60,10 @@ export function AppRouter() {
       <Route path="/auth/callback" element={<GoogleCallback />} />
       <Route path="/confirm-password" element={<ConfirmPasswordPage />} />
       <Route path="/cabinets/invites/:token" element={<AcceptInvite />} />
+      <Route
+        path="/pesquisa/:token"
+        element={<Suspense fallback={<PageLoader />}><DemandSurveyPage /></Suspense>}
+      />
       <Route
         path="/sandbox"
         element={<Suspense fallback={<PageLoader />}><Sandbox /></Suspense>}

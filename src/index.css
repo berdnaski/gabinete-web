@@ -357,6 +357,26 @@ html {
 .lp-mockup-lg  { min-height: 380px; }
 .lp-bento-tall { min-height: 280px; }
 
+/* ─── Print / PDF export ─── */
+@media print {
+  /* Hide chrome: sidebar, header, controls */
+  [data-sidebar="sidebar"],
+  [data-sidebar="rail"],
+  header { display: none !important; }
+  /* Let the inset fill the page */
+  [data-sidebar="inset"] {
+    margin: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+  /* Period selector and export buttons */
+  .report-controls { display: none !important; }
+  /* Avoid breaking cards across pages */
+  .rounded-xl { break-inside: avoid; }
+  * { box-shadow: none !important; }
+}
+
 /* ─── Heatmap section ─── */
 .lp-heatmap-bg {
   background-color: #192030;

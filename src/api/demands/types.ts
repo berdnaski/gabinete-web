@@ -53,6 +53,7 @@ export interface Demand {
 	state?: string;
 	reporterId: string;
 	guestEmail?: string;
+	guestPhone?: string;
 	cabinetId?: string;
 	cabinet?: {
 		name: string;
@@ -70,6 +71,9 @@ export interface Demand {
 	createdAt: string;
 	updatedAt: string;
 	disabledAt?: string;
+	surveyToken?: string | null;
+	surveyRating?: number | null;
+	surveySubmittedAt?: string | null;
 	evidences?: Evidence[];
 	likesCount: number;
 	commentsCount: number;
@@ -100,6 +104,7 @@ export interface CreateDemandProps {
 	city?: string;
 	state?: string;
 	guestEmail?: string;
+	guestPhone?: string;
 }
 
 export interface ListDemandsParams {
