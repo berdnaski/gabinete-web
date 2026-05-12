@@ -22,7 +22,7 @@ export function CitizenHeader() {
           <img src={GIcon} alt="Ícone do Gabinete" className="size-12" />
         </Link>
 
-        <nav className="hidden sm:flex items-center gap-0.5">
+        <nav className="flex items-center gap-0.5">
           {NAV_LINKS.map(({ to, label, icon: Icon }) => (
             <NavLink key={to} to={to}>
               {({ isActive }) => (
