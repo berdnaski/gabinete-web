@@ -172,7 +172,19 @@ export function Reports() {
   }, [report])
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
+    <div className="max-w-4xl mx-auto px-4 py-8 space-y-8" id="report-print-root">
+      <div className="report-print-header hidden items-center justify-between pb-4 border-b border-border mb-6">
+        <div>
+          <h1 className="text-lg font-bold text-foreground">{cabinet?.name ?? "Gabinete"}</h1>
+          <p className="text-xs text-muted-foreground">Relatório de Demandas</p>
+        </div>
+        {report && (
+          <p className="text-xs text-muted-foreground">
+            {formatPeriodLabel(report.period.start, report.period.end)}
+          </p>
+        )}
+      </div>
+
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold text-foreground">Relatórios</h1>
@@ -354,79 +366,96 @@ export function Reports() {
                 <LegendDot color="bg-primary" label="Recebidas" />
                 <LegendDot color="bg-emerald-500" label="Resolvidas" />
               </div>
-              <ChartContainer
-                config={{
-                  created:  { label: "Recebidas",  color: "#0058F3" },
-                  resolved: { label: "Resolvidas", color: "#22c55e" },
-                }}
-                className="h-52 w-full"
-              >
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={trendData} margin={{ top: 4, right: 4, left: -28, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="grad-created" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%"  stopColor="#0058F3" stopOpacity={0.15} />
-                        <stop offset="95%" stopColor="#0058F3" stopOpacity={0} />
-                      </linearGradient>
-                      <linearGradient id="grad-resolved" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%"  stopColor="#22c55e" stopOpacity={0.15} />
-                        <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid vertical={false} stroke="hsl(var(--border))" strokeOpacity={0.6} />
-                    <XAxis
-                      dataKey="label"
-                      tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
-                      axisLine={false}
-                      tickLine={false}
-                      interval="preserveStartEnd"
-                    />
-                    <YAxis
-                      tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
-                      axisLine={false}
-                      tickLine={false}
-                      allowDecimals={false}
-                    />
-                    <ChartTooltip
-                      content={({ active, payload, label }) => {
-                        if (!active || !payload?.length) return null
-                        return (
-                          <div className="rounded-lg border border-border bg-background px-3 py-2 shadow-md text-xs">
-                            <p className="font-medium text-foreground mb-1">{label}</p>
-                            {payload.map((p, i) => (
-                              <div key={i} className="flex items-center gap-1.5">
-                                <span className="size-1.5 rounded-full shrink-0" style={{ background: p.color }} />
-                                <span className="text-muted-foreground">{p.name}:</span>
-                                <span className="font-medium text-foreground">{p.value}</span>
-                              </div>
-                            ))}
-                          </div>
-                        )
-                      }}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="created"
-                      name="Recebidas"
-                      stroke="#0058F3"
-                      strokeWidth={2}
-                      fill="url(#grad-created)"
-                      dot={false}
-                      activeDot={{ r: 3, fill: "#0058F3" }}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="resolved"
-                      name="Resolvidas"
-                      stroke="#22c55e"
-                      strokeWidth={2}
-                      fill="url(#grad-resolved)"
-                      dot={false}
-                      activeDot={{ r: 3, fill: "#22c55e" }}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </ChartContainer>
+
+              <div className="report-chart-screen">
+                <ChartContainer
+                  config={{
+                    created:  { label: "Recebidas",  color: "#0058F3" },
+                    resolved: { label: "Resolvidas", color: "#22c55e" },
+                  }}
+                  className="h-52 w-full"
+                >
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={trendData} margin={{ top: 4, right: 4, left: -28, bottom: 0 }}>
+                      <defs>
+                        <linearGradient id="grad-created" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%"  stopColor="#0058F3" stopOpacity={0.15} />
+                          <stop offset="95%" stopColor="#0058F3" stopOpacity={0} />
+                        </linearGradient>
+                        <linearGradient id="grad-resolved" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%"  stopColor="#22c55e" stopOpacity={0.15} />
+                          <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid vertical={false} stroke="hsl(var(--border))" strokeOpacity={0.6} />
+                      <XAxis
+                        dataKey="label"
+                        tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                        axisLine={false}
+                        tickLine={false}
+                        interval="preserveStartEnd"
+                      />
+                      <YAxis
+                        tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                        axisLine={false}
+                        tickLine={false}
+                        allowDecimals={false}
+                      />
+                      <ChartTooltip
+                        content={({ active, payload, label }) => {
+                          if (!active || !payload?.length) return null
+                          return (
+                            <div className="rounded-lg border border-border bg-background px-3 py-2 shadow-md text-xs">
+                              <p className="font-medium text-foreground mb-1">{label}</p>
+                              {payload.map((p, i) => (
+                                <div key={i} className="flex items-center gap-1.5">
+                                  <span className="size-1.5 rounded-full shrink-0" style={{ background: p.color }} />
+                                  <span className="text-muted-foreground">{p.name}:</span>
+                                  <span className="font-medium text-foreground">{p.value}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )
+                        }}
+                      />
+                      <Area type="monotone" dataKey="created" name="Recebidas" stroke="#0058F3" strokeWidth={2} fill="url(#grad-created)" dot={false} activeDot={{ r: 3, fill: "#0058F3" }} />
+                      <Area type="monotone" dataKey="resolved" name="Resolvidas" stroke="#22c55e" strokeWidth={2} fill="url(#grad-resolved)" dot={false} activeDot={{ r: 3, fill: "#22c55e" }} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </ChartContainer>
+              </div>
+
+              <div className="report-trend-print hidden">
+                <table className="w-full text-xs border-collapse">
+                  <thead>
+                    <tr className="border-b border-border">
+                      <th className="text-left py-1.5 text-muted-foreground font-medium">Data</th>
+                      <th className="text-right py-1.5 text-muted-foreground font-medium">Recebidas</th>
+                      <th className="text-right py-1.5 text-muted-foreground font-medium">Resolvidas</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {trendData.filter(d => d.created > 0 || d.resolved > 0).map((d, i) => (
+                      <tr key={i} className="border-b border-border/40">
+                        <td className="py-1 text-foreground">{d.label}</td>
+                        <td className="py-1 text-right tabular-nums font-medium" style={{ color: "#0058F3" }}>{d.created}</td>
+                        <td className="py-1 text-right tabular-nums font-medium" style={{ color: "#22c55e" }}>{d.resolved}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot>
+                    <tr className="border-t border-border">
+                      <td className="py-1.5 font-semibold text-foreground">Total</td>
+                      <td className="py-1.5 text-right tabular-nums font-bold" style={{ color: "#0058F3" }}>
+                        {trendData.reduce((s, d) => s + d.created, 0)}
+                      </td>
+                      <td className="py-1.5 text-right tabular-nums font-bold" style={{ color: "#22c55e" }}>
+                        {trendData.reduce((s, d) => s + d.resolved, 0)}
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
             </ReportSection>
           )}
 
@@ -486,7 +515,7 @@ function ReportSection({
   children: React.ReactNode
 }) {
   return (
-    <div className="rounded-xl border border-border bg-background p-5">
+    <div className="report-section rounded-xl border border-border bg-background p-5">
       <div className="flex items-center gap-2 mb-4">
         <span className="text-xs font-semibold tabular-nums text-muted-foreground/40">{number}</span>
         {icon}

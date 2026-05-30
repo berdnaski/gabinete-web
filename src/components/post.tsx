@@ -1,6 +1,6 @@
 import { useLikeDemand, useUnlinkDemand } from "@/api/demands/hooks"
 import type { Demand } from "@/api/demands/types"
-import { Building2, ExternalLinkIcon, MapPinIcon, MessageCircle, MoreHorizontal, ThumbsUp, Unlink, UserCheck } from "lucide-react"
+import { Building2, ExternalLinkIcon, MapPinIcon, MessageCircle, MoreHorizontal, Share2, ThumbsUp, Unlink, UserCheck } from "lucide-react"
 import type { ComponentProps } from "react"
 import { useEffect, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
@@ -103,6 +103,33 @@ export function Post({ demand, className, hideComment = false, showStatus = fals
     navigate(`/comments/${demand.id}`)
   }
 
+  async function handleShare(e: React.MouseEvent) {
+    e.stopPropagation()
+    const url = `${window.location.origin}/comments/${demand.id}`
+    const shareData = {
+      title: demand.title,
+      text: demand.description ? `${demand.description.slice(0, 100)}…` : demand.title,
+      url,
+    }
+    if (navigator.share && navigator.canShare?.(shareData)) {
+      try {
+        await navigator.share(shareData)
+      } catch (err) {
+        if ((err as Error).name !== "AbortError") {
+          await navigator.clipboard.writeText(url)
+          toast.success("Link copiado!")
+        }
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(url)
+        toast.success("Link copiado!", { description: "Cole no WhatsApp ou onde quiser." })
+      } catch {
+        toast.error("Não foi possível compartilhar.")
+      }
+    }
+  }
+
   function handleUnlink() {
     unlinkDemand(demand.id, {
       onSuccess: () => {
@@ -114,8 +141,6 @@ export function Post({ demand, className, hideComment = false, showStatus = fals
       },
     })
   }
-
-  const actionCount = hideComment ? 1 : isCabinetMember && isUnlinked ? 3 : 2
 
   return (
     <article
@@ -179,7 +204,7 @@ export function Post({ demand, className, hideComment = false, showStatus = fals
 
       <Separator />
 
-      <div className={cn("flex", actionCount === 1 && "")}>
+      <div className="flex">
         <Button
           variant="ghost"
           size="sm"
@@ -225,6 +250,17 @@ export function Post({ demand, className, hideComment = false, showStatus = fals
             </Button>
           </>
         )}
+
+        <div className="w-px bg-border/60 self-stretch" />
+        <Button
+          size="sm"
+          variant="ghost"
+          className="flex-1 gap-1.5 rounded-none h-9 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/40"
+          onClick={handleShare}
+        >
+          <Share2 className="size-3.5" />
+          <span className="hidden sm:inline">Compartilhar</span>
+        </Button>
       </div>
 
       {children && (
@@ -286,42 +322,67 @@ interface PostHeaderProps {
 }
 
 function PostHeader({ demand, authorName, profilePath, showStatus, userOwnsDemand, onAssign, onUnlink }: PostHeaderProps) {
-  return (
-    <div className="flex items-start justify-between px-4 py-3">
-      <div className="flex items-center gap-3 min-w-0 flex-1" onClick={(e) => e.stopPropagation()}>
-        {profilePath ? (
-          <Link to={profilePath} className="shrink-0">
-            <UserAvatar size="lg" name={authorName} avatarUrl={demand?.reporter?.avatarUrl} />
-          </Link>
-        ) : (
-          <UserAvatar size="lg" name={authorName} avatarUrl={demand?.reporter?.avatarUrl} />
-        )}
+  const avatarEl = profilePath ? (
+    <Link to={profilePath} className="shrink-0" onClick={(e) => e.stopPropagation()}>
+      <UserAvatar size="lg" name={authorName} avatarUrl={demand?.reporter?.avatarUrl} />
+    </Link>
+  ) : (
+    <UserAvatar size="lg" name={authorName} avatarUrl={demand?.reporter?.avatarUrl} />
+  )
 
-        {profilePath ? (
-          <Link to={profilePath} className="min-w-0">
-            <PostInfo
-              authorName={authorName}
-              category={demand?.category?.name}
-              dateToNow={formatDateToNow(demand.createdAt)}
-            />
-          </Link>
-        ) : (
-          <PostInfo
-            authorName={authorName}
-            category={demand?.category?.name}
-            dateToNow={formatDateToNow(demand.createdAt)}
-          />
-        )}
+  const infoEl = profilePath ? (
+    <Link to={profilePath} className="min-w-0" onClick={(e) => e.stopPropagation()}>
+      <PostInfo authorName={authorName} category={demand?.category?.name} dateToNow={formatDateToNow(demand.createdAt)} />
+    </Link>
+  ) : (
+    <PostInfo authorName={authorName} category={demand?.category?.name} dateToNow={formatDateToNow(demand.createdAt)} />
+  )
+
+  return (
+    <div className="px-4 py-3 space-y-1.5">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-3 min-w-0 flex-1">
+          {avatarEl}
+          {infoEl}
+        </div>
+
+        <div className="flex items-center gap-1 shrink-0">
+          {showStatus && <DemandStatusBadge status={demand.status} />}
+          {userOwnsDemand && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  aria-label="Mais opções"
+                  className="text-muted-foreground size-7"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <MoreHorizontal className="size-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+                <DropdownMenuItem onClick={onAssign}>
+                  <UserCheck className="size-3.5" />
+                  Alterar responsável
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={onUnlink} className="text-destructive focus:text-destructive">
+                  <Unlink className="size-3.5" />
+                  Desvincular demanda
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
       </div>
 
-      <div className="flex items-center gap-1.5 shrink-0 ml-2">
-        {showStatus && <DemandStatusBadge status={demand.status} />}
-
-        {demand.cabinet && (
+      {demand.cabinet && (
+        <div className="ml-11">
           <Link
             to={`/gabinetes/${demand.cabinet.slug}`}
             onClick={(e) => e.stopPropagation()}
-            className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium bg-muted text-muted-foreground hover:text-foreground border border-border/60 transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 text-xs font-medium bg-muted text-muted-foreground hover:text-foreground border border-border/60 transition-colors max-w-full"
           >
             <Avatar className="size-3.5 shrink-0">
               <AvatarImage src={demand.cabinet.avatarUrl ?? undefined} />
@@ -329,37 +390,10 @@ function PostHeader({ demand, authorName, profilePath, showStatus, userOwnsDeman
                 {getFirstLettersFromNames(demand.cabinet.name)}
               </AvatarFallback>
             </Avatar>
-            <span className="max-w-20 truncate">{demand.cabinet.name}</span>
+            <span className="truncate max-w-36">{demand.cabinet.name}</span>
           </Link>
-        )}
-
-        {userOwnsDemand && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                size="icon"
-                variant="ghost"
-                aria-label="Mais opções"
-                className="text-muted-foreground size-7"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <MoreHorizontal className="size-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
-              <DropdownMenuItem onClick={onAssign}>
-                <UserCheck className="size-3.5" />
-                Alterar responsável
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={onUnlink} className="text-destructive focus:text-destructive">
-                <Unlink className="size-3.5" />
-                Desvincular demanda
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   )
 }
