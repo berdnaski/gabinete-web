@@ -28,7 +28,6 @@ const Settings = lazy(() => import("@/pages/settings").then((m) => ({ default: m
 const DemandComments = lazy(() => import("@/pages/demand-comments").then((m) => ({ default: m.DemandComments })));
 const Profile = lazy(() => import("@/pages/profile").then((m) => ({ default: m.Profile })));
 const Cabinets = lazy(() => import("@/pages/cabinets").then((m) => ({ default: m.Cabinets })));
-const CabinetDetail = lazy(() => import("@/pages/cabinet-detail").then((m) => ({ default: m.CabinetDetail })));
 const Map = lazy(() => import("@/pages/map").then((m) => ({ default: m.Map })));
 
 const Demands = lazy(() => import("@/pages/private/demands").then((m) => ({ default: m.Demands })));
@@ -108,10 +107,6 @@ export function AppRouter() {
         <Route
           path="gabinetes"
           element={<Suspense fallback={<PageLoader />}><Cabinets /></Suspense>}
-        />
-        <Route
-          path="gabinetes/:slug"
-          element={<Suspense fallback={<PageLoader />}><CabinetDetail /></Suspense>}
         />
         <Route
           path="mapa"

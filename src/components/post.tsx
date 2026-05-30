@@ -362,7 +362,7 @@ function PostHeader({ demand, authorName, profilePath, showStatus, userOwnsDeman
 
         {demand.cabinet && (
           <Link
-            to={`/gabinetes/${demand.cabinet.slug}`}
+            to={`/${demand.cabinet.slug}`}
             onClick={(e) => e.stopPropagation()}
             className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium bg-muted text-muted-foreground hover:text-foreground border border-border/60 transition-colors"
           >

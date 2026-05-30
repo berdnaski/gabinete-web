@@ -14,7 +14,7 @@ export function CabinetListItem({ cabinet, rank }: CabinetListItemProps) {
 
   return (
     <Link
-      to={`/gabinetes/${cabinet.slug}`}
+      to={`/${cabinet.slug}`}
       className={cn(
         "group flex items-center gap-4 px-5 py-4 hover:bg-muted/40 transition-colors",
         isFirst && "border-l-2 border-l-primary",

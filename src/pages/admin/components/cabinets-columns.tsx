@@ -90,7 +90,7 @@ export const cabinetsColumns: ColumnDef<Cabinet>[] = [
           <CabinetEditSheet cabinetId={c.id} />
           <DisableCabinetDialog cabinet={c} />
           <Link
-            to={`/gabinetes/${c.slug}`}
+            to={`/${c.slug}`}
             className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
           >
             Abrir <ArrowRight className="size-3" />
