@@ -23,6 +23,7 @@ const DemandSurveyPage = lazy(() => import("@/pages/public/demand-survey").then(
 const TermsOfUsePage = lazy(() => import("@/pages/public/terms-of-use").then((m) => ({ default: m.TermsOfUsePage })));
 const PrivacyPolicyPage = lazy(() => import("@/pages/public/privacy-policy").then((m) => ({ default: m.PrivacyPolicyPage })));
 const LandingPage = lazy(() => import("@/pages/public/landing").then((m) => ({ default: m.LandingPage })));
+const LpPage = lazy(() => import("@/pages/public/lp").then((m) => ({ default: m.LpPage })));
 
 const Feed = lazy(() => import("@/pages/feed").then((m) => ({ default: m.Feed })));
 const Settings = lazy(() => import("@/pages/settings").then((m) => ({ default: m.Settings })));
@@ -80,47 +81,27 @@ export function AppRouter() {
         path="/landingpage"
         element={<Suspense fallback={<PageLoader />}><LandingPage /></Suspense>}
       />
+      <Route
+        path="/lp"
+        element={<Suspense fallback={<PageLoader />}><LpPage /></Suspense>}
+      />
 
       <Route path="/" element={<Layout />}>
-        <Route index element={<Feed />} />
-        <Route path="settings" element={<Settings />} />
-        <Route path="comments/:demandId" element={<DemandComments />} />
-        <Route path="demands/:demandId" element={<DemandComments />} />
-        <Route path="profile/:userId" element={<Profile />} />
-        <Route path="gabinetes" element={<Cabinets />} />
-        <Route path="gabinetes/:slug" element={<CabinetDetail />} />
-        <Route path="mapa" element={<Map />} />
-        <Route
-          path="admin"
-          element={
-            <ProtectedRoute allowedRoles={onlyAdmin}>
-              <Admin />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="admin/usuarios"
-          element={
-            <ProtectedRoute allowedRoles={onlyAdmin}>
-              <AdminUsers />
-            </ProtectedRoute>
-          }
-        />
         <Route
           index
           element={<Suspense fallback={<PageLoader />}><Feed /></Suspense>}
         />
         <Route
-          path="settings"
-          element={<Suspense fallback={<PageLoader />}><Settings /></Suspense>}
+          path="demand/:demandId"
+          element={<Suspense fallback={<PageLoader />}><DemandComments /></Suspense>}
         />
         <Route
           path="comments/:demandId"
           element={<Suspense fallback={<PageLoader />}><DemandComments /></Suspense>}
         />
         <Route
-          path="demands/:demandId"
-          element={<Suspense fallback={<PageLoader />}><DemandComments /></Suspense>}
+          path="settings"
+          element={<Suspense fallback={<PageLoader />}><Settings /></Suspense>}
         />
         <Route
           path="profile/:userId"
