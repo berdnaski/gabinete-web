@@ -6,6 +6,33 @@
 
 @custom-variant dark (&:is(.dark *));
 
+.lp-bg {
+  background: radial-gradient(ellipse 140% 55% at 50% -5%, #dbeafe 0%, #eff6ff 35%, #ffffff 70%);
+}
+
+@keyframes lp-ticker-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.lp-ticker-track {
+  width: max-content;
+  display: flex;
+  animation: lp-ticker-scroll 40s linear infinite;
+}
+
+.lp-dot-grid {
+  background-image: radial-gradient(circle, #e2e8f0 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.lp-feature-card {
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+.lp-feature-card:hover {
+  box-shadow: 0 12px 40px -12px rgba(0, 88, 243, 0.18);
+  transform: translateY(-2px);
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

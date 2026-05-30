@@ -38,7 +38,7 @@ export function DataTablePagination<TData>({
 
 			<div className="flex flex-wrap items-center gap-4">
 				<div className="flex items-center gap-2">
-					<span className="shrink-0">Rows per page</span>
+					<span className="shrink-0">Linhas por página</span>
 					<Select
 						value={String(pageSize)}
 						onValueChange={(value) => table.setPageSize(Number(value))}
@@ -59,7 +59,7 @@ export function DataTablePagination<TData>({
 				</div>
 
 				<span className="shrink-0 tabular-nums">
-					Page {pageIndex + 1} of {Math.max(1, pageCount)}
+					Página {pageIndex + 1} de {Math.max(1, pageCount)}
 				</span>
 
 				<div className="flex items-center gap-0.5">

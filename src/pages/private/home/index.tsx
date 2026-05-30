@@ -18,6 +18,7 @@ import {
   ArrowRight,
   CheckCircle2,
   ClipboardList,
+  Download,
   Loader2,
   Star,
   ThumbsUp,
@@ -39,40 +40,33 @@ const BRAND = {
 
 const CAT_COLORS = ["#EF4444", "#F59E0B", "#0058F3", "#34D144", "#8B5CF6", "#06B6D4"]
 
-const PRIORITY_STRIPE: Record<string, string> = {
-  URGENT: "bg-red-500",
-  HIGH: "bg-orange-400",
-  MEDIUM: "bg-primary",
-  LOW: "bg-border",
-}
-
 const trendConfig: ChartConfig = {
   created: { label: "Recebidas", color: BRAND.primary },
   resolved: { label: "Resolvidas", color: BRAND.green },
 }
 
 const fadeUp = {
-  hidden: { opacity: 0, y: 20, filter: "blur(6px)" },
+  hidden: { opacity: 0, y: 16, filter: "blur(4px)" },
   visible: (delay = 0) => ({
     opacity: 1,
     y: 0,
     filter: "blur(0px)",
-    transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number], delay },
+    transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] as [number, number, number, number], delay },
   }),
 }
 
 const stagger = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.08 } },
+  visible: { transition: { staggerChildren: 0.07 } },
 }
 
 const cardVariant = {
-  hidden: { opacity: 0, y: 16, filter: "blur(4px)" },
+  hidden: { opacity: 0, y: 14, filter: "blur(3px)" },
   visible: {
     opacity: 1,
     y: 0,
     filter: "blur(0px)",
-    transition: { duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number] },
+    transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
   },
 }
 
@@ -89,6 +83,10 @@ function getFormattedDate(): string {
     day: "numeric",
     month: "long",
   }).format(new Date())
+}
+
+function getMonthYear(): string {
+  return new Intl.DateTimeFormat("pt-BR", { month: "long", year: "numeric" }).format(new Date())
 }
 
 function ChartTip({
@@ -108,7 +106,7 @@ function ChartTip({
       {payload.map((item, i) => (
         <div key={i} className="flex items-center justify-between gap-6">
           <div className="flex items-center gap-2">
-            <div className="size-2.5 rounded-sm shrink-0" style={{ background: item.color }} />
+            <div className="size-2 rounded-full shrink-0" style={{ background: item.color }} />
             <span className="text-muted-foreground text-xs">{item.name}</span>
           </div>
           <span className="font-mono font-bold tabular-nums text-foreground">{item.value}</span>
@@ -193,46 +191,53 @@ export function Home() {
       animate="visible"
       variants={stagger}
     >
-      {/* ── Header ── */}
-      <motion.div
-        className="flex items-end justify-between gap-4"
-        variants={fadeUp}
-        custom={0}
-      >
+      {/* Header */}
+      <motion.div className="flex items-center justify-between gap-4" variants={fadeUp} custom={0}>
         <div>
-          <p className="text-sm text-muted-foreground capitalize mb-1">{getFormattedDate()}</p>
           <h1 className="text-2xl font-bold font-brand text-foreground tracking-tight leading-none">
-            {getGreeting()}, {firstName}
+            Dashboard
           </h1>
+          <p className="text-sm text-muted-foreground mt-1.5 capitalize">
+            {getGreeting()}, {firstName} · {getFormattedDate()}
+          </p>
         </div>
-        {score > 0 && (
-          <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-primary/10 border border-primary/20 shrink-0">
-            <Star className="size-4 fill-primary text-primary" />
-            <span className="text-sm font-bold font-brand tabular-nums text-primary">{score}</span>
-            <span className="text-xs text-primary/60 font-medium">pontos</span>
+        <div className="flex items-center gap-2 shrink-0">
+          {score > 0 && (
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-muted/60 border border-border text-xs font-semibold text-foreground">
+              <Star className="size-3 fill-amber-400 text-amber-400" />
+              {score} pts
+            </div>
+          )}
+          <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border bg-card text-xs font-medium text-muted-foreground capitalize">
+            {getMonthYear()}
           </div>
-        )}
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1.5 h-7 text-xs text-muted-foreground"
+            onClick={() => navigate("/relatorios")}
+          >
+            <Download className="size-3" />
+            Exportar
+          </Button>
+        </div>
       </motion.div>
 
-      {/* ── KPI Cards ── */}
-      <motion.div
-        className="grid grid-cols-2 gap-4 lg:grid-cols-4"
-        variants={stagger}
-      >
+      {/* KPI Cards */}
+      <motion.div className="grid grid-cols-2 gap-3 lg:grid-cols-4" variants={stagger}>
         <KpiCard
-          icon={<ClipboardList className="size-5" />}
+          icon={<ClipboardList className="size-4.5" />}
           iconBg="bg-primary/10"
           iconColor="text-primary"
           label="Total de Demandas"
           value={String(demandCount)}
-          accentColor={BRAND.primary}
           loading={!cabinetData}
           onClick={() => navigate("/demands")}
         />
         <KpiCard
-          icon={<TrendingUp className="size-5" />}
-          iconBg={resolutionRate >= 70 ? "bg-[#34D144]/10" : "bg-amber-50 dark:bg-amber-950/30"}
-          iconColor={resolutionRate >= 70 ? "text-[#34D144]" : "text-amber-500"}
+          icon={<TrendingUp className="size-4.5" />}
+          iconBg={resolutionRate >= 70 ? "bg-emerald-50 dark:bg-emerald-950/30" : "bg-amber-50 dark:bg-amber-950/30"}
+          iconColor={resolutionRate >= 70 ? "text-emerald-600 dark:text-emerald-400" : "text-amber-500"}
           label="Taxa de Resolução"
           value={`${resolutionRate}%`}
           badge={
@@ -242,78 +247,66 @@ export function Home() {
                 ? { text: "Em progresso", variant: "warning" as const }
                 : undefined
           }
-          accentColor={resolutionRate >= 70 ? BRAND.green : "#F59E0B"}
           loading={!cabinetData}
         />
         <KpiCard
-          icon={<Zap className="size-5" />}
+          icon={<Zap className="size-4.5" />}
           iconBg={(metrics?.new ?? 0) > 0 ? "bg-amber-50 dark:bg-amber-950/30" : "bg-muted/50"}
           iconColor={(metrics?.new ?? 0) > 0 ? "text-amber-500" : "text-muted-foreground"}
           label="Novas (24h)"
           value={String(metrics?.new ?? 0)}
           badge={(metrics?.new ?? 0) > 0 ? { text: "+hoje", variant: "warning" } : undefined}
-          accentColor={(metrics?.new ?? 0) > 0 ? "#F59E0B" : undefined}
           loading={metricsLoading}
         />
         <KpiCard
-          icon={<AlertTriangle className="size-5" />}
+          icon={<AlertTriangle className="size-4.5" />}
           iconBg={(metrics?.urgent ?? 0) > 0 ? "bg-red-50 dark:bg-red-950/30" : "bg-muted/50"}
           iconColor={(metrics?.urgent ?? 0) > 0 ? "text-red-500" : "text-muted-foreground"}
           label="Urgentes Abertas"
           value={String(metrics?.urgent ?? 0)}
-          badge={(metrics?.urgent ?? 0) > 0 ? { text: "atenção!", variant: "danger" } : undefined}
-          accentColor={(metrics?.urgent ?? 0) > 0 ? "#EF4444" : undefined}
+          badge={(metrics?.urgent ?? 0) > 0 ? { text: "atenção", variant: "danger" } : undefined}
           loading={metricsLoading}
         />
       </motion.div>
 
-      {/* ── Volume chart + Principais Problemas ── */}
+      {/* Volume chart + Principais Problemas */}
       <motion.div className="grid gap-4 lg:grid-cols-3" variants={fadeUp} custom={0.15}>
-        {/* Dual-series bar chart */}
         <div className="lg:col-span-2 rounded-2xl border border-border bg-card overflow-hidden">
-          <div className="flex items-start justify-between px-6 py-5 border-b border-border/50">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-border/50">
             <div>
-              <h2 className="text-base font-bold font-brand text-foreground">Volume de Demandas</h2>
-              <p className="text-sm text-muted-foreground mt-1">Últimos 14 dias de atividade</p>
+              <h2 className="text-sm font-semibold text-foreground">Volume de Demandas</h2>
+              <p className="text-xs text-muted-foreground mt-0.5">Últimos 14 dias de atividade</p>
             </div>
             {hasTrendData && (
               <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2">
-                  <div className="size-2.5 rounded-full" style={{ background: BRAND.primary }} />
-                  <span className="text-sm text-muted-foreground">Recebidas</span>
-                  <span className="font-mono text-sm font-bold tabular-nums text-foreground">
-                    {trendCreatedTotal}
-                  </span>
+                <div className="flex items-center gap-1.5">
+                  <div className="size-2 rounded-full" style={{ background: BRAND.primary }} />
+                  <span className="text-xs text-muted-foreground">Recebidas</span>
+                  <span className="font-mono text-xs font-bold tabular-nums text-foreground">{trendCreatedTotal}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="size-2.5 rounded-full" style={{ background: BRAND.green }} />
-                  <span className="text-sm text-muted-foreground">Resolvidas</span>
-                  <span className="font-mono text-sm font-bold tabular-nums text-foreground">
-                    {trendResolvedTotal}
-                  </span>
+                <div className="flex items-center gap-1.5">
+                  <div className="size-2 rounded-full" style={{ background: BRAND.green }} />
+                  <span className="text-xs text-muted-foreground">Resolvidas</span>
+                  <span className="font-mono text-xs font-bold tabular-nums text-foreground">{trendResolvedTotal}</span>
                 </div>
               </div>
             )}
           </div>
 
           {trendLoading ? (
-            <div className="flex justify-center items-center h-72">
-              <Loader2 className="size-5 animate-spin text-muted-foreground" />
+            <div className="flex justify-center items-center h-64">
+              <Loader2 className="size-4 animate-spin text-muted-foreground" />
             </div>
           ) : !hasTrendData ? (
-            <div className="flex flex-col items-center justify-center h-72 gap-3">
-              <div className="size-12 rounded-2xl bg-muted flex items-center justify-center">
-                <ClipboardList className="size-5 text-muted-foreground" />
-              </div>
-              <div className="text-center">
-                <p className="text-sm font-semibold text-foreground">Sem atividade recente</p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Nenhuma demanda criada nos últimos 14 dias
-                </p>
+            <div className="flex flex-col items-center justify-center h-64 gap-2.5 text-center px-6">
+              <ClipboardList className="size-8 text-muted-foreground/30" />
+              <div>
+                <p className="text-sm font-medium text-foreground">Sem atividade recente</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Nenhuma demanda criada nos últimos 14 dias</p>
               </div>
             </div>
           ) : (
-            <ChartContainer config={trendConfig} className="h-72 w-full px-2 pt-5 pb-3">
+            <ChartContainer config={trendConfig} className="h-64 w-full px-2 pt-5 pb-3">
               <BarChart
                 data={trendData}
                 margin={{ top: 0, right: 8, left: -12, bottom: 0 }}
@@ -357,54 +350,53 @@ export function Home() {
                   cursor={{ fill: "currentColor", className: "text-muted/20" }}
                   content={<ChartTip labelKey="label" />}
                 />
-                <Bar dataKey="created" name="Recebidas" fill="url(#createdGrad)" radius={[4, 4, 0, 0]} maxBarSize={24} />
-                <Bar dataKey="resolved" name="Resolvidas" fill="url(#resolvedGrad)" radius={[4, 4, 0, 0]} maxBarSize={24} />
+                <Bar dataKey="created" name="Recebidas" fill="url(#createdGrad)" radius={[4, 4, 0, 0]} maxBarSize={22} />
+                <Bar dataKey="resolved" name="Resolvidas" fill="url(#resolvedGrad)" radius={[4, 4, 0, 0]} maxBarSize={22} />
               </BarChart>
             </ChartContainer>
           )}
         </div>
 
-        {/* Principais Problemas */}
         <div className="rounded-2xl border border-border bg-card overflow-hidden">
-          <div className="px-6 py-5 border-b border-border/50">
-            <h2 className="text-base font-bold font-brand text-foreground">Principais Problemas</h2>
-            <p className="text-sm text-muted-foreground mt-1">Categorias mais recorrentes</p>
+          <div className="px-5 py-4 border-b border-border/50">
+            <h2 className="text-sm font-semibold text-foreground">Principais Problemas</h2>
+            <p className="text-xs text-muted-foreground mt-0.5">Categorias mais recorrentes</p>
           </div>
           {summaryLoading ? (
-            <div className="flex justify-center items-center h-72">
-              <Loader2 className="size-5 animate-spin text-muted-foreground" />
+            <div className="flex justify-center items-center h-64">
+              <Loader2 className="size-4 animate-spin text-muted-foreground" />
             </div>
           ) : categoryData.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-72 gap-2 px-6 text-center">
-              <span className="text-sm text-muted-foreground">Nenhuma categoria ainda</span>
+            <div className="flex flex-col items-center justify-center h-64 gap-2 px-6 text-center">
+              <p className="text-xs text-muted-foreground">Nenhuma categoria ainda</p>
             </div>
           ) : (
-            <div className="px-6 py-5 flex flex-col gap-5">
+            <div className="px-5 py-4 flex flex-col gap-4">
               {categoryData.map((cat, i) => (
                 <motion.div
                   key={cat.id}
-                  className="flex flex-col gap-2"
-                  initial={{ opacity: 0, x: -8 }}
+                  className="flex flex-col gap-1.5"
+                  initial={{ opacity: 0, x: -6 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.3 + i * 0.06, duration: 0.35, ease: "easeOut" }}
+                  transition={{ delay: 0.3 + i * 0.05, duration: 0.3, ease: "easeOut" }}
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="size-2.5 rounded-full shrink-0" style={{ background: cat.color }} />
-                      <span className="text-sm font-medium text-foreground truncate">{cat.name}</span>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="size-2 rounded-full shrink-0" style={{ background: cat.color }} />
+                      <span className="text-sm text-foreground truncate">{cat.name}</span>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       <span className="text-sm font-bold font-mono tabular-nums text-foreground">{cat.total}</span>
-                      <span className="text-xs text-muted-foreground w-8 text-right tabular-nums">{cat.pct}%</span>
+                      <span className="text-xs text-muted-foreground w-7 text-right tabular-nums">{cat.pct}%</span>
                     </div>
                   </div>
-                  <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div className="h-1.5 bg-muted rounded-full overflow-hidden">
                     <motion.div
                       className="h-full rounded-full"
                       style={{ background: cat.color }}
                       initial={{ width: 0 }}
                       animate={{ width: `${cat.pct}%` }}
-                      transition={{ delay: 0.4 + i * 0.06, duration: 0.6, ease: "easeOut" }}
+                      transition={{ delay: 0.35 + i * 0.05, duration: 0.55, ease: "easeOut" }}
                     />
                   </div>
                 </motion.div>
@@ -414,23 +406,21 @@ export function Home() {
         </div>
       </motion.div>
 
-      {/* ── Radares de Urgência ── */}
+      {/* Radares de Urgência */}
       <motion.div
         className="rounded-2xl border border-border bg-card overflow-hidden"
         variants={fadeUp}
         custom={0.25}
       >
-        <div className="flex items-center justify-between px-6 py-5 border-b border-border/50">
-          <div className="flex items-center gap-3">
-            <span className="text-xl leading-none select-none">🔥</span>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border/50">
+          <div className="flex items-center gap-2.5">
+            <span className="text-lg leading-none select-none">🔥</span>
             <div>
-              <h2 className="text-base font-bold font-brand text-foreground leading-none">
-                Radares de Urgência
-              </h2>
-              <p className="text-sm text-muted-foreground mt-1">Demandas urgentes mais apoiadas</p>
+              <h2 className="text-sm font-semibold text-foreground leading-none">Radares de Urgência</h2>
+              <p className="text-xs text-muted-foreground mt-0.5">Demandas urgentes mais apoiadas</p>
             </div>
             {urgentTotal > 0 && (
-              <span className="inline-flex items-center justify-center min-w-6 h-6 px-2 rounded-full bg-red-500/10 text-red-500 text-xs font-bold tabular-nums">
+              <span className="inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-red-50 text-red-500 border border-red-100 text-xs font-bold tabular-nums dark:bg-red-950/30 dark:border-red-800">
                 {urgentTotal > 99 ? "99+" : urgentTotal}
               </span>
             )}
@@ -438,43 +428,43 @@ export function Home() {
           <Button
             variant="ghost"
             size="sm"
-            className="h-8 gap-1.5 text-sm text-primary hover:text-primary/80 font-medium"
+            className="h-7 gap-1 text-xs text-primary hover:text-primary/80 font-medium"
             onClick={() => navigate("/demands?priority=URGENT")}
           >
-            Ver todas
-            <ArrowRight className="size-3.5" />
+            Ver todas as urgências
+            <ArrowRight className="size-3" />
           </Button>
         </div>
 
         {urgentLoading ? (
-          <div className="flex justify-center py-12">
-            <Loader2 className="size-5 animate-spin text-muted-foreground" />
+          <div className="flex justify-center py-10">
+            <Loader2 className="size-4 animate-spin text-muted-foreground" />
           </div>
         ) : urgentList.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-14 gap-3">
-            <div className="size-12 rounded-2xl bg-[#34D144]/10 flex items-center justify-center">
-              <CheckCircle2 className="size-5" style={{ color: BRAND.green }} />
+          <div className="flex items-center gap-3 px-6 py-8">
+            <div className="size-9 rounded-full bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center shrink-0">
+              <CheckCircle2 className="size-4 text-emerald-500" />
             </div>
-            <div className="text-center">
-              <p className="text-sm font-semibold text-foreground">Nenhuma demanda urgente</p>
-              <p className="text-sm text-muted-foreground mt-1">Ótimo! Sem alertas críticos no momento.</p>
+            <div>
+              <p className="text-sm font-medium text-foreground">Nenhuma demanda urgente</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Ótimo! Sem alertas críticos no momento.</p>
             </div>
           </div>
         ) : (
           <div>
-            <div className="hidden sm:grid grid-cols-[1fr_140px_160px_40px] gap-x-4 px-6 py-3 border-b border-border/30 bg-muted/20">
-              <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/60">LOCALIZAÇÃO & PROBLEMA</span>
-              <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/60">IMPACTO POPULAR</span>
-              <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/60">STATUS</span>
+            <div className="hidden sm:grid grid-cols-[1fr_120px_160px_32px] gap-x-4 px-6 py-2.5 border-b border-border/20 bg-muted/20">
+              <span className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground/60">Localização & Problema</span>
+              <span className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground/60">Apoios</span>
+              <span className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground/60">Status</span>
               <span />
             </div>
-            <div className="divide-y divide-border/40">
+            <div className="divide-y divide-border/30">
               {urgentList.map((demand, i) => (
                 <motion.div
                   key={demand.id}
-                  initial={{ opacity: 0, y: 8 }}
+                  initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 + i * 0.07, duration: 0.35, ease: "easeOut" }}
+                  transition={{ delay: 0.25 + i * 0.06, duration: 0.3, ease: "easeOut" }}
                 >
                   <UrgencyRow demand={demand} onNavigate={navigate} />
                 </motion.div>
@@ -484,7 +474,7 @@ export function Home() {
         )}
       </motion.div>
 
-      {/* ── My Demands ── */}
+      {/* My Demands */}
       <motion.div variants={fadeUp} custom={0.35}>
         <AssignedDemandsCard
           demands={myDemandsList}
@@ -499,7 +489,7 @@ export function Home() {
 }
 
 function KpiCard({
-  icon, iconBg, iconColor, label, value, badge, accentColor, loading, onClick,
+  icon, iconBg, iconColor, label, value, badge, loading, onClick,
 }: {
   icon: React.ReactNode
   iconBg: string
@@ -507,7 +497,6 @@ function KpiCard({
   label: string
   value: string
   badge?: { text: string; variant: "success" | "warning" | "danger" | "info" }
-  accentColor?: string
   loading?: boolean
   onClick?: () => void
 }) {
@@ -516,30 +505,30 @@ function KpiCard({
       variants={cardVariant}
       onClick={onClick}
       disabled={!onClick}
-      whileHover={onClick ? { y: -2, transition: { duration: 0.2 } } : undefined}
-      whileTap={onClick ? { scale: 0.98 } : undefined}
+      whileHover={onClick ? { y: -1, transition: { duration: 0.15 } } : undefined}
+      whileTap={onClick ? { scale: 0.99 } : undefined}
       className={cn(
-        "relative w-full rounded-2xl border border-border bg-card px-5 pt-5 pb-6 flex flex-col gap-4 text-left overflow-hidden transition-colors duration-200",
-        onClick ? "hover:bg-muted/30 hover:border-border/70 cursor-pointer" : "cursor-default",
+        "relative w-full rounded-2xl border border-border bg-card p-5 flex flex-col gap-4 text-left overflow-hidden",
+        "transition-all duration-150",
+        onClick ? "hover:shadow-md hover:border-border/60 cursor-pointer" : "cursor-default",
       )}
     >
-      {accentColor && (
-        <div className="absolute top-0 left-0 right-0 h-0.5" style={{ background: accentColor }} />
-      )}
       <div className="flex items-start justify-between gap-2">
-        <div className={cn("flex items-center justify-center size-11 rounded-xl shrink-0", iconBg)}>
-          <span className={iconColor}>{icon}</span>
+        <div className={cn("flex items-center justify-center size-9 rounded-xl shrink-0", iconBg)}>
+          <span className={cn("flex items-center justify-center", iconColor)}>{icon}</span>
         </div>
         {badge && <KpiBadge text={badge.text} variant={badge.variant} />}
       </div>
       {loading ? (
-        <Loader2 className="size-4 text-muted-foreground animate-spin" />
+        <div className="h-9 flex items-center">
+          <Loader2 className="size-4 text-muted-foreground animate-spin" />
+        </div>
       ) : (
-        <div>
+        <div className="flex flex-col gap-1">
           <p className="text-3xl font-bold font-brand tabular-nums text-foreground leading-none tracking-tight">
             {value}
           </p>
-          <p className="text-sm text-muted-foreground leading-tight mt-2">{label}</p>
+          <p className="text-xs text-muted-foreground leading-snug">{label}</p>
         </div>
       )}
     </motion.button>
@@ -548,10 +537,10 @@ function KpiCard({
 
 function KpiBadge({ text, variant }: { text: string; variant: "success" | "warning" | "danger" | "info" }) {
   const styles: Record<string, string> = {
-    success: "bg-[#34D144]/10 text-[#34D144] border-[#34D144]/20",
-    warning: "bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-800",
-    danger: "bg-red-50 text-red-600 border-red-200 dark:bg-red-950/30 dark:text-red-400 dark:border-red-800",
-    info: "bg-primary/10 text-primary border-primary/20",
+    success: "bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800",
+    warning: "bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-800",
+    danger: "bg-red-50 text-red-600 border-red-100 dark:bg-red-950/30 dark:text-red-400 dark:border-red-800",
+    info: "bg-primary/5 text-primary border-primary/15",
   }
   return (
     <span className={cn("inline-flex items-center px-2 py-0.5 rounded-full border text-xs font-semibold", styles[variant])}>
@@ -563,38 +552,36 @@ function KpiBadge({ text, variant }: { text: string; variant: "success" | "warni
 function UrgencyRow({ demand, onNavigate }: { demand: Demand; onNavigate: (path: string) => void }) {
   return (
     <button
-      className="group w-full grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_140px_160px_40px] gap-x-4 items-center px-6 py-4 hover:bg-muted/30 transition-colors text-left"
+      className="group w-full grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_120px_160px_32px] gap-x-4 items-center px-6 py-3.5 hover:bg-muted/30 transition-colors text-left"
       onClick={() => onNavigate(`/comments/${demand.id}`)}
     >
-      <div className="min-w-0 flex items-center gap-4">
-        <div className="size-9 rounded-xl bg-red-500/10 flex items-center justify-center shrink-0">
-          <AlertTriangle className="size-4 text-red-500" />
+      <div className="min-w-0 flex items-center gap-3.5">
+        <div className="size-8 rounded-xl bg-red-50 dark:bg-red-950/30 flex items-center justify-center shrink-0 border border-red-100/50 dark:border-red-900">
+          <AlertTriangle className="size-3.5 text-red-500" />
         </div>
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-foreground line-clamp-1">{demand.title}</p>
-          <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-            {demand.category && <span className="text-sm text-muted-foreground">{demand.category.name}</span>}
+          <p className="text-sm font-medium text-foreground line-clamp-1">{demand.title}</p>
+          <div className="flex items-center gap-1.5 mt-0.5">
+            {demand.category && <span className="text-xs text-muted-foreground">{demand.category.name}</span>}
             {demand.neighborhood && (
               <>
-                <span className="text-muted-foreground/30 text-sm">·</span>
-                <span className="text-sm text-muted-foreground">{demand.neighborhood}</span>
+                <span className="text-muted-foreground/30 text-xs">·</span>
+                <span className="text-xs text-muted-foreground">{demand.neighborhood}</span>
               </>
             )}
           </div>
         </div>
       </div>
-      <div className="hidden sm:flex items-center gap-2">
-        <ThumbsUp className="size-3.5 text-muted-foreground" />
-        <span className="text-sm font-bold font-brand tabular-nums text-foreground">{demand.likesCount}</span>
-        <span className="text-sm text-muted-foreground">apoios</span>
+      <div className="hidden sm:flex items-center gap-1.5">
+        <ThumbsUp className="size-3 text-muted-foreground/60" />
+        <span className="text-sm font-semibold font-mono tabular-nums text-foreground">{demand.likesCount}</span>
+        <span className="text-xs text-muted-foreground">apoios</span>
       </div>
       <div className="hidden sm:flex items-center">
         <DemandStatusBadge status={demand.status} />
       </div>
       <div className="flex items-center justify-end">
-        <div className="size-8 rounded-xl bg-muted flex items-center justify-center group-hover:bg-primary/10 transition-colors">
-          <ArrowRight className="size-3.5 text-muted-foreground group-hover:text-primary transition-colors" />
-        </div>
+        <ArrowRight className="size-3.5 text-muted-foreground/30 group-hover:text-muted-foreground transition-colors" />
       </div>
     </button>
   )
@@ -611,14 +598,14 @@ function AssignedDemandsCard({
 }) {
   return (
     <div className="rounded-2xl border border-border bg-card overflow-hidden">
-      <div className="flex items-center justify-between px-6 py-5 border-b border-border/50">
-        <div className="flex items-center gap-3">
-          <div className="size-8 rounded-lg bg-muted flex items-center justify-center">
-            <User className="size-4 text-muted-foreground" />
+      <div className="flex items-center justify-between px-6 py-4 border-b border-border/50">
+        <div className="flex items-center gap-2.5">
+          <div className="size-7 rounded-lg bg-muted flex items-center justify-center">
+            <User className="size-3.5 text-muted-foreground" />
           </div>
-          <h2 className="text-base font-bold font-brand text-foreground">Minhas Demandas</h2>
+          <h2 className="text-sm font-semibold text-foreground">Minhas Demandas</h2>
           {total > 0 && (
-            <span className="inline-flex items-center justify-center min-w-6 h-6 px-2 rounded-full bg-primary/10 text-primary text-xs font-bold tabular-nums">
+            <span className="inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-primary/5 text-primary border border-primary/10 text-xs font-bold tabular-nums">
               {total > 99 ? "99+" : total}
             </span>
           )}
@@ -627,39 +614,35 @@ function AssignedDemandsCard({
           <Button
             variant="ghost"
             size="sm"
-            className="h-8 gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+            className="h-7 gap-1 text-xs text-muted-foreground hover:text-foreground"
             onClick={() => onNavigate(`/demands?assigneeMemberId=${currentMemberId}`)}
           >
             Ver todas
-            <ArrowRight className="size-3.5" />
+            <ArrowRight className="size-3" />
           </Button>
         )}
       </div>
 
       {isLoading ? (
-        <div className="flex justify-center py-12">
-          <Loader2 className="size-5 text-muted-foreground animate-spin" />
+        <div className="flex justify-center py-10">
+          <Loader2 className="size-4 text-muted-foreground animate-spin" />
         </div>
       ) : demands.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-14 gap-3 text-center">
-          <div className="size-11 rounded-xl bg-muted flex items-center justify-center">
-            <ClipboardList className="size-4.5 text-muted-foreground" />
-          </div>
+        <div className="flex items-center gap-3 px-6 py-8">
+          <ClipboardList className="size-8 text-muted-foreground/25" />
           <div>
-            <p className="text-sm font-semibold text-foreground">Nenhuma demanda atribuída</p>
-            <p className="text-sm text-muted-foreground mt-1">
-              Quando uma demanda for atribuída a você, aparecerá aqui.
-            </p>
+            <p className="text-sm font-medium text-foreground">Nenhuma demanda atribuída</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Quando uma demanda for atribuída a você, aparecerá aqui.</p>
           </div>
         </div>
       ) : (
-        <div className="divide-y divide-border/40">
+        <div className="divide-y divide-border/30">
           {demands.map((demand, i) => (
             <motion.div
               key={demand.id}
-              initial={{ opacity: 0, y: 8 }}
+              initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.35 + i * 0.07, duration: 0.35, ease: "easeOut" }}
+              transition={{ delay: 0.3 + i * 0.06, duration: 0.3, ease: "easeOut" }}
             >
               <DemandRow demand={demand} onNavigate={onNavigate} />
             </motion.div>
@@ -671,20 +654,17 @@ function AssignedDemandsCard({
 }
 
 function DemandRow({ demand, onNavigate }: { demand: Demand; onNavigate: (path: string) => void }) {
-  const stripeClass = demand.priority ? (PRIORITY_STRIPE[demand.priority] ?? "bg-border") : "bg-border"
-
   return (
     <button
-      className="group relative w-full flex items-center gap-4 pl-5 pr-6 py-4 hover:bg-muted/30 transition-colors text-left"
+      className="group w-full flex items-center gap-4 px-6 py-3.5 hover:bg-muted/30 transition-colors text-left"
       onClick={() => onNavigate(`/comments/${demand.id}`)}
     >
-      <div className={cn("absolute left-0 inset-y-0 w-0.5", stripeClass)} />
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-foreground line-clamp-1 leading-snug">{demand.title}</p>
-        <div className="flex items-center gap-2.5 mt-1.5 flex-wrap">
+        <p className="text-sm font-medium text-foreground line-clamp-1 leading-snug">{demand.title}</p>
+        <div className="flex items-center gap-2 mt-1.5 flex-wrap">
           <DemandStatusBadge status={demand.status} />
-          {demand.category && <span className="text-sm text-muted-foreground">{demand.category.name}</span>}
-          <span className="text-sm text-muted-foreground">{formatDateToNow(demand.createdAt)}</span>
+          {demand.category && <span className="text-xs text-muted-foreground">{demand.category.name}</span>}
+          <span className="text-xs text-muted-foreground">{formatDateToNow(demand.createdAt)}</span>
         </div>
       </div>
       {demand.priority && (
@@ -692,7 +672,7 @@ function DemandRow({ demand, onNavigate }: { demand: Demand; onNavigate: (path: 
           <DemandPriority variant={demand.priority} />
         </div>
       )}
-      <ArrowRight className="size-4 text-border group-hover:text-muted-foreground transition-colors shrink-0" />
+      <ArrowRight className="size-3.5 text-muted-foreground/30 group-hover:text-muted-foreground transition-colors shrink-0" />
     </button>
   )
 }
