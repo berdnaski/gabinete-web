@@ -13,8 +13,6 @@ import { ResetPassword } from "@/pages/public/reset-password";
 import { VerifyEmail } from "@/pages/public/verify-email";
 import { GoogleCallback } from "@/pages/public/google-callback";
 import { ConfirmPasswordPage } from "@/pages/public/confirm-password";
-import { Admin } from "@/pages/admin";
-import { AdminUsers } from "@/pages/admin/users";
 import { AcceptInvite } from "@/pages/public/accept-invite";
 
 const Sandbox = lazy(() => import("@/pages/public/sandbox").then((m) => ({ default: m.Sandbox })));
@@ -23,7 +21,7 @@ const DemandSurveyPage = lazy(() => import("@/pages/public/demand-survey").then(
 const TermsOfUsePage = lazy(() => import("@/pages/public/terms-of-use").then((m) => ({ default: m.TermsOfUsePage })));
 const PrivacyPolicyPage = lazy(() => import("@/pages/public/privacy-policy").then((m) => ({ default: m.PrivacyPolicyPage })));
 const LandingPage = lazy(() => import("@/pages/public/landing").then((m) => ({ default: m.LandingPage })));
-const LpPage = lazy(() => import("@/pages/public/lp").then((m) => ({ default: m.LpPage })));
+//const LpPage = lazy(() => import("@/pages/public/lp").then((m) => ({ default: m.LpPage })));
 
 const Feed = lazy(() => import("@/pages/feed").then((m) => ({ default: m.Feed })));
 const Settings = lazy(() => import("@/pages/settings").then((m) => ({ default: m.Settings })));
@@ -40,7 +38,7 @@ const MyTasks = lazy(() => import("@/pages/private/my-tasks").then((m) => ({ def
 const Reports = lazy(() => import("@/pages/private/reports").then((m) => ({ default: m.Reports })));
 
 const onlyMember = [UserRole.MEMBER];
-const onlyAdmin = [UserRole.ADMIN];
+// const onlyAdmin = [UserRole.ADMIN];
 
 function PageLoader() {
   return (
@@ -81,10 +79,10 @@ export function AppRouter() {
         path="/landingpage"
         element={<Suspense fallback={<PageLoader />}><LandingPage /></Suspense>}
       />
-      <Route
+      {/* <Route
         path="/lp"
         element={<Suspense fallback={<PageLoader />}><LpPage /></Suspense>}
-      />
+      /> */}
 
       <Route path="/" element={<Layout />}>
         <Route
