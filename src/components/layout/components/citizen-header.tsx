@@ -37,7 +37,7 @@ export function CitizenHeader() {
                   )}
                 >
                   <Icon className="size-3.5" />
-                  {label}
+                  <span className="hidden sm:inline">{label}</span>
                 </Button>
               )}
             </NavLink>

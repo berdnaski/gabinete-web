@@ -151,7 +151,8 @@ export function DemandsForm({ sizeTrigger }: DemandFormProps) {
       <SheetTrigger asChild>
         <Button size={sizeTrigger} variant="default" className={sizeTrigger?.includes('icon') ? "rounded-full" : ""}>
           <PlusIcon className="size-4" />
-          {sizeTrigger !== "icon" && "Nova Demanda"}
+          {sizeTrigger !== "icon" && <span className="hidden sm:inline">Nova Demanda</span>}
+          {sizeTrigger !== "icon" && <span className="sm:hidden">Nova</span>}
         </Button>
       </SheetTrigger>
 

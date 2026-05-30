@@ -29,9 +29,9 @@ export function Layout() {
         }
       >
         <AppSidebar />
-        <SidebarInset className="border border-muted shadow-2xl">
+        <SidebarInset className="sm:border sm:border-muted sm:shadow-2xl">
           <Header />
-          <div className="pt-4 p-6">
+          <div className="p-3 sm:p-6">
             <Outlet />
           </div>
         </SidebarInset>
@@ -43,7 +43,7 @@ export function Layout() {
   return (
     <div className="min-h-screen flex flex-col">
       <CitizenHeader />
-      <div className="pt-20 p-6 min-h-screen bg-[#F8F8F8]">
+      <div className="pt-20 p-3 sm:p-6 min-h-screen bg-[#F8F8F8]">
         <Outlet />
       </div>
       <ConsentOverlay />

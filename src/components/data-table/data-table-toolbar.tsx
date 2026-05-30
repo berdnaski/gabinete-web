@@ -83,7 +83,7 @@ export function DataTableToolbar<TData>({
   return (
     <div className="flex flex-wrap items-center justify-between gap-2">
       <div className="flex flex-wrap items-center gap-2">
-        <div className="relative max-w-xs min-w-xs flex-1">
+        <div className="relative w-full max-w-xs min-w-0 flex-1 sm:min-w-48">
           <Search className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground/50" />
           <Input
             className="pl-8"

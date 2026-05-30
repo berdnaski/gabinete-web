@@ -192,23 +192,23 @@ export function Home() {
       variants={stagger}
     >
       {/* Header */}
-      <motion.div className="flex items-center justify-between gap-4" variants={fadeUp} custom={0}>
+      <motion.div className="flex flex-wrap items-start justify-between gap-3" variants={fadeUp} custom={0}>
         <div>
           <h1 className="text-2xl font-bold font-brand text-foreground tracking-tight leading-none">
             Dashboard
           </h1>
-          <p className="text-sm text-muted-foreground mt-1.5 capitalize">
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1.5 capitalize">
             {getGreeting()}, {firstName} · {getFormattedDate()}
           </p>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-1.5 flex-wrap">
           {score > 0 && (
-            <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-muted/60 border border-border text-xs font-semibold text-foreground">
+            <div className="flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-lg bg-muted/60 border border-border text-xs font-semibold text-foreground">
               <Star className="size-3 fill-amber-400 text-amber-400" />
               {score} pts
             </div>
           )}
-          <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border bg-card text-xs font-medium text-muted-foreground capitalize">
+          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border bg-card text-xs font-medium text-muted-foreground capitalize">
             {getMonthYear()}
           </div>
           <Button
@@ -218,7 +218,7 @@ export function Home() {
             onClick={() => navigate("/relatorios")}
           >
             <Download className="size-3" />
-            Exportar
+            <span className="hidden sm:inline">Exportar</span>
           </Button>
         </div>
       </motion.div>
@@ -431,7 +431,8 @@ export function Home() {
             className="h-7 gap-1 text-xs text-primary hover:text-primary/80 font-medium"
             onClick={() => navigate("/demands?priority=URGENT")}
           >
-            Ver todas as urgências
+            <span className="hidden sm:inline">Ver todas as urgências</span>
+            <span className="sm:hidden">Ver todas</span>
             <ArrowRight className="size-3" />
           </Button>
         </div>
@@ -508,7 +509,7 @@ function KpiCard({
       whileHover={onClick ? { y: -1, transition: { duration: 0.15 } } : undefined}
       whileTap={onClick ? { scale: 0.99 } : undefined}
       className={cn(
-        "relative w-full rounded-2xl border border-border bg-card p-5 flex flex-col gap-4 text-left overflow-hidden",
+        "relative w-full rounded-2xl border border-border bg-card p-4 sm:p-5 flex flex-col gap-3 sm:gap-4 text-left overflow-hidden",
         "transition-all duration-150",
         onClick ? "hover:shadow-md hover:border-border/60 cursor-pointer" : "cursor-default",
       )}
@@ -525,7 +526,7 @@ function KpiCard({
         </div>
       ) : (
         <div className="flex flex-col gap-1">
-          <p className="text-3xl font-bold font-brand tabular-nums text-foreground leading-none tracking-tight">
+          <p className="text-2xl sm:text-3xl font-bold font-brand tabular-nums text-foreground leading-none tracking-tight">
             {value}
           </p>
           <p className="text-xs text-muted-foreground leading-snug">{label}</p>
