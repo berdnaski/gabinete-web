@@ -93,6 +93,10 @@ export function Post({ demand, className, hideComment = false, showStatus = fals
     })
   }
 
+  function navigateToDemand() {
+    navigate(`/demand/${demand.id}`)
+  }
+
   function handleComment(e: React.MouseEvent) {
     e.stopPropagation()
     if (!isAuthenticated) {
@@ -100,12 +104,13 @@ export function Post({ demand, className, hideComment = false, showStatus = fals
       setShowAuthModal(true)
       return
     }
-    navigate(`/comments/${demand.id}`)
+    navigate(`/demand/${demand.id}`)
   }
 
   async function handleShare(e: React.MouseEvent) {
     e.stopPropagation()
-    const url = `${window.location.origin}/comments/${demand.id}`
+    const ogBase = import.meta.env.VITE_OG_BASE_URL as string ?? ''
+    const url = ogBase ? `${ogBase}/${demand.id}` : `${window.location.origin}/demand/${demand.id}`
     const shareData = {
       title: demand.title,
       text: demand.description ? `${demand.description.slice(0, 100)}…` : demand.title,
@@ -157,12 +162,19 @@ export function Post({ demand, className, hideComment = false, showStatus = fals
         onUnlink={() => setShowUnlinkDialog(true)}
       />
 
-      <div className="px-4 pb-3 space-y-1">
+      <div
+        className="px-4 pb-3 space-y-1 cursor-pointer"
+        onClick={navigateToDemand}
+      >
         <p className="text-sm font-semibold leading-snug">{demand.title}</p>
         <p className="text-sm text-muted-foreground leading-relaxed">{demand.description}</p>
       </div>
 
-      {demand.evidences && demand.evidences.length > 0 && <Gallery images={demand.evidences} />}
+      {demand.evidences && demand.evidences.length > 0 && (
+        <div className="cursor-pointer" onClick={navigateToDemand}>
+          <Gallery images={demand.evidences} />
+        </div>
+      )}
 
       {demand.address && (
         <div className="flex items-center justify-between px-4 py-2">
@@ -339,50 +351,20 @@ function PostHeader({ demand, authorName, profilePath, showStatus, userOwnsDeman
   )
 
   return (
-    <div className="px-4 py-3 space-y-1.5">
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-3 min-w-0 flex-1">
-          {avatarEl}
-          {infoEl}
-        </div>
-
-        <div className="flex items-center gap-1 shrink-0">
-          {showStatus && <DemandStatusBadge status={demand.status} />}
-          {userOwnsDemand && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  aria-label="Mais opções"
-                  className="text-muted-foreground size-7"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <MoreHorizontal className="size-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
-                <DropdownMenuItem onClick={onAssign}>
-                  <UserCheck className="size-3.5" />
-                  Alterar responsável
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={onUnlink} className="text-destructive focus:text-destructive">
-                  <Unlink className="size-3.5" />
-                  Desvincular demanda
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
-        </div>
+    <div className="flex items-start justify-between px-4 py-3 gap-2">
+      <div className="flex items-center gap-3 min-w-0 flex-1" onClick={(e) => e.stopPropagation()}>
+        {avatarEl}
+        {infoEl}
       </div>
 
-      {demand.cabinet && (
-        <div className="ml-11">
+      <div className="flex items-center gap-1.5 shrink-0">
+        {showStatus && <DemandStatusBadge status={demand.status} />}
+
+        {demand.cabinet && (
           <Link
             to={`/gabinetes/${demand.cabinet.slug}`}
             onClick={(e) => e.stopPropagation()}
-            className="inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 text-xs font-medium bg-muted text-muted-foreground hover:text-foreground border border-border/60 transition-colors max-w-full"
+            className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium bg-muted text-muted-foreground hover:text-foreground border border-border/60 transition-colors"
           >
             <Avatar className="size-3.5 shrink-0">
               <AvatarImage src={demand.cabinet.avatarUrl ?? undefined} />
@@ -390,10 +372,37 @@ function PostHeader({ demand, authorName, profilePath, showStatus, userOwnsDeman
                 {getFirstLettersFromNames(demand.cabinet.name)}
               </AvatarFallback>
             </Avatar>
-            <span className="truncate max-w-36">{demand.cabinet.name}</span>
+            <span className="hidden sm:inline truncate max-w-24">{demand.cabinet.name}</span>
           </Link>
-        </div>
-      )}
+        )}
+
+        {userOwnsDemand && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                size="icon"
+                variant="ghost"
+                aria-label="Mais opções"
+                className="text-muted-foreground size-7"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <MoreHorizontal className="size-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+              <DropdownMenuItem onClick={onAssign}>
+                <UserCheck className="size-3.5" />
+                Alterar responsável
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={onUnlink} className="text-destructive focus:text-destructive">
+                <Unlink className="size-3.5" />
+                Desvincular demanda
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+      </div>
     </div>
   )
 }

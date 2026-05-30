@@ -554,7 +554,7 @@ function UrgencyRow({ demand, onNavigate }: { demand: Demand; onNavigate: (path:
   return (
     <button
       className="group w-full grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_120px_160px_32px] gap-x-4 items-center px-6 py-3.5 hover:bg-muted/30 transition-colors text-left"
-      onClick={() => onNavigate(`/comments/${demand.id}`)}
+      onClick={() => onNavigate(`/demand/${demand.id}`)}
     >
       <div className="min-w-0 flex items-center gap-3.5">
         <div className="size-8 rounded-xl bg-red-50 dark:bg-red-950/30 flex items-center justify-center shrink-0 border border-red-100/50 dark:border-red-900">
@@ -658,7 +658,7 @@ function DemandRow({ demand, onNavigate }: { demand: Demand; onNavigate: (path: 
   return (
     <button
       className="group w-full flex items-center gap-4 px-6 py-3.5 hover:bg-muted/30 transition-colors text-left"
-      onClick={() => onNavigate(`/comments/${demand.id}`)}
+      onClick={() => onNavigate(`/demand/${demand.id}`)}
     >
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-foreground line-clamp-1 leading-snug">{demand.title}</p>

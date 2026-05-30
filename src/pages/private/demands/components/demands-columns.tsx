@@ -21,7 +21,7 @@ export const demandsColumns: ColumnDef<Demand>[] = [
       return (
         <div className="flex flex-col gap-0.5 min-w-0">
           <Link
-            to={`/comments/${d.id}`}
+            to={`/demand/${d.id}`}
             className="group/title inline-flex items-center gap-1 font-semibold text-foreground hover:text-primary transition-colors leading-snug w-fit max-w-full"
             onClick={(e) => e.stopPropagation()}
           >

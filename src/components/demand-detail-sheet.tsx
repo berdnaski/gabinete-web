@@ -284,7 +284,7 @@ export function DemandDetailSheet({
                   Atualizar progresso
                 </Button>
                 <Button variant="outline" asChild>
-                  <Link to={`/comments/${demand.id}`} onClick={() => onOpenChange(false)}>
+                  <Link to={`/demand/${demand.id}`} onClick={() => onOpenChange(false)}>
                     Ver comentários
                   </Link>
                 </Button>
