@@ -66,10 +66,10 @@ export function AppSidebar() {
                 <SidebarMenuButton
                   asChild
                   tooltip="Usuários"
-                  isActive={pathname === "/admin/usuarios"}
+                  isActive={pathname === "/admin/users"}
                 >
-                  <Link to="/admin/usuarios">
-                    <Users className={cn({ "text-primary": pathname === "/admin/usuarios" })} />
+                  <Link to="/admin/users">
+                    <Users className={cn({ "text-primary": pathname === "/admin/users" })} />
                     <span>Usuários</span>
                   </Link>
                 </SidebarMenuButton>
