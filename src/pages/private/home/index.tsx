@@ -155,9 +155,8 @@ export function Home() {
   const firstName = user?.name?.split(" ")[0] ?? "usuário"
 
   const demandCount = cabinetData?.demand_count ?? 0
-  const resolvedCount = cabinetData?.resolved_count ?? 0
   const score = cabinetData?.score ?? 0
-  const resolutionRate = demandCount > 0 ? Math.round((resolvedCount / demandCount) * 100) : 0
+  const resolutionRate = cabinetData?.resolution_rate ?? 0
 
   const trendData = useMemo(() => {
     if (!trendPoints?.length) return []
@@ -176,12 +175,9 @@ export function Home() {
   const trendResolvedTotal = trendData.reduce((s, d) => s + d.resolved, 0)
 
   const categoryData = useMemo(() => {
-    const cats = dashboardSummary?.categories ?? []
-    const total = cats.reduce((s, c) => s + c.total, 0)
-    return cats.slice(0, 6).map((c, i) => ({
+    return (dashboardSummary?.categories ?? []).slice(0, 6).map((c, i) => ({
       ...c,
       color: CAT_COLORS[i % CAT_COLORS.length],
-      pct: total > 0 ? Math.round((c.total / total) * 100) : 0,
     }))
   }, [dashboardSummary?.categories])
 
@@ -192,7 +188,6 @@ export function Home() {
       animate="visible"
       variants={stagger}
     >
-      {/* Header */}
       <motion.div className="flex flex-wrap items-start justify-between gap-3" variants={fadeUp} custom={0}>
         <div>
           <h1 className="text-2xl font-bold font-brand text-foreground tracking-tight leading-none">
@@ -224,7 +219,6 @@ export function Home() {
         </div>
       </motion.div>
 
-      {/* KPI Cards */}
       <motion.div className="grid grid-cols-2 gap-3 lg:grid-cols-4" variants={stagger}>
         <KpiCard
           icon={<ClipboardList className="size-4.5" />}
@@ -270,7 +264,6 @@ export function Home() {
         />
       </motion.div>
 
-      {/* Volume chart + Principais Problemas */}
       <motion.div className="grid gap-4 lg:grid-cols-3" variants={fadeUp} custom={0.15}>
         <div className="lg:col-span-2 rounded-2xl border border-border bg-card overflow-hidden">
           <div className="flex items-center justify-between px-6 py-4 border-b border-border/50">
@@ -388,7 +381,7 @@ export function Home() {
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       <span className="text-sm font-bold font-mono tabular-nums text-foreground">{cat.total}</span>
-                      <span className="text-xs text-muted-foreground w-7 text-right tabular-nums">{cat.pct}%</span>
+                      <span className="text-xs text-muted-foreground w-7 text-right tabular-nums">{cat.percentage}%</span>
                     </div>
                   </div>
                   <div className="h-2 bg-muted rounded-full overflow-hidden">
@@ -396,7 +389,7 @@ export function Home() {
                       className="h-full rounded-full"
                       style={{ background: cat.color }}
                       initial={{ width: 0 }}
-                      animate={{ width: `${cat.pct}%` }}
+                      animate={{ width: `${cat.percentage}%` }}
                       transition={{ delay: 0.35 + i * 0.05, duration: 0.55, ease: "easeOut" }}
                     />
                   </div>
@@ -407,7 +400,6 @@ export function Home() {
         </div>
       </motion.div>
 
-      {/* Radares de Urgência */}
       <motion.div
         className="rounded-2xl border border-border bg-card overflow-hidden"
         variants={fadeUp}
@@ -476,7 +468,6 @@ export function Home() {
         )}
       </motion.div>
 
-      {/* My Demands */}
       <motion.div variants={fadeUp} custom={0.35}>
         <AssignedDemandsCard
           demands={myDemandsList}

@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react"
+import { useRef, useState, useEffect, useCallback } from "react"
 import { toast } from "sonner"
 import { QRCodeSVG } from "qrcode.react"
 import { Image, ImageIcon, Palette, QrCode, Code2, Copy, Check, Loader2, Lock, Upload, X } from "lucide-react"
@@ -18,6 +18,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
+import { BannerCropDialog } from "@/components/ui/banner-crop-dialog"
 
 const ACCENT_PRESETS = [
   "#0058F3",
@@ -45,6 +46,8 @@ export function CabinetBrandingCard() {
   // banner
   const [selectedBanner, setSelectedBanner] = useState<File | null>(null)
   const [bannerPreview, setBannerPreview] = useState<string | null>(null)
+  const [cropSource, setCropSource] = useState<string | null>(null)
+  const [cropOpen, setCropOpen] = useState(false)
   const bannerInputRef = useRef<HTMLInputElement>(null)
 
   // logo
@@ -68,10 +71,26 @@ export function CabinetBrandingCard() {
   const handleBannerSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-    if (bannerPreview) URL.revokeObjectURL(bannerPreview)
-    setSelectedBanner(file)
-    setBannerPreview(URL.createObjectURL(file))
+    if (bannerInputRef.current) bannerInputRef.current.value = ""
+    const url = URL.createObjectURL(file)
+    setCropSource(url)
+    setCropOpen(true)
   }
+
+  const handleCropConfirm = useCallback((file: File, previewUrl: string) => {
+    if (bannerPreview) URL.revokeObjectURL(bannerPreview)
+    if (cropSource) URL.revokeObjectURL(cropSource)
+    setSelectedBanner(file)
+    setBannerPreview(previewUrl)
+    setCropSource(null)
+    setCropOpen(false)
+  }, [bannerPreview, cropSource])
+
+  const handleCropCancel = useCallback(() => {
+    if (cropSource) URL.revokeObjectURL(cropSource)
+    setCropSource(null)
+    setCropOpen(false)
+  }, [cropSource])
 
   const removeBannerPreview = () => {
     if (bannerPreview) URL.revokeObjectURL(bannerPreview)
@@ -394,6 +413,13 @@ export function CabinetBrandingCard() {
           </div>
         </FieldGroup>
       </CardContent>
+
+      <BannerCropDialog
+        open={cropOpen}
+        imageSrc={cropSource}
+        onConfirm={handleCropConfirm}
+        onCancel={handleCropCancel}
+      />
 
       <CardFooter className="px-6 py-4 border-t border-border flex items-center justify-between">
         {isOwner ? (

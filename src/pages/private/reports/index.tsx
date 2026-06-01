@@ -5,7 +5,7 @@ import { ChartContainer, ChartTooltip } from "@/components/ui/chart"
 import { useAuth } from "@/hooks/use-auth"
 import { usePageTitle } from "@/hooks/use-page-title"
 import { cn } from "@/lib/utils"
-import { format, subDays, subMonths, subYears } from "date-fns"
+import { format, subDays, subMonths, subYears, parseISO } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import {
   CheckCircle2,
@@ -74,8 +74,10 @@ function formatPeriodLabel(start: string, end: string) {
   return `${format(s, "dd 'de' MMM 'de' yyyy", { locale: ptBR })} – ${format(e, "dd 'de' MMM 'de' yyyy", { locale: ptBR })}`
 }
 
-function formatShortDate(dateStr: string) {
-  return format(new Date(dateStr + "T12:00:00"), "dd/MM", { locale: ptBR })
+function formatTrendLabel(dateStr: string, periodDays: number): string {
+  const date = parseISO(dateStr + "T12:00:00")
+  if (periodDays > 180) return format(date, "MMM/yy", { locale: ptBR })
+  return format(date, "dd/MM", { locale: ptBR })
 }
 
 function exportCSV(report: CabinetReport, cabinetName: string) {
@@ -143,32 +145,9 @@ export function Reports() {
 
   const trendData = useMemo(() => {
     if (!report) return []
-    const days = report.trend.length
-    if (days <= 60) return report.trend.map(t => ({ ...t, label: formatShortDate(t.date) }))
-    if (days <= 180) {
-      const weekly: typeof report.trend = []
-      for (let i = 0; i < days; i += 7) {
-        const slice = report.trend.slice(i, i + 7)
-        weekly.push({
-          date: slice[0].date,
-          created: slice.reduce((s, d) => s + d.created, 0),
-          resolved: slice.reduce((s, d) => s + d.resolved, 0),
-        })
-      }
-      return weekly.map(t => ({ ...t, label: formatShortDate(t.date) }))
-    }
-    const monthly: typeof report.trend = []
-    for (let i = 0; i < days; i += 30) {
-      const slice = report.trend.slice(i, i + 30)
-      monthly.push({
-        date: slice[0].date,
-        created: slice.reduce((s, d) => s + d.created, 0),
-        resolved: slice.reduce((s, d) => s + d.resolved, 0),
-      })
-    }
-    return monthly.map(t => ({
+    return report.trend.map(t => ({
       ...t,
-      label: format(new Date(t.date + "T12:00:00"), "MMM/yy", { locale: ptBR }),
+      label: formatTrendLabel(t.date, report.period.days),
     }))
   }, [report])
 

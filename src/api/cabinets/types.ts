@@ -19,6 +19,7 @@ export interface Cabinet {
   in_progress_count: number;
   resolved_count: number;
   transparencyScore: number;
+  resolution_rate: number;
 }
 
 export interface CabinetMember {
