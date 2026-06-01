@@ -1,11 +1,4 @@
 {
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "has": [{ "type": "host", "value": "lp.gabineteapp.com.br" }],
-      "destination": "/lp"
-    },
-    { "source": "/(.*)", "destination": "/index.html" }
-  ]
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
 

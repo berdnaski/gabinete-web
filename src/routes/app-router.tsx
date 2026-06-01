@@ -47,6 +47,17 @@ function PageLoader() {
 }
 
 export function AppRouter() {
+  if (window.location.hostname.startsWith("lp.")) {
+    return (
+      <Routes>
+        <Route
+          path="*"
+          element={<Suspense fallback={<PageLoader />}><LandingPage /></Suspense>}
+        />
+      </Routes>
+    )
+  }
+
   return (
     <Routes>
       <Route path="/sign-up" element={<SignUp />} />
