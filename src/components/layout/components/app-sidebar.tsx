@@ -2,7 +2,7 @@ import { useGetDemandsByCabinetSlug } from "@/api/demands/hooks"
 import { useAuth } from "@/hooks/use-auth"
 import { useCurrentMember } from "@/hooks/use-current-member"
 import { cn } from "@/lib/utils"
-import { Building2, CheckSquare, ClipboardListIcon, Home, Newspaper, Users, BarChart3 } from "lucide-react"
+import { Building2, CheckSquare, ClipboardListIcon, Home, Newspaper, Users, BarChart3, Map } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
 import Logo from "../../../assets/logo.png"
 import {
@@ -74,6 +74,14 @@ export function AppSidebar() {
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip="Mapa" isActive={pathname === "/mapa"}>
+                  <Link to="/mapa">
+                    <Map className={cn({ "text-primary": pathname === "/mapa" })} />
+                    <span>Mapa</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroup>
         </SidebarContent>
@@ -97,6 +105,14 @@ export function AppSidebar() {
                 <Link to="/">
                   <Newspaper className={cn({ "text-primary": pathname === "/" })} />
                   <span>Feed</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild tooltip="Mapa" isActive={pathname === "/mapa"}>
+                <Link to="/mapa">
+                  <Map className={cn({ "text-primary": pathname === "/mapa" })} />
+                  <span>Mapa</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
