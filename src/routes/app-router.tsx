@@ -4,6 +4,8 @@ import { UserRole } from "@/api/users/types";
 import { Route, Routes } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import { Loader2 } from "lucide-react";
+import { Admin } from "@/pages/admin";
+import { AdminUsers } from "@/pages/admin/users";
 
 // Public pages — small, load eagerly
 import { Login } from "@/pages/public/login";
@@ -36,7 +38,7 @@ const MyTasks = lazy(() => import("@/pages/private/my-tasks").then((m) => ({ def
 const Reports = lazy(() => import("@/pages/private/reports").then((m) => ({ default: m.Reports })));
 
 const onlyMember = [UserRole.MEMBER];
-// const onlyAdmin = [UserRole.ADMIN];
+const onlyAdmin = [UserRole.ADMIN];
 
 function PageLoader() {
   return (
@@ -117,6 +119,23 @@ export function AppRouter() {
         <Route
           path="mapa"
           element={<Suspense fallback={<PageLoader />}><Map /></Suspense>}
+        />
+
+        <Route
+          path="admin"
+          element={
+            <ProtectedRoute allowedRoles={onlyAdmin}>
+              <Admin />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="admin/users"
+          element={
+            <ProtectedRoute allowedRoles={onlyAdmin}>
+              <AdminUsers />
+            </ProtectedRoute>
+          }
         />
 
         <Route
