@@ -1,7 +1,7 @@
-import { useNavigate } from "react-router-dom"
 import { ArrowRight, Play } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { APP_URL } from "../constants"
 
 const TRUST_STATS = [
   { value: "200+", label: "gabinetes ativos" },
@@ -10,8 +10,6 @@ const TRUST_STATS = [
 ]
 
 export function HeroSection() {
-  const navigate = useNavigate()
-
   return (
     <section className="relative pt-16 overflow-hidden bg-background">
       <div className="absolute inset-x-0 top-0 h-140 bg-linear-to-b from-primary/[0.07] to-transparent pointer-events-none" />
@@ -35,7 +33,7 @@ export function HeroSection() {
         </p>
 
         <div className="flex flex-col sm:flex-row items-center gap-3 mb-4">
-          <Button size="lg" onClick={() => navigate("/sign-up")}>
+          <Button size="lg" onClick={() => { window.location.href = `${APP_URL}/sign-up` }}>
             Começar grátis
             <ArrowRight className="size-4" />
           </Button>

@@ -1,10 +1,9 @@
-import { useNavigate } from "react-router-dom"
 import { ArrowRight, MessageCircle } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useInView } from "../hooks/use-in-view"
+import { APP_URL, WHATSAPP_URL } from "../constants"
 
 export function CTASection() {
-  const navigate = useNavigate()
   const { ref, visible } = useInView()
 
   return (
@@ -17,7 +16,7 @@ export function CTASection() {
             visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8",
           )}
         >
-          <div className="absolute -top-32 left-1/2 -translate-x-1/2 size-[480px] rounded-full bg-primary/25 blur-[80px] pointer-events-none" />
+          <div className="absolute -top-32 left-1/2 -translate-x-1/2 size-120 rounded-full bg-primary/25 blur-[80px] pointer-events-none" />
           <div className="absolute -bottom-16 right-1/4 size-56 rounded-full bg-primary/10 blur-[56px] pointer-events-none" />
 
           <div className="relative px-8 sm:px-16 py-16 sm:py-20 flex flex-col items-center text-center gap-6">
@@ -38,20 +37,22 @@ export function CTASection() {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center gap-2.5 pt-1">
-              <button
-                onClick={() => navigate("/sign-up")}
-                className="cursor-pointer inline-flex items-center gap-2 bg-background text-foreground font-semibold rounded-lg px-6 py-3 text-sm hover:bg-background/90 active:scale-95 transition-all duration-150 shadow-sm"
+              <a
+                href={`${APP_URL}/sign-up`}
+                className="inline-flex items-center gap-2 bg-background text-foreground font-semibold rounded-lg px-6 py-3 text-sm hover:bg-background/90 active:scale-95 transition-all duration-150 shadow-sm"
               >
                 Começar grátis
                 <ArrowRight className="size-4" />
-              </button>
-              <button
-                onClick={() => navigate("/sign-up")}
-                className="cursor-pointer inline-flex items-center gap-2 bg-background/5 border border-background/10 text-background/70 font-medium rounded-lg px-6 py-3 text-sm hover:bg-background/10 hover:text-background/90 active:scale-95 transition-all duration-150"
+              </a>
+              <a
+                href={WHATSAPP_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-background/5 border border-background/10 text-background/70 font-medium rounded-lg px-6 py-3 text-sm hover:bg-background/10 hover:text-background/90 active:scale-95 transition-all duration-150"
               >
                 <MessageCircle className="size-4" />
                 Falar com o CEO
-              </button>
+              </a>
             </div>
 
             <p className="text-2xs text-background/25 tracking-wide mt-1">
