@@ -43,7 +43,7 @@ export function Layout() {
   return (
     <div className="min-h-screen flex flex-col">
       <CitizenHeader />
-      <div className="pt-20 p-3 sm:p-6 min-h-screen bg-[#F8F8F8]">
+      <div className="pt-20 px-3 pb-3 sm:px-6 sm:pb-6 min-h-screen bg-[#F8F8F8]">
         <Outlet />
       </div>
       <ConsentOverlay />

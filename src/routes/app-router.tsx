@@ -21,7 +21,6 @@ const DemandSurveyPage = lazy(() => import("@/pages/public/demand-survey").then(
 const TermsOfUsePage = lazy(() => import("@/pages/public/terms-of-use").then((m) => ({ default: m.TermsOfUsePage })));
 const PrivacyPolicyPage = lazy(() => import("@/pages/public/privacy-policy").then((m) => ({ default: m.PrivacyPolicyPage })));
 const LandingPage = lazy(() => import("@/pages/public/landing").then((m) => ({ default: m.LandingPage })));
-//const LpPage = lazy(() => import("@/pages/public/lp").then((m) => ({ default: m.LpPage })));
 
 const Feed = lazy(() => import("@/pages/feed").then((m) => ({ default: m.Feed })));
 const Settings = lazy(() => import("@/pages/settings").then((m) => ({ default: m.Settings })));
@@ -75,13 +74,9 @@ export function AppRouter() {
         element={<Suspense fallback={<PageLoader />}><PrivacyPolicyPage /></Suspense>}
       />
       <Route
-        path="/landingpage"
+        path="/lp"
         element={<Suspense fallback={<PageLoader />}><LandingPage /></Suspense>}
       />
-      {/* <Route
-        path="/lp"
-        element={<Suspense fallback={<PageLoader />}><LpPage /></Suspense>}
-      /> */}
 
       <Route path="/" element={<Layout />}>
         <Route
