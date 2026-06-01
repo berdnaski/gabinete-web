@@ -27,7 +27,7 @@ export function HowItWorksSection() {
   const { ref, visible } = useInView()
 
   return (
-    <section className="py-28 bg-muted/20" id="como-funciona">
+    <section className="py-16 sm:py-28 bg-muted/20" id="como-funciona">
       <div ref={ref} className="max-w-6xl mx-auto px-5 sm:px-8">
         <div
           className={cn(

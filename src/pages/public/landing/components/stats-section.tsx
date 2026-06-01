@@ -36,7 +36,7 @@ export function StatsSection() {
   const satisfaction = useCountUp(48, 1200, active)
 
   return (
-    <section ref={ref} className="py-28 bg-muted/20" id="impacto">
+    <section ref={ref} className="py-16 sm:py-28 bg-muted/20" id="impacto">
       <div className="max-w-6xl mx-auto px-5 sm:px-8">
         <div className="text-center mb-14">
           <div className="inline-flex items-center gap-2 border border-border rounded-full px-3.5 py-1.5 mb-6 bg-background">
@@ -56,7 +56,7 @@ export function StatsSection() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div
             className={cn(
-              "rounded-2xl border border-border bg-background p-8 flex flex-col gap-6 shadow-sm transition-all duration-700",
+              "rounded-2xl border border-border bg-background p-5 sm:p-8 flex flex-col gap-6 shadow-sm transition-all duration-700",
               active ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
             )}
           >
@@ -70,7 +70,7 @@ export function StatsSection() {
               </span>
             </div>
             <div className="flex items-end gap-2 leading-none">
-              <span className="text-6xl font-bold text-foreground tabular-nums">
+              <span className="text-5xl sm:text-6xl font-bold text-foreground tabular-nums">
                 {demands.toLocaleString("pt-BR")}
               </span>
             </div>
@@ -90,7 +90,7 @@ export function StatsSection() {
 
           <div
             className={cn(
-              "rounded-2xl border border-border bg-background p-8 flex flex-col gap-6 shadow-sm transition-all duration-700 delay-100",
+              "rounded-2xl border border-border bg-background p-5 sm:p-8 flex flex-col gap-6 shadow-sm transition-all duration-700 delay-100",
               active ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
             )}
           >
@@ -104,7 +104,7 @@ export function StatsSection() {
               </span>
             </div>
             <div className="flex items-end gap-1.5 leading-none">
-              <span className="text-6xl font-bold text-foreground tabular-nums">{rate}</span>
+              <span className="text-5xl sm:text-6xl font-bold text-foreground tabular-nums">{rate}</span>
               <span className="text-2xl font-semibold text-muted-foreground mb-1">%</span>
             </div>
             <div className="flex flex-col gap-3 mt-auto">
@@ -133,7 +133,7 @@ export function StatsSection() {
 
           <div
             className={cn(
-              "rounded-2xl border border-border bg-background p-8 flex flex-col gap-6 shadow-sm transition-all duration-700 delay-200",
+              "rounded-2xl border border-border bg-background p-5 sm:p-8 flex flex-col gap-6 shadow-sm transition-all duration-700 delay-200",
               active ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
             )}
           >
@@ -144,7 +144,7 @@ export function StatsSection() {
               <span className="text-xs text-muted-foreground">4.2k avaliações</span>
             </div>
             <div className="flex items-end gap-1.5 leading-none">
-              <span className="text-6xl font-bold text-foreground tabular-nums">
+              <span className="text-5xl sm:text-6xl font-bold text-foreground tabular-nums">
                 {(satisfaction / 10).toFixed(1)}
               </span>
               <span className="text-2xl font-semibold text-muted-foreground mb-1">/5</span>

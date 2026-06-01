@@ -7,7 +7,7 @@ export function CTASection() {
   const { ref, visible } = useInView()
 
   return (
-    <section className="py-28 bg-background">
+    <section className="py-16 sm:py-28 bg-background">
       <div ref={ref} className="max-w-4xl mx-auto px-5 sm:px-8">
         <div
           className={cn(

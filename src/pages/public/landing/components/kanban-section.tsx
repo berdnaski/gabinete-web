@@ -69,7 +69,7 @@ const DETAIL_COMMENTS = [
 
 export function KanbanSection() {
   return (
-    <section className="py-28 bg-background" id="gestao">
+    <section className="py-16 sm:py-28 bg-background" id="gestao">
       <div className="max-w-6xl mx-auto px-5 sm:px-8">
         <div className="text-center mb-14">
           <div className="inline-flex items-center gap-2 border border-border rounded-full px-3.5 py-1.5 mb-6 bg-background">
@@ -143,7 +143,7 @@ export function KanbanSection() {
                 </div>
               </div>
 
-              <div className="flex-1 relative overflow-hidden bg-background">
+              <div className="flex-1 relative overflow-x-auto sm:overflow-hidden overflow-y-hidden bg-background">
                 <div className="flex gap-3 p-4 h-full">
                   {KANBAN_COLUMNS.map((col) => (
                     <div
@@ -255,7 +255,7 @@ export function KanbanSection() {
                 </div>
 
                 <div className="absolute inset-x-0 bottom-0 h-16 bg-linear-to-t from-background to-transparent pointer-events-none z-20" />
-                <div className="absolute right-0 top-0 bottom-0 w-10 bg-linear-to-l from-background to-transparent pointer-events-none z-20 sm:hidden" />
+                <div className="absolute right-0 top-0 bottom-0 w-10 bg-linear-to-l from-background to-transparent pointer-events-none z-20 hidden" />
               </div>
             </div>
           </div>

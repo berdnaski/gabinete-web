@@ -60,7 +60,7 @@ export function FeaturesSection() {
   const { ref, visible } = useInView()
 
   return (
-    <section className="py-28 bg-muted/30" id="funcionalidades">
+    <section className="py-16 sm:py-28 bg-muted/30" id="funcionalidades">
       <div ref={ref} className="max-w-6xl mx-auto px-5 sm:px-8">
         <div
           className={cn(

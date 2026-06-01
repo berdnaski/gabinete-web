@@ -78,7 +78,7 @@ export function EcosystemSection() {
   const { ref, visible } = useInView()
 
   return (
-    <section className="py-28 bg-background" id="ecossistema">
+    <section className="py-16 sm:py-28 bg-background" id="ecossistema">
       <div className="max-w-6xl mx-auto px-5 sm:px-8">
         <div
           className={cn(
