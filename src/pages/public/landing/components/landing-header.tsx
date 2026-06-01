@@ -2,7 +2,6 @@ import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { MessageCircle, Menu, X } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
 import logo from "@/assets/logo.png"
 
 const NAV_LINKS = [
