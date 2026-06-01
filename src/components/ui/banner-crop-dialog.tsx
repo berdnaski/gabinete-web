@@ -12,40 +12,38 @@ import {
 import { Button } from "@/components/ui/button"
 
 const BANNER_ASPECT = 3
-
-function createImage(url: string): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const img = new Image()
-    img.addEventListener("load", () => resolve(img))
-    img.addEventListener("error", reject)
-    img.setAttribute("crossOrigin", "anonymous")
-    img.src = url
-  })
-}
+const OUTPUT_W = 1200
+const OUTPUT_H = 400
 
 async function cropToFile(imageSrc: string, pixelCrop: Area): Promise<File> {
-  const image = await createImage(imageSrc)
+  const response = await fetch(imageSrc)
+  const blob = await response.blob()
+  const bitmap = await createImageBitmap(blob)
+
   const canvas = document.createElement("canvas")
-  canvas.width = 1200
-  canvas.height = 400
+  canvas.width = OUTPUT_W
+  canvas.height = OUTPUT_H
   const ctx = canvas.getContext("2d")
   if (!ctx) throw new Error("Canvas context unavailable")
+
   ctx.drawImage(
-    image,
+    bitmap,
     pixelCrop.x,
     pixelCrop.y,
     pixelCrop.width,
     pixelCrop.height,
     0,
     0,
-    1200,
-    400,
+    OUTPUT_W,
+    OUTPUT_H,
   )
+  bitmap.close()
+
   return new Promise((resolve, reject) => {
     canvas.toBlob(
-      (blob) => {
-        if (!blob) { reject(new Error("Empty canvas")); return }
-        resolve(new File([blob], "banner.webp", { type: "image/webp" }))
+      (result) => {
+        if (!result) { reject(new Error("Empty canvas")); return }
+        resolve(new File([result], "banner.webp", { type: "image/webp" }))
       },
       "image/webp",
       0.93,
