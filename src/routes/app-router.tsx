@@ -86,11 +86,6 @@ export function AppRouter() {
         path="/politica-de-privacidade"
         element={<Suspense fallback={<PageLoader />}><PrivacyPolicyPage /></Suspense>}
       />
-      <Route
-        path="/lp"
-        element={<Suspense fallback={<PageLoader />}><LandingPage /></Suspense>}
-      />
-
       <Route path="/" element={<Layout />}>
         <Route
           index
