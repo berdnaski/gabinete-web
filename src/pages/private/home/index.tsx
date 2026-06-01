@@ -101,15 +101,16 @@ function ChartTip({
   if (!active || !payload?.length) return null
   const label = String(payload[0].payload[labelKey] ?? "")
   return (
-    <div className="rounded-xl border border-border/50 bg-background px-4 py-3 text-sm shadow-xl space-y-2 min-w-36">
-      <p className="font-semibold text-foreground">{label}</p>
+    <div className="rounded-xl border border-border/60 bg-background/98 px-3.5 py-3 shadow-lg shadow-black/[0.08] min-w-40 space-y-2.5">
+      <p className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground">{label}</p>
+      <div className="h-px bg-border/50" />
       {payload.map((item, i) => (
         <div key={i} className="flex items-center justify-between gap-6">
           <div className="flex items-center gap-2">
             <div className="size-2 rounded-full shrink-0" style={{ background: item.color }} />
-            <span className="text-muted-foreground text-xs">{item.name}</span>
+            <span className="text-xs text-muted-foreground">{item.name}</span>
           </div>
-          <span className="font-mono font-bold tabular-nums text-foreground">{item.value}</span>
+          <span className="font-mono text-sm font-bold tabular-nums text-foreground">{item.value}</span>
         </div>
       ))}
     </div>
@@ -310,25 +311,25 @@ export function Home() {
               <BarChart
                 data={trendData}
                 margin={{ top: 0, right: 8, left: -12, bottom: 0 }}
-                barCategoryGap="32%"
+                barCategoryGap="20%"
                 barGap={3}
               >
                 <defs>
                   <linearGradient id="createdGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor={BRAND.primary} stopOpacity={0.9} />
-                    <stop offset="100%" stopColor={BRAND.blue2} stopOpacity={0.6} />
+                    <stop offset="0%" stopColor={BRAND.primary} stopOpacity={1} />
+                    <stop offset="100%" stopColor={BRAND.blue2} stopOpacity={0.55} />
                   </linearGradient>
                   <linearGradient id="resolvedGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor={BRAND.green} stopOpacity={0.9} />
-                    <stop offset="100%" stopColor={BRAND.green} stopOpacity={0.45} />
+                    <stop offset="0%" stopColor={BRAND.green} stopOpacity={1} />
+                    <stop offset="100%" stopColor={BRAND.green} stopOpacity={0.5} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid
                   vertical={false}
-                  strokeDasharray="3 3"
+                  strokeDasharray="2 4"
                   stroke="currentColor"
                   className="text-border"
-                  strokeOpacity={0.4}
+                  strokeOpacity={0.5}
                 />
                 <XAxis
                   dataKey="label"
@@ -347,11 +348,11 @@ export function Home() {
                   width={24}
                 />
                 <ChartTooltip
-                  cursor={{ fill: "currentColor", className: "text-muted/20" }}
+                  cursor={{ fill: "hsl(var(--muted))", opacity: 0.5, radius: 6 }}
                   content={<ChartTip labelKey="label" />}
                 />
-                <Bar dataKey="created" name="Recebidas" fill="url(#createdGrad)" radius={[4, 4, 0, 0]} maxBarSize={22} />
-                <Bar dataKey="resolved" name="Resolvidas" fill="url(#resolvedGrad)" radius={[4, 4, 0, 0]} maxBarSize={22} />
+                <Bar dataKey="created" name="Recebidas" fill="url(#createdGrad)" radius={[5, 5, 2, 2]} maxBarSize={34} animationDuration={700} animationEasing="ease-out" />
+                <Bar dataKey="resolved" name="Resolvidas" fill="url(#resolvedGrad)" radius={[5, 5, 2, 2]} maxBarSize={34} animationDuration={700} animationBegin={120} animationEasing="ease-out" />
               </BarChart>
             </ChartContainer>
           )}
@@ -390,7 +391,7 @@ export function Home() {
                       <span className="text-xs text-muted-foreground w-7 text-right tabular-nums">{cat.pct}%</span>
                     </div>
                   </div>
-                  <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                  <div className="h-2 bg-muted rounded-full overflow-hidden">
                     <motion.div
                       className="h-full rounded-full"
                       style={{ background: cat.color }}

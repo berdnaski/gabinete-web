@@ -14,6 +14,7 @@ import {
   Loader2,
   BarChart3,
 } from "lucide-react"
+import { motion } from "framer-motion"
 import { useEffect, useMemo, useState } from "react"
 
 import {
@@ -264,7 +265,7 @@ export function Reports() {
               <div className="space-y-2.5">
                 {report.byStatus
                   .sort((a, b) => b.count - a.count)
-                  .map(s => {
+                  .map((s, i) => {
                     const cfg = STATUS_CONFIG[s.status]
                     return (
                       <DistBar
@@ -274,6 +275,7 @@ export function Reports() {
                         percentage={s.percentage}
                         color={cfg?.bg ?? "bg-muted-foreground/40"}
                         total={report.summary.totalInPeriod}
+                        index={i}
                       />
                     )
                   })}
@@ -286,7 +288,7 @@ export function Reports() {
               <div className="space-y-2.5">
                 {report.byPriority
                   .sort((a, b) => b.count - a.count)
-                  .map(p => {
+                  .map((p, i) => {
                     const cfg = PRIORITY_CONFIG[p.priority]
                     return (
                       <DistBar
@@ -296,6 +298,7 @@ export function Reports() {
                         percentage={p.percentage}
                         color={cfg?.bg ?? "bg-muted-foreground/40"}
                         total={report.summary.totalInPeriod}
+                        index={i}
                       />
                     )
                   })}
@@ -318,10 +321,12 @@ export function Reports() {
                           {c.count} · {c.percentage}%
                         </span>
                       </div>
-                      <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-                        <div
-                          className="h-full rounded-full bg-primary/70 transition-all duration-500"
-                          style={{ width: `${c.percentage}%` }}
+                      <div className="h-2 rounded-full bg-muted overflow-hidden">
+                        <motion.div
+                          className="h-full rounded-full bg-primary/70"
+                          initial={{ width: 0 }}
+                          animate={{ width: `${c.percentage}%` }}
+                          transition={{ duration: 0.55, ease: "easeOut", delay: 0.1 + i * 0.04 }}
                         />
                       </div>
                     </div>
@@ -336,6 +341,7 @@ export function Reports() {
               <div className="space-y-1.5">
                 {report.byNeighborhood.map((n, i) => {
                   const max = report.byNeighborhood[0].count
+                  const pct = Math.round((n.count / max) * 100)
                   return (
                     <div key={n.neighborhood} className="flex items-center gap-3">
                       <span className="text-xs tabular-nums text-muted-foreground/50 w-4 shrink-0">
@@ -346,10 +352,12 @@ export function Reports() {
                           <span className="text-sm text-foreground truncate">{n.neighborhood}</span>
                           <span className="text-xs tabular-nums text-muted-foreground shrink-0">{n.count}</span>
                         </div>
-                        <div className="h-1 rounded-full bg-muted overflow-hidden">
-                          <div
-                            className="h-full rounded-full bg-muted-foreground/30 transition-all duration-500"
-                            style={{ width: `${Math.round((n.count / max) * 100)}%` }}
+                        <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                          <motion.div
+                            className="h-full rounded-full bg-muted-foreground/30"
+                            initial={{ width: 0 }}
+                            animate={{ width: `${pct}%` }}
+                            transition={{ duration: 0.55, ease: "easeOut", delay: 0.1 + i * 0.04 }}
                           />
                         </div>
                       </div>
@@ -373,21 +381,21 @@ export function Reports() {
                     created:  { label: "Recebidas",  color: "#0058F3" },
                     resolved: { label: "Resolvidas", color: "#22c55e" },
                   }}
-                  className="h-52 w-full"
+                  className="h-64 w-full"
                 >
                   <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={trendData} margin={{ top: 4, right: 4, left: -28, bottom: 0 }}>
+                    <AreaChart data={trendData} margin={{ top: 8, right: 4, left: -24, bottom: 0 }}>
                       <defs>
                         <linearGradient id="grad-created" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%"  stopColor="#0058F3" stopOpacity={0.15} />
-                          <stop offset="95%" stopColor="#0058F3" stopOpacity={0} />
+                          <stop offset="0%"  stopColor="#0058F3" stopOpacity={0.22} />
+                          <stop offset="85%" stopColor="#0058F3" stopOpacity={0.02} />
                         </linearGradient>
                         <linearGradient id="grad-resolved" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%"  stopColor="#22c55e" stopOpacity={0.15} />
-                          <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
+                          <stop offset="0%"  stopColor="#22c55e" stopOpacity={0.22} />
+                          <stop offset="85%" stopColor="#22c55e" stopOpacity={0.02} />
                         </linearGradient>
                       </defs>
-                      <CartesianGrid vertical={false} stroke="hsl(var(--border))" strokeOpacity={0.6} />
+                      <CartesianGrid vertical={false} strokeDasharray="3 6" stroke="hsl(var(--border))" strokeOpacity={0.7} />
                       <XAxis
                         dataKey="label"
                         tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
@@ -400,26 +408,31 @@ export function Reports() {
                         axisLine={false}
                         tickLine={false}
                         allowDecimals={false}
+                        width={28}
                       />
                       <ChartTooltip
+                        cursor={{ stroke: "hsl(var(--border))", strokeWidth: 1, strokeDasharray: "4 4" }}
                         content={({ active, payload, label }) => {
                           if (!active || !payload?.length) return null
                           return (
-                            <div className="rounded-lg border border-border bg-background px-3 py-2 shadow-md text-xs">
-                              <p className="font-medium text-foreground mb-1">{label}</p>
+                            <div className="rounded-xl border border-border/60 bg-background/98 px-3.5 py-3 shadow-lg shadow-black/8 min-w-40 space-y-2.5">
+                              <p className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground">{label}</p>
+                              <div className="h-px bg-border/50" />
                               {payload.map((p, i) => (
-                                <div key={i} className="flex items-center gap-1.5">
-                                  <span className="size-1.5 rounded-full shrink-0" style={{ background: p.color }} />
-                                  <span className="text-muted-foreground">{p.name}:</span>
-                                  <span className="font-medium text-foreground">{p.value}</span>
+                                <div key={i} className="flex items-center justify-between gap-6">
+                                  <div className="flex items-center gap-2">
+                                    <span className="size-2 rounded-full shrink-0" style={{ background: p.color }} />
+                                    <span className="text-xs text-muted-foreground">{p.name}</span>
+                                  </div>
+                                  <span className="font-mono text-sm font-bold tabular-nums text-foreground">{p.value}</span>
                                 </div>
                               ))}
                             </div>
                           )
                         }}
                       />
-                      <Area type="monotone" dataKey="created" name="Recebidas" stroke="#0058F3" strokeWidth={2} fill="url(#grad-created)" dot={false} activeDot={{ r: 3, fill: "#0058F3" }} />
-                      <Area type="monotone" dataKey="resolved" name="Resolvidas" stroke="#22c55e" strokeWidth={2} fill="url(#grad-resolved)" dot={false} activeDot={{ r: 3, fill: "#22c55e" }} />
+                      <Area type="monotone" dataKey="created" name="Recebidas" stroke="#0058F3" strokeWidth={2.5} fill="url(#grad-created)" dot={false} activeDot={{ r: 5, fill: "#0058F3", stroke: "white", strokeWidth: 2 }} animationDuration={900} animationEasing="ease-out" />
+                      <Area type="monotone" dataKey="resolved" name="Resolvidas" stroke="#22c55e" strokeWidth={2.5} fill="url(#grad-resolved)" dot={false} activeDot={{ r: 5, fill: "#22c55e", stroke: "white", strokeWidth: 2 }} animationDuration={900} animationBegin={150} animationEasing="ease-out" />
                     </AreaChart>
                   </ResponsiveContainer>
                 </ChartContainer>
@@ -532,22 +545,26 @@ function DistBar({
   percentage,
   color,
   total,
+  index = 0,
 }: {
   label: string
   count: number
   percentage: number
   color: string
   total: number
+  index?: number
 }) {
   return (
     <div className="flex items-center gap-3">
       <div className="w-28 shrink-0">
         <span className="text-sm text-foreground">{label}</span>
       </div>
-      <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
-        <div
-          className={cn("h-full rounded-full transition-all duration-500", color)}
-          style={{ width: total > 0 ? `${percentage}%` : "0%" }}
+      <div className="flex-1 h-2.5 rounded-full bg-muted overflow-hidden">
+        <motion.div
+          className={cn("h-full rounded-full", color)}
+          initial={{ width: 0 }}
+          animate={{ width: total > 0 ? `${percentage}%` : "0%" }}
+          transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 + index * 0.05 }}
         />
       </div>
       <div className="w-16 text-right shrink-0">
