@@ -1,86 +1,148 @@
 import { useGetMyDemands, useGetMyDemandsSummary } from "@/api/demands/hooks"
+import type { Demand } from "@/api/demands/types"
+import { DemandStatusBadge } from "@/components/demand-status-badge"
 import { useAuth } from "@/hooks/use-auth"
 import { usePageTitle } from "@/hooks/use-page-title"
 import { cn } from "@/lib/utils"
+import { formatDistanceToNow } from "date-fns"
+import { ptBR } from "date-fns/locale"
+import { motion } from "framer-motion"
 import {
+  ArrowRight,
   BarChart3,
+  CheckCircle2,
   ClipboardList,
+  Clock,
   Loader2,
+  MapPin,
   Plus,
   Sparkles,
   TrendingUp,
+  Zap,
 } from "lucide-react"
 import { useEffect } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { ActivityChart } from "./components/activity-chart"
-import { RecentDemands } from "./components/recent-demands"
 import { ResolutionRing } from "./components/resolution-ring"
 import { StatusBreakdown } from "./components/status-breakdown"
 
-function SectionCard({
-  children,
-  className,
-  style,
-}: {
-  children: React.ReactNode
-  className?: string
-  style?: React.CSSProperties
-}) {
-  return (
-    <div
-      className={cn("rounded-xl border border-border bg-card overflow-hidden", className)}
-      style={style}
-    >
-      {children}
-    </div>
-  )
+const CAT_COLORS = ["#0058F3", "#8B5CF6", "#06B6D4", "#34D144", "#F59E0B", "#EF4444"]
+
+function getGreeting(): string {
+  const h = new Date().getHours()
+  if (h < 12) return "Bom dia"
+  if (h < 18) return "Boa tarde"
+  return "Boa noite"
 }
 
-function CardHeader({
-  icon: Icon,
-  title,
-  subtitle,
-}: {
-  icon: React.ElementType
-  title: string
-  subtitle?: string
-}) {
-  return (
-    <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-muted/20">
-      <Icon className="size-3.5 text-muted-foreground shrink-0" />
-      <span className="text-xs font-semibold text-foreground">{title}</span>
-      {subtitle && <span className="text-xs text-muted-foreground ml-auto">{subtitle}</span>}
-    </div>
-  )
+const fadeUp = {
+  hidden: { opacity: 0, y: 16, filter: "blur(4px)" },
+  visible: (delay = 0) => ({
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: {
+      duration: 0.45,
+      ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
+      delay,
+    },
+  }),
 }
 
-function StatTile({
+const stagger = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.07 } },
+}
+
+const cardVariant = {
+  hidden: { opacity: 0, y: 14, filter: "blur(3px)" },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
+  },
+}
+
+function KpiCard({
+  icon,
+  iconBg,
+  iconColor,
   label,
   value,
   sub,
-  accent,
+  loading,
 }: {
+  icon: React.ReactNode
+  iconBg: string
+  iconColor: string
   label: string
-  value: string | number
+  value: string
   sub?: string
-  accent?: "emerald" | "amber" | "blue"
+  loading?: boolean
 }) {
-  const accentClass = {
-    emerald: "text-emerald-600 dark:text-emerald-400",
-    amber: "text-amber-600 dark:text-amber-400",
-    blue: "text-primary",
-  }
-
   return (
-    <div className="flex flex-col gap-0.5 px-4 py-3.5 border-b border-border last:border-b-0">
-      <span className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground">
-        {label}
-      </span>
-      <span className={cn("text-2xl font-bold tabular-nums leading-none mt-0.5", accent ? accentClass[accent] : "text-foreground")}>
-        {value}
-      </span>
-      {sub && <span className="text-xs text-muted-foreground leading-tight mt-0.5">{sub}</span>}
-    </div>
+    <motion.div
+      variants={cardVariant}
+      className="relative rounded-2xl border border-border bg-card p-4 sm:p-5 flex flex-col gap-3 overflow-hidden"
+    >
+      <div className={cn("flex items-center justify-center size-9 rounded-xl shrink-0", iconBg)}>
+        <span className={cn("flex items-center justify-center", iconColor)}>{icon}</span>
+      </div>
+      {loading ? (
+        <div className="h-9 flex items-center">
+          <Loader2 className="size-4 text-muted-foreground animate-spin" />
+        </div>
+      ) : (
+        <div className="flex flex-col gap-1">
+          <p className="text-2xl sm:text-3xl font-bold tabular-nums text-foreground leading-none tracking-tight">
+            {value}
+          </p>
+          <p className="text-xs text-muted-foreground leading-snug">{label}</p>
+          {sub && <p className="text-2xs text-muted-foreground/70 leading-snug">{sub}</p>}
+        </div>
+      )}
+    </motion.div>
+  )
+}
+
+function DemandRow({ demand }: { demand: Demand }) {
+  const navigate = useNavigate()
+  return (
+    <button
+      className="group w-full grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_140px_32px] gap-x-4 items-center px-6 py-3.5 hover:bg-muted/30 transition-colors text-left"
+      onClick={() => navigate(`/demand/${demand.id}`)}
+    >
+      <div className="min-w-0 flex items-center gap-3.5">
+        <div className="size-8 rounded-xl bg-muted/60 flex items-center justify-center shrink-0 border border-border/50">
+          <ClipboardList className="size-3.5 text-muted-foreground" />
+        </div>
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-foreground line-clamp-1">{demand.title}</p>
+          <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+            <span className="text-xs text-muted-foreground">{demand.category.name}</span>
+            {demand.neighborhood && (
+              <>
+                <span className="text-muted-foreground/30 text-xs">·</span>
+                <span className="text-xs text-muted-foreground flex items-center gap-0.5">
+                  <MapPin className="size-2.5 shrink-0" />
+                  {demand.neighborhood}
+                </span>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+      <div className="hidden sm:flex items-center gap-3">
+        <DemandStatusBadge status={demand.status} />
+        <span className="text-xs text-muted-foreground tabular-nums whitespace-nowrap">
+          {formatDistanceToNow(new Date(demand.createdAt), { addSuffix: true, locale: ptBR })}
+        </span>
+      </div>
+      <div className="flex items-center justify-end">
+        <ArrowRight className="size-3.5 text-muted-foreground/30 group-hover:text-muted-foreground transition-colors" />
+      </div>
+    </button>
   )
 }
 
@@ -88,35 +150,13 @@ function SkeletonBlock({ className }: { className?: string }) {
   return <div className={cn("animate-pulse rounded bg-muted/60", className)} />
 }
 
-function LoadingSkeleton() {
+function KpiSkeleton() {
   return (
-    <div className="flex flex-col gap-4">
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        <div className="md:col-span-2 rounded-xl border border-border bg-card p-6 flex flex-col items-center gap-3">
-          <SkeletonBlock className="size-36 rounded-full" />
-          <SkeletonBlock className="h-3 w-32" />
-        </div>
-        <div className="md:col-span-3 rounded-xl border border-border bg-card flex flex-col">
-          {[0, 1, 2].map((i) => (
-            <div key={i} className="px-4 py-3.5 border-b border-border last:border-b-0 flex flex-col gap-1.5">
-              <SkeletonBlock className="h-2 w-20" />
-              <SkeletonBlock className="h-5 w-10" />
-              <SkeletonBlock className="h-2 w-28" />
-            </div>
-          ))}
-        </div>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {[0, 1].map((i) => (
-          <div key={i} className="rounded-xl border border-border bg-card">
-            <div className="h-10 border-b border-border px-4 flex items-center">
-              <SkeletonBlock className="h-3 w-24" />
-            </div>
-            <div className="p-4">
-              <SkeletonBlock className="h-28 w-full" />
-            </div>
-          </div>
-        ))}
+    <div className="rounded-2xl border border-border bg-card p-5 flex flex-col gap-3">
+      <SkeletonBlock className="size-9 rounded-xl" />
+      <div className="flex flex-col gap-2">
+        <SkeletonBlock className="h-7 w-16" />
+        <SkeletonBlock className="h-3 w-28" />
       </div>
     </div>
   )
@@ -124,171 +164,346 @@ function LoadingSkeleton() {
 
 export function MyDemands() {
   const { user } = useAuth()
+  const { setTitle } = usePageTitle()
   const { data: summary, isLoading: isLoadingSummary } = useGetMyDemandsSummary()
   const { data: demandsData, isLoading: isLoadingDemands } = useGetMyDemands({ limit: 8 })
-  const { setTitle } = usePageTitle()
 
   useEffect(() => {
     setTitle({ title: "Minhas Demandas" })
   }, [setTitle])
 
-  const firstName = user?.name?.split(" ")[0] ?? "Cidadão"
+  const firstName = user?.name?.split(" ")[0] ?? "cidadão"
   const recentDemands = demandsData?.pages[0]?.items ?? []
 
-  const resolvedCount = summary?.statusBreakdown.find((s) => s.status === "RESOLVED")?.count ?? 0
+  const resolvedCount =
+    summary?.statusBreakdown.find((s) => s.status === "RESOLVED")?.count ?? 0
   const activeCount =
     (summary?.statusBreakdown.find((s) => s.status === "IN_ANALYSIS")?.count ?? 0) +
     (summary?.statusBreakdown.find((s) => s.status === "IN_PROGRESS")?.count ?? 0)
+  const total = summary?.totalDemands ?? 0
+  const resolutionRate = summary?.resolutionRate ?? 0
+
+  const categoryData = (summary?.categoryBreakdown ?? []).map((c, i) => ({
+    ...c,
+    color: CAT_COLORS[i % CAT_COLORS.length],
+  }))
+  const maxCatCount = categoryData[0]?.count ?? 1
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6 flex flex-col gap-5">
-      <header className="flex items-start justify-between gap-4">
+    <motion.div
+      className="flex flex-col gap-6"
+      initial="hidden"
+      animate="visible"
+      variants={stagger}
+    >
+      <motion.div
+        className="flex flex-wrap items-start justify-between gap-3"
+        variants={fadeUp}
+        custom={0}
+      >
         <div>
-          <h1 className="text-base font-semibold text-foreground">Minhas demandas</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Olá,{" "}
+          <h1 className="text-2xl font-bold text-foreground tracking-tight leading-none">
+            Minhas Demandas
+          </h1>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1.5">
+            {getGreeting()},{" "}
             <span className="font-medium text-foreground">{firstName}</span> — acompanhe suas
             solicitações aqui.
           </p>
         </div>
         <Link
           to="/"
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors shrink-0"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors shrink-0 h-8"
         >
-          <Plus className="size-3" />
+          <Plus className="size-3.5" />
           Nova demanda
         </Link>
-      </header>
+      </motion.div>
 
-      {isLoadingSummary ? (
-        <LoadingSkeleton />
-      ) : !summary ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center gap-3">
-          <div className="size-14 rounded-full bg-muted flex items-center justify-center">
-            <ClipboardList className="size-6 text-muted-foreground" />
-          </div>
-          <p className="text-sm font-semibold text-foreground">Erro ao carregar dados</p>
-        </div>
-      ) : (
-        <>
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 animate-fade-slide-in">
-            <SectionCard className="md:col-span-2 flex flex-col items-center justify-center p-6 gap-1">
-              <ResolutionRing
-                rate={summary.resolutionRate}
-                resolved={resolvedCount}
-                total={summary.totalDemands}
-              />
-            </SectionCard>
+      <motion.div className="grid grid-cols-2 gap-3 lg:grid-cols-4" variants={stagger}>
+        {isLoadingSummary ? (
+          Array.from({ length: 4 }).map((_, i) => <KpiSkeleton key={i} />)
+        ) : (
+          <>
+            <KpiCard
+              icon={<ClipboardList className="size-4.5" />}
+              iconBg="bg-primary/10"
+              iconColor="text-primary"
+              label="Total de Demandas"
+              value={String(total)}
+              sub={total === 0 ? "Registre sua primeira" : "desde o início"}
+            />
+            <KpiCard
+              icon={<TrendingUp className="size-4.5" />}
+              iconBg={
+                resolutionRate >= 50
+                  ? "bg-emerald-50 dark:bg-emerald-950/30"
+                  : "bg-amber-50 dark:bg-amber-950/30"
+              }
+              iconColor={
+                resolutionRate >= 50
+                  ? "text-emerald-600 dark:text-emerald-400"
+                  : "text-amber-500"
+              }
+              label="Taxa de Resolução"
+              value={`${resolutionRate}%`}
+              sub={
+                resolutionRate >= 50
+                  ? "acima da metade"
+                  : resolvedCount > 0
+                    ? `${resolvedCount} resolvida${resolvedCount > 1 ? "s" : ""}`
+                    : "sem resoluções ainda"
+              }
+            />
+            <KpiCard
+              icon={<Zap className="size-4.5" />}
+              iconBg={activeCount > 0 ? "bg-blue-50 dark:bg-blue-950/30" : "bg-muted/50"}
+              iconColor={activeCount > 0 ? "text-blue-500" : "text-muted-foreground"}
+              label="Em Andamento"
+              value={String(activeCount)}
+              sub={activeCount > 0 ? "em análise ou progresso" : "nenhuma no momento"}
+            />
+            <KpiCard
+              icon={<Clock className="size-4.5" />}
+              iconBg="bg-muted/50"
+              iconColor="text-muted-foreground"
+              label="Tempo Médio de Resolução"
+              value={
+                summary?.avgDaysToResolve !== null && summary?.avgDaysToResolve !== undefined
+                  ? `${summary.avgDaysToResolve}d`
+                  : "—"
+              }
+              sub={
+                summary?.avgDaysToResolve !== null && summary?.avgDaysToResolve !== undefined
+                  ? "para demandas resolvidas"
+                  : "sem dados ainda"
+              }
+            />
+          </>
+        )}
+      </motion.div>
 
-            <SectionCard className="md:col-span-3 flex flex-col">
-              <StatTile
-                label="Total registradas"
-                value={summary.totalDemands}
-                sub={summary.totalDemands === 0 ? "Registre sua primeira demanda" : "desde o início"}
-                accent="blue"
-              />
-              <StatTile
-                label="Em andamento"
-                value={activeCount}
-                sub={activeCount > 0 ? "em análise ou em progresso" : "nenhuma em andamento"}
-                accent="amber"
-              />
-              <StatTile
-                label="Tempo médio de resolução"
-                value={summary.avgDaysToResolve !== null ? `${summary.avgDaysToResolve} dias` : "—"}
-                sub={
-                  summary.avgDaysToResolve !== null
-                    ? "para demandas resolvidas"
-                    : "sem demandas resolvidas ainda"
-                }
-                accent="emerald"
-              />
-            </SectionCard>
-          </div>
-
-          <div
-            className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-slide-in"
-            style={{ animationDelay: "60ms" }}
-          >
-            <SectionCard>
-              <CardHeader icon={TrendingUp} title="Atividade" subtitle="últimos 6 meses" />
-              <div className="p-4">
-                {summary.monthlyActivity.every((m) => m.count === 0) ? (
-                  <div className="h-28 flex items-center justify-center">
-                    <p className="text-xs text-muted-foreground">Sem atividade neste período</p>
-                  </div>
-                ) : (
-                  <ActivityChart data={summary.monthlyActivity} />
-                )}
-              </div>
-            </SectionCard>
-
-            <SectionCard>
-              <CardHeader
-                icon={Sparkles}
-                title="Por categoria"
-                subtitle={`${summary.categoryBreakdown.length} tipo${summary.categoryBreakdown.length !== 1 ? "s" : ""}`}
-              />
-              <div className="flex flex-col divide-y divide-border">
-                {summary.categoryBreakdown.length === 0 ? (
-                  <div className="h-28 flex items-center justify-center">
-                    <p className="text-xs text-muted-foreground">Sem dados de categoria</p>
-                  </div>
-                ) : (
-                  summary.categoryBreakdown.map((cat, i) => {
-                    const maxCount = summary.categoryBreakdown[0]?.count ?? 1
-                    const widthPct = maxCount > 0 ? Math.round((cat.count / maxCount) * 100) : 0
-                    return (
-                      <div key={i} className="flex items-center gap-3 px-4 py-2.5">
-                        <span className="text-xs text-muted-foreground truncate w-28 shrink-0">
-                          {cat.name}
-                        </span>
-                        <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
-                          <div
-                            className="h-full rounded-full bg-primary/60 transition-all duration-500"
-                            style={{ width: `${widthPct}%` }}
-                          />
-                        </div>
-                        <span className="text-xs font-semibold text-foreground tabular-nums w-4 text-right shrink-0">
-                          {cat.count}
-                        </span>
-                      </div>
-                    )
-                  })
-                )}
-              </div>
-            </SectionCard>
-          </div>
-
-          <SectionCard style={{ animationDelay: "120ms" }} className="animate-fade-slide-in">
-            <CardHeader icon={BarChart3} title="Distribuição por status" />
-            <div className="px-4 py-4">
-              <StatusBreakdown data={summary.statusBreakdown} />
+      <motion.div className="grid gap-4 lg:grid-cols-3" variants={fadeUp} custom={0.15}>
+        <div className="lg:col-span-2 rounded-2xl border border-border bg-card overflow-hidden">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-border/50">
+            <div>
+              <h2 className="text-sm font-semibold text-foreground">Atividade</h2>
+              <p className="text-xs text-muted-foreground mt-0.5">Demandas registradas nos últimos 6 meses</p>
             </div>
-          </SectionCard>
-        </>
-      )}
+            {summary?.monthlyActivity.some((m) => m.count > 0) && (
+              <span className="text-xs text-muted-foreground font-mono tabular-nums font-semibold">
+                {summary.monthlyActivity.reduce((s, m) => s + m.count, 0)} total
+              </span>
+            )}
+          </div>
+          {isLoadingSummary ? (
+            <div className="flex justify-center items-center h-[240px]">
+              <Loader2 className="size-4 animate-spin text-muted-foreground" />
+            </div>
+          ) : !summary?.monthlyActivity.some((m) => m.count > 0) ? (
+            <div className="flex flex-col items-center justify-center h-[240px] gap-2.5 text-center px-6">
+              <BarChart3 className="size-8 text-muted-foreground/30" />
+              <div>
+                <p className="text-sm font-medium text-foreground">Sem atividade ainda</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Registre sua primeira demanda para ver o histórico.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="px-2 pt-5 pb-3">
+              <ActivityChart data={summary.monthlyActivity} />
+            </div>
+          )}
+        </div>
 
-      <SectionCard style={{ animationDelay: "160ms" }} className="animate-fade-slide-in">
-        <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-muted/20">
-          <ClipboardList className="size-3.5 text-muted-foreground shrink-0" />
-          <span className="text-xs font-semibold text-foreground">Demandas recentes</span>
+        <div className="rounded-2xl border border-border bg-card overflow-hidden flex flex-col">
+          <div className="px-6 py-4 border-b border-border/50">
+            <h2 className="text-sm font-semibold text-foreground">Índice de Resolutividade</h2>
+            <p className="text-xs text-muted-foreground mt-0.5">Taxa de demandas resolvidas</p>
+          </div>
+          <div className="flex-1 flex flex-col items-center justify-center p-6 gap-4">
+            {isLoadingSummary ? (
+              <div className="flex items-center justify-center h-40">
+                <Loader2 className="size-4 animate-spin text-muted-foreground" />
+              </div>
+            ) : (
+              <>
+                <ResolutionRing
+                  rate={resolutionRate}
+                  resolved={resolvedCount}
+                  total={total}
+                />
+                {total > 0 && resolvedCount === total && (
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-800">
+                    <CheckCircle2 className="size-3 text-emerald-500" />
+                    <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                      Todas resolvidas!
+                    </span>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      </motion.div>
+
+      <motion.div className="grid gap-4 lg:grid-cols-2" variants={fadeUp} custom={0.25}>
+        <div className="rounded-2xl border border-border bg-card overflow-hidden">
+          <div className="px-6 py-4 border-b border-border/50">
+            <h2 className="text-sm font-semibold text-foreground">Por Categoria</h2>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {categoryData.length > 0
+                ? `${categoryData.length} categoria${categoryData.length !== 1 ? "s" : ""} registradas`
+                : "Tipos de problema reportados"}
+            </p>
+          </div>
+          {isLoadingSummary ? (
+            <div className="px-6 py-4 flex flex-col gap-4">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="flex flex-col gap-1.5">
+                  <div className="flex items-center justify-between">
+                    <SkeletonBlock className="h-3 w-24" />
+                    <SkeletonBlock className="h-3 w-8" />
+                  </div>
+                  <SkeletonBlock className="h-2 w-full rounded-full" />
+                </div>
+              ))}
+            </div>
+          ) : categoryData.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-40 gap-2 px-6 text-center">
+              <Sparkles className="size-7 text-muted-foreground/30" />
+              <p className="text-xs text-muted-foreground">Nenhuma categoria ainda</p>
+            </div>
+          ) : (
+            <div className="px-6 py-4 flex flex-col gap-4">
+              {categoryData.map((cat, i) => (
+                <motion.div
+                  key={cat.name}
+                  className="flex flex-col gap-1.5"
+                  initial={{ opacity: 0, x: -6 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3 + i * 0.05, duration: 0.3, ease: "easeOut" }}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="size-2 rounded-full shrink-0" style={{ background: cat.color }} />
+                      <span className="text-sm text-foreground truncate">{cat.name}</span>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="text-sm font-bold font-mono tabular-nums text-foreground">
+                        {cat.count}
+                      </span>
+                      <span className="text-xs text-muted-foreground w-7 text-right tabular-nums">
+                        {Math.round((cat.count / maxCatCount) * 100)}%
+                      </span>
+                    </div>
+                  </div>
+                  <div className="h-2 bg-muted rounded-full overflow-hidden">
+                    <motion.div
+                      className="h-full rounded-full"
+                      style={{ background: cat.color }}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${Math.round((cat.count / maxCatCount) * 100)}%` }}
+                      transition={{ delay: 0.35 + i * 0.05, duration: 0.55, ease: "easeOut" }}
+                    />
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="rounded-2xl border border-border bg-card overflow-hidden">
+          <div className="px-6 py-4 border-b border-border/50">
+            <h2 className="text-sm font-semibold text-foreground">Distribuição por Status</h2>
+            <p className="text-xs text-muted-foreground mt-0.5">Situação atual de todas as demandas</p>
+          </div>
+          <div className="px-6 py-5">
+            {isLoadingSummary ? (
+              <div className="flex flex-col gap-4">
+                <SkeletonBlock className="h-3 w-full rounded-full" />
+                <div className="grid grid-cols-3 gap-2">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <SkeletonBlock key={i} className="h-8 rounded-lg" />
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <StatusBreakdown data={summary?.statusBreakdown ?? []} />
+            )}
+          </div>
+        </div>
+      </motion.div>
+
+      <motion.div
+        className="rounded-2xl border border-border bg-card overflow-hidden"
+        variants={fadeUp}
+        custom={0.35}
+      >
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border/50">
+          <div className="flex items-center gap-2.5">
+            <div className="size-7 rounded-lg bg-muted flex items-center justify-center">
+              <ClipboardList className="size-3.5 text-muted-foreground" />
+            </div>
+            <h2 className="text-sm font-semibold text-foreground">Demandas Recentes</h2>
+            {recentDemands.length > 0 && (
+              <span className="inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-primary/5 text-primary border border-primary/10 text-xs font-bold tabular-nums">
+                {demandsData?.pages[0]?.meta.total ?? recentDemands.length}
+              </span>
+            )}
+          </div>
           <Link
             to="/"
-            className="ml-auto text-xs text-primary hover:underline transition-colors"
+            className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors h-7 px-2 rounded-md hover:bg-muted"
           >
             Ver feed
+            <ArrowRight className="size-3" />
           </Link>
         </div>
 
         {isLoadingDemands ? (
-          <div className="flex items-center justify-center py-10">
+          <div className="flex justify-center py-10">
             <Loader2 className="size-4 animate-spin text-muted-foreground" />
           </div>
+        ) : recentDemands.length === 0 ? (
+          <div className="flex items-center gap-3 px-6 py-8">
+            <div className="size-9 rounded-full bg-muted flex items-center justify-center shrink-0">
+              <ClipboardList className="size-4 text-muted-foreground" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-foreground">Nenhuma demanda ainda</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Suas demandas registradas aparecerão aqui.
+              </p>
+            </div>
+          </div>
         ) : (
-          <RecentDemands demands={recentDemands} />
+          <>
+            <div className="hidden sm:grid grid-cols-[1fr_140px_32px] gap-x-4 px-6 py-2.5 border-b border-border/20 bg-muted/20">
+              <span className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground/60">
+                Demanda
+              </span>
+              <span className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground/60">
+                Status · Data
+              </span>
+              <span />
+            </div>
+            <div className="divide-y divide-border/30">
+              {recentDemands.map((demand, i) => (
+                <motion.div
+                  key={demand.id}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.25 + i * 0.05, duration: 0.3, ease: "easeOut" }}
+                >
+                  <DemandRow demand={demand} />
+                </motion.div>
+              ))}
+            </div>
+          </>
         )}
-      </SectionCard>
-    </div>
+      </motion.div>
+    </motion.div>
   )
 }
