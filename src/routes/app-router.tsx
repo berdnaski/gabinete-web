@@ -15,6 +15,7 @@ import { GoogleCallback } from "@/pages/public/google-callback";
 import { ConfirmPasswordPage } from "@/pages/public/confirm-password";
 import { Admin } from "@/pages/admin";
 import { AdminUsers } from "@/pages/admin/users";
+import { AdminReports } from "@/pages/admin/reports";
 import { AcceptInvite } from "@/pages/public/accept-invite";
 
 const Sandbox = lazy(() => import("@/pages/public/sandbox").then((m) => ({ default: m.Sandbox })));
@@ -103,6 +104,14 @@ export function AppRouter() {
           element={
             <ProtectedRoute allowedRoles={onlyAdmin}>
               <AdminUsers />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="admin/denuncias"
+          element={
+            <ProtectedRoute allowedRoles={onlyAdmin}>
+              <AdminReports />
             </ProtectedRoute>
           }
         />

@@ -2,7 +2,7 @@ import { useGetDemandsByCabinetSlug } from "@/api/demands/hooks"
 import { useAuth } from "@/hooks/use-auth"
 import { useCurrentMember } from "@/hooks/use-current-member"
 import { cn } from "@/lib/utils"
-import { Building2, CheckSquare, ClipboardListIcon, Home, Newspaper, Users, BarChart3 } from "lucide-react"
+import { Building2, CheckSquare, ClipboardListIcon, Flag, Home, Newspaper, Users, BarChart3 } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
 import Logo from "../../../assets/logo.png"
 import {
@@ -71,6 +71,18 @@ export function AppSidebar() {
                   <Link to="/admin/usuarios">
                     <Users className={cn({ "text-primary": pathname === "/admin/usuarios" })} />
                     <span>Usuários</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  tooltip="Denúncias"
+                  isActive={pathname === "/admin/denuncias"}
+                >
+                  <Link to="/admin/denuncias">
+                    <Flag className={cn({ "text-primary": pathname === "/admin/denuncias" })} />
+                    <span>Denúncias</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

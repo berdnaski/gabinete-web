@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { queryClient } from "../queryClient"
 import {
@@ -57,6 +57,61 @@ export function useAdminUpdateUser() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] })
       toast.success("Usuário atualizado com sucesso!")
+    },
+  })
+}
+
+export function useAdminListReportedDemands(params: { page: number; limit: number }) {
+  return useQuery({
+    queryKey: ["admin-reported-demands", params],
+    queryFn: () => AdminApi.listReportedDemands(params),
+    placeholderData: (prev) => prev,
+  })
+}
+
+export function useAdminListReportReasons(demandId: string | null, params: { page: number; limit: number }) {
+  return useQuery({
+    queryKey: ["admin-report-reasons", demandId, params],
+    queryFn: () => AdminApi.listReportReasons(demandId!, params),
+    enabled: !!demandId,
+  })
+}
+
+export function useAdminDismissDemandReports() {
+  return useMutation({
+    mutationFn: (demandId: string) => AdminApi.dismissDemandReports(demandId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-reported-demands"] })
+      queryClient.invalidateQueries({ queryKey: ["admin-report-reasons"] })
+      toast.success("Denúncias ignoradas. Novos reportes estão bloqueados.")
+    },
+  })
+}
+
+export function useAdminDeleteDemand() {
+  return useMutation({
+    mutationFn: (demandId: string) => AdminApi.adminDeleteDemand(demandId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-reported-demands"] })
+      toast.success("Demanda excluída com sucesso.")
+    },
+  })
+}
+
+export function useAdminDisableUser() {
+  return useMutation({
+    mutationFn: (userId: string) => AdminApi.disableUser(userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] })
+    },
+  })
+}
+
+export function useAdminEnableUser() {
+  return useMutation({
+    mutationFn: (userId: string) => AdminApi.enableUser(userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] })
     },
   })
 }
