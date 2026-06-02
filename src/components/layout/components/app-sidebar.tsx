@@ -2,7 +2,7 @@ import { useGetDemandsByCabinetSlug } from "@/api/demands/hooks"
 import { useAuth } from "@/hooks/use-auth"
 import { useCurrentMember } from "@/hooks/use-current-member"
 import { cn } from "@/lib/utils"
-import { Building2, CheckSquare, ClipboardListIcon, Home, Newspaper, Users, BarChart3, Map } from "lucide-react"
+import { Building2, CheckSquare, ClipboardListIcon, ExternalLink, Globe, Home, Newspaper, Users, BarChart3, Map } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
 import Logo from "../../../assets/logo.png"
 import {
@@ -39,7 +39,7 @@ function MyTasksBadge() {
 
 export function AppSidebar() {
   const { pathname } = useLocation()
-  const { hasRoleAdmin } = useAuth()
+  const { hasRoleAdmin, cabinet } = useAuth()
   const isAdmin = hasRoleAdmin()
 
   if (isAdmin) {
@@ -174,6 +174,25 @@ export function AppSidebar() {
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
+
+          {cabinet?.slug && (
+            <>
+              <SidebarGroupLabel className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground">
+                Perfil Público
+              </SidebarGroupLabel>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild tooltip={cabinet.name ?? "Ver perfil público"}>
+                    <Link to={`/${cabinet.slug}`} target="_blank" rel="noopener noreferrer">
+                      <Globe className="text-muted-foreground" />
+                      <span className="truncate">{cabinet.name ?? "Ver perfil"}</span>
+                      <ExternalLink className="ml-auto size-3 shrink-0 text-muted-foreground/50" />
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </>
+          )}
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>

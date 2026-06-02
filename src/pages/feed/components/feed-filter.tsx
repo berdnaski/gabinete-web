@@ -90,12 +90,18 @@ function CategoryAndStatusFields({ value, onChange, fetchCategories }: SharedFie
                 type="button"
                 onClick={() => toggleStatus(status)}
                 className={cn(
-                  "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border transition-all",
+                  "inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-medium border h-5 transition-all",
                   isActive
-                    ? cn(cfg.className, "ring-2 ring-offset-1 ring-current/30")
-                    : "bg-muted/50 text-muted-foreground border-border hover:border-border hover:text-foreground",
+                    ? cfg.className
+                    : "bg-transparent text-muted-foreground border-border hover:bg-muted/50 hover:text-foreground",
                 )}
               >
+                <span
+                  className={cn(
+                    "size-1.5 rounded-full shrink-0",
+                    isActive ? cfg.dotClassName : "bg-muted-foreground/40",
+                  )}
+                />
                 {DemandStatusLabel[status]}
               </button>
             );
