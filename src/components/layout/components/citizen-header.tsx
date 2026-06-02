@@ -2,14 +2,18 @@ import { Button } from "@/components/ui/button"
 import { NotificationPopover } from "@/components/layout/components/notification-popover"
 import { UserDropdown } from "@/components/user-dropdown"
 import { useAuth } from "@/hooks/use-auth"
-import { Building2, LogIn, MapPin } from "lucide-react"
+import { Building2, LayoutDashboard, LogIn, MapPin } from "lucide-react"
 import { Link, NavLink } from "react-router-dom"
 import GIcon from '@/assets/icon.svg'
 import { cn } from "@/lib/utils"
 
-const NAV_LINKS = [
+const PUBLIC_NAV_LINKS = [
   { to: "/gabinetes", label: "Gabinetes", icon: Building2 },
   { to: "/mapa", label: "Mapa", icon: MapPin },
+]
+
+const CITIZEN_NAV_LINKS = [
+  { to: "/my-demands", label: "Minhas Demandas", icon: LayoutDashboard },
 ]
 
 export function CitizenHeader() {
@@ -23,7 +27,7 @@ export function CitizenHeader() {
         </Link>
 
         <nav className="flex items-center gap-0.5">
-          {NAV_LINKS.map(({ to, label, icon: Icon }) => (
+          {[...PUBLIC_NAV_LINKS, ...(isAuthenticated ? CITIZEN_NAV_LINKS : [])].map(({ to, label, icon: Icon }) => (
             <NavLink key={to} to={to}>
               {({ isActive }) => (
                 <Button
