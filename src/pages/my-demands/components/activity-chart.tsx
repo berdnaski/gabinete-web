@@ -28,7 +28,7 @@ export function ActivityChart({ data }: ActivityChartProps) {
         <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" />
         <XAxis
           dataKey="label"
-          tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))", textTransform: "capitalize" }}
+          tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
           axisLine={false}
           tickLine={false}
         />

@@ -10,6 +10,7 @@ import {
   Sparkles,
   TrendingUp,
 } from "lucide-react"
+import { useEffect } from "react"
 import { Link } from "react-router-dom"
 import { ActivityChart } from "./components/activity-chart"
 import { RecentDemands } from "./components/recent-demands"
@@ -125,8 +126,11 @@ export function MyDemands() {
   const { user } = useAuth()
   const { data: summary, isLoading: isLoadingSummary } = useGetMyDemandsSummary()
   const { data: demandsData, isLoading: isLoadingDemands } = useGetMyDemands({ limit: 8 })
+  const { setTitle } = usePageTitle()
 
-  usePageTitle("Minhas Demandas")
+  useEffect(() => {
+    setTitle({ title: "Minhas Demandas" })
+  }, [setTitle])
 
   const firstName = user?.name?.split(" ")[0] ?? "Cidadão"
   const recentDemands = demandsData?.pages[0]?.items ?? []
