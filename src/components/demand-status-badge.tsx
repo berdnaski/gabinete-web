@@ -12,11 +12,14 @@ export function DemandStatusBadge({ status, className }: DemandStatusBadgeProps)
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold leading-none",
+        "inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-xs font-medium leading-none h-5",
         config.className,
         className,
       )}
     >
+      {config.dotClassName && (
+        <span className={cn("size-1.5 rounded-full shrink-0", config.dotClassName)} />
+      )}
       {config.label}
     </span>
   )

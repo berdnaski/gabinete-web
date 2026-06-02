@@ -16,8 +16,6 @@ import { Button } from "./ui/button"
 import { AuthRequiredModal } from "./auth-required-modal"
 import { DemandStatusBadge } from "./demand-status-badge"
 import { ClaimDemandFlow } from "./claim-demand-flow"
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
-import { getFirstLettersFromNames } from "@/utils/get-first-letters-from-names"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -342,39 +340,36 @@ function PostHeader({ demand, authorName, profilePath, showStatus, userOwnsDeman
     <UserAvatar size="lg" name={authorName} avatarUrl={demand?.reporter?.avatarUrl} />
   )
 
-  const infoEl = profilePath ? (
-    <Link to={profilePath} className="min-w-0" onClick={(e) => e.stopPropagation()}>
-      <PostInfo authorName={authorName} category={demand?.category?.name} dateToNow={formatDateToNow(demand.createdAt)} />
-    </Link>
-  ) : (
+  const postInfo = (
     <PostInfo authorName={authorName} category={demand?.category?.name} dateToNow={formatDateToNow(demand.createdAt)} />
   )
 
   return (
     <div className="flex items-start justify-between px-4 py-3 gap-2">
-      <div className="flex items-center gap-3 min-w-0 flex-1" onClick={(e) => e.stopPropagation()}>
+      <div className="flex items-start gap-3 min-w-0 flex-1" onClick={(e) => e.stopPropagation()}>
         {avatarEl}
-        {infoEl}
+        <div className="flex flex-col gap-0.5 min-w-0">
+          {profilePath ? (
+            <Link to={profilePath} className="min-w-0" onClick={(e) => e.stopPropagation()}>
+              {postInfo}
+            </Link>
+          ) : (
+            postInfo
+          )}
+          {demand.cabinet && (
+            <Link
+              to={`/${demand.cabinet.slug}`}
+              onClick={(e) => e.stopPropagation()}
+              className="text-xs text-muted-foreground hover:text-foreground hover:underline transition-colors w-fit leading-none"
+            >
+              {demand.cabinet.name}
+            </Link>
+          )}
+        </div>
       </div>
 
       <div className="flex items-center gap-1.5 shrink-0">
         {showStatus && <DemandStatusBadge status={demand.status} />}
-
-        {demand.cabinet && (
-          <Link
-            to={`/${demand.cabinet.slug}`}
-            onClick={(e) => e.stopPropagation()}
-            className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium bg-muted text-muted-foreground hover:text-foreground border border-border/60 transition-colors"
-          >
-            <Avatar className="size-3.5 shrink-0">
-              <AvatarImage src={demand.cabinet.avatarUrl ?? undefined} />
-              <AvatarFallback className="text-2xs bg-primary/10 text-primary">
-                {getFirstLettersFromNames(demand.cabinet.name)}
-              </AvatarFallback>
-            </Avatar>
-            <span className="hidden sm:inline truncate max-w-24">{demand.cabinet.name}</span>
-          </Link>
-        )}
 
         {userOwnsDemand && (
           <DropdownMenu>
