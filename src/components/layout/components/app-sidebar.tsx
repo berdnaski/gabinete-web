@@ -8,6 +8,7 @@ import Logo from "../../../assets/logo.png"
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupLabel,
   SidebarHeader,
@@ -175,26 +176,24 @@ export function AppSidebar() {
             </SidebarMenuItem>
           </SidebarMenu>
 
-          {cabinet?.slug && (
-            <>
-              <SidebarGroupLabel className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground">
-                Perfil Público
-              </SidebarGroupLabel>
-              <SidebarMenu>
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip={cabinet.name ?? "Ver perfil público"}>
-                    <Link to={`/${cabinet.slug}`} target="_blank" rel="noopener noreferrer">
-                      <Globe className="text-muted-foreground" />
-                      <span className="truncate">{cabinet.name ?? "Ver perfil"}</span>
-                      <ExternalLink className="ml-auto size-3 shrink-0 text-muted-foreground/50" />
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              </SidebarMenu>
-            </>
-          )}
         </SidebarGroup>
       </SidebarContent>
+
+      {cabinet?.slug && (
+        <SidebarFooter className="border-t border-border">
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild tooltip={cabinet.name ?? "Perfil público"}>
+                <Link to={`/${cabinet.slug}`} target="_blank" rel="noopener noreferrer">
+                  <Globe className="text-muted-foreground" />
+                  <span className="truncate">{cabinet.name ?? "Ver perfil"}</span>
+                  <ExternalLink className="ml-auto size-3 shrink-0 text-muted-foreground/50" />
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarFooter>
+      )}
     </Sidebar>
   )
 }
