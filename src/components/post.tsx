@@ -360,7 +360,7 @@ function PostHeader({ demand, authorName, profilePath, showStatus, userOwnsDeman
             <Link
               to={`/${demand.cabinet.slug}`}
               onClick={(e) => e.stopPropagation()}
-              className="text-xs text-muted-foreground hover:text-foreground hover:underline transition-colors w-fit leading-none"
+              className="text-xs text-primary/70 hover:text-primary hover:underline transition-colors w-fit leading-none"
             >
               {demand.cabinet.name}
             </Link>
