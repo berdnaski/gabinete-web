@@ -253,7 +253,7 @@ export function DemandDetailSheet({
                 <section>
                   <SectionLabel>Gabinete responsável</SectionLabel>
                   <Link
-                    to={`/gabinetes/${demand.cabinet.slug}`}
+                    to={`/${demand.cabinet.slug}`}
                     onClick={() => onOpenChange(false)}
                     className="inline-flex items-center gap-2 hover:opacity-80 transition-opacity"
                   >
@@ -284,7 +284,7 @@ export function DemandDetailSheet({
                   Atualizar progresso
                 </Button>
                 <Button variant="outline" asChild>
-                  <Link to={`/comments/${demand.id}`} onClick={() => onOpenChange(false)}>
+                  <Link to={`/demand/${demand.id}`} onClick={() => onOpenChange(false)}>
                     Ver comentários
                   </Link>
                 </Button>

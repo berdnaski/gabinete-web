@@ -43,7 +43,7 @@ export function ActionsCell({ row }: { row: Row<Demand> }) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
-          <DropdownMenuItem onClick={() => navigate(`/comments/${demand.id}`)}>
+          <DropdownMenuItem onClick={() => navigate(`/demand/${demand.id}`)}>
             <ExternalLinkIcon className="size-3.5 text-muted-foreground" />
             Abrir demanda
           </DropdownMenuItem>
@@ -58,7 +58,7 @@ export function ActionsCell({ row }: { row: Row<Demand> }) {
               Atualizar progresso
             </DropdownMenuItem>
           )}
-          <DropdownMenuItem onClick={() => navigate(`/comments/${demand.id}`)}>
+          <DropdownMenuItem onClick={() => navigate(`/demand/${demand.id}`)}>
             <MessageSquareIcon className="size-3.5 text-muted-foreground" />
             Comentar
           </DropdownMenuItem>

@@ -1,7 +1,7 @@
 import { useLikeDemand, useUnlinkDemand } from "@/api/demands/hooks"
 import type { Demand } from "@/api/demands/types"
 import { ReportDemandDialog } from "@/components/report-demand-dialog"
-import { Building2, ExternalLinkIcon, FlagIcon, MapPinIcon, MessageCircle, MoreHorizontal, ThumbsUp, Unlink, UserCheck } from "lucide-react"
+import { Building2, ExternalLinkIcon, MapPinIcon, MessageCircle, MoreHorizontal, FlagIcon, Share2, ThumbsUp, Unlink, UserCheck } from "lucide-react"
 import type { ComponentProps } from "react"
 import { useEffect, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
@@ -17,8 +17,6 @@ import { Button } from "./ui/button"
 import { AuthRequiredModal } from "./auth-required-modal"
 import { DemandStatusBadge } from "./demand-status-badge"
 import { ClaimDemandFlow } from "./claim-demand-flow"
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
-import { getFirstLettersFromNames } from "@/utils/get-first-letters-from-names"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -95,6 +93,10 @@ export function Post({ demand, className, hideComment = false, showStatus = fals
     })
   }
 
+  function navigateToDemand() {
+    navigate(`/demand/${demand.id}`)
+  }
+
   function handleComment(e: React.MouseEvent) {
     e.stopPropagation()
     if (!isAuthenticated) {
@@ -102,7 +104,35 @@ export function Post({ demand, className, hideComment = false, showStatus = fals
       setShowAuthModal(true)
       return
     }
-    navigate(`/comments/${demand.id}`)
+    navigate(`/demand/${demand.id}`)
+  }
+
+  async function handleShare(e: React.MouseEvent) {
+    e.stopPropagation()
+    const ogBase = import.meta.env.VITE_OG_BASE_URL as string ?? ''
+    const url = ogBase ? `${ogBase}/${demand.id}` : `${window.location.origin}/demand/${demand.id}`
+    const shareData = {
+      title: demand.title,
+      text: demand.description ? `${demand.description.slice(0, 100)}…` : demand.title,
+      url,
+    }
+    if (navigator.share && navigator.canShare?.(shareData)) {
+      try {
+        await navigator.share(shareData)
+      } catch (err) {
+        if ((err as Error).name !== "AbortError") {
+          await navigator.clipboard.writeText(url)
+          toast.success("Link copiado!")
+        }
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(url)
+        toast.success("Link copiado!", { description: "Cole no WhatsApp ou onde quiser." })
+      } catch {
+        toast.error("Não foi possível compartilhar.")
+      }
+    }
   }
 
   function handleUnlink() {
@@ -116,8 +146,6 @@ export function Post({ demand, className, hideComment = false, showStatus = fals
       },
     })
   }
-
-  const actionCount = hideComment ? 1 : isCabinetMember && isUnlinked ? 3 : 2
 
   return (
     <article
@@ -143,12 +171,19 @@ export function Post({ demand, className, hideComment = false, showStatus = fals
         }}
       />
 
-      <div className="px-4 pb-3 space-y-1">
+      <div
+        className="px-4 pb-3 space-y-1 cursor-pointer"
+        onClick={navigateToDemand}
+      >
         <p className="text-sm font-semibold leading-snug">{demand.title}</p>
         <p className="text-sm text-muted-foreground leading-relaxed">{demand.description}</p>
       </div>
 
-      {demand.evidences && demand.evidences.length > 0 && <Gallery images={demand.evidences} />}
+      {demand.evidences && demand.evidences.length > 0 && (
+        <div className="cursor-pointer" onClick={navigateToDemand}>
+          <Gallery images={demand.evidences} />
+        </div>
+      )}
 
       {demand.address && (
         <div className="flex items-center justify-between px-4 py-2">
@@ -190,7 +225,7 @@ export function Post({ demand, className, hideComment = false, showStatus = fals
 
       <Separator />
 
-      <div className={cn("flex", actionCount === 1 && "")}>
+      <div className="flex">
         <Button
           variant="ghost"
           size="sm"
@@ -236,6 +271,17 @@ export function Post({ demand, className, hideComment = false, showStatus = fals
             </Button>
           </>
         )}
+
+        <div className="w-px bg-border/60 self-stretch" />
+        <Button
+          size="sm"
+          variant="ghost"
+          className="flex-1 gap-1.5 rounded-none h-9 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/40"
+          onClick={handleShare}
+        >
+          <Share2 className="size-3.5" />
+          <span className="hidden sm:inline">Compartilhar</span>
+        </Button>
       </div>
 
       {children && (
@@ -305,52 +351,44 @@ interface PostHeaderProps {
 }
 
 function PostHeader({ demand, authorName, profilePath, showStatus, userOwnsDemand, isAuthenticated, onAssign, onUnlink, onReport }: PostHeaderProps) {
-  return (
-    <div className="flex items-start justify-between px-4 py-3">
-      <div className="flex items-center gap-3 min-w-0 flex-1" onClick={(e) => e.stopPropagation()}>
-        {profilePath ? (
-          <Link to={profilePath} className="shrink-0">
-            <UserAvatar size="lg" name={authorName} avatarUrl={demand?.reporter?.avatarUrl} />
-          </Link>
-        ) : (
-          <UserAvatar size="lg" name={authorName} avatarUrl={demand?.reporter?.avatarUrl} />
-        )}
+  const avatarEl = profilePath ? (
+    <Link to={profilePath} className="shrink-0" onClick={(e) => e.stopPropagation()}>
+      <UserAvatar size="lg" name={authorName} avatarUrl={demand?.reporter?.avatarUrl} />
+    </Link>
+  ) : (
+    <UserAvatar size="lg" name={authorName} avatarUrl={demand?.reporter?.avatarUrl} />
+  )
 
-        {profilePath ? (
-          <Link to={profilePath} className="min-w-0">
-            <PostInfo
-              authorName={authorName}
-              category={demand?.category?.name}
-              dateToNow={formatDateToNow(demand.createdAt)}
-            />
-          </Link>
-        ) : (
-          <PostInfo
-            authorName={authorName}
-            category={demand?.category?.name}
-            dateToNow={formatDateToNow(demand.createdAt)}
-          />
-        )}
+  const postInfo = (
+    <PostInfo authorName={authorName} category={demand?.category?.name} dateToNow={formatDateToNow(demand.createdAt)} />
+  )
+  
+  return (
+    <div className="flex items-start justify-between px-4 py-3 gap-2">
+      <div className="flex items-start gap-3 min-w-0 flex-1" onClick={(e) => e.stopPropagation()}>
+        {avatarEl}
+        <div className="flex flex-col gap-0.5 min-w-0">
+          {profilePath ? (
+            <Link to={profilePath} className="min-w-0" onClick={(e) => e.stopPropagation()}>
+              {postInfo}
+            </Link>
+          ) : (
+            postInfo
+          )}
+          {demand.cabinet && (
+            <Link
+              to={`/${demand.cabinet.slug}`}
+              onClick={(e) => e.stopPropagation()}
+              className="text-xs text-primary/70 hover:text-primary hover:underline transition-colors w-fit leading-none"
+            >
+              {demand.cabinet.name}
+            </Link>
+          )}
+        </div>
       </div>
 
-      <div className="flex items-center gap-1.5 shrink-0 ml-2">
+      <div className="flex items-center gap-1.5 shrink-0">
         {showStatus && <DemandStatusBadge status={demand.status} />}
-
-        {demand.cabinet && (
-          <Link
-            to={`/gabinetes/${demand.cabinet.slug}`}
-            onClick={(e) => e.stopPropagation()}
-            className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium bg-muted text-muted-foreground hover:text-foreground border border-border/60 transition-colors"
-          >
-            <Avatar className="size-3.5 shrink-0">
-              <AvatarImage src={demand.cabinet.avatarUrl ?? undefined} />
-              <AvatarFallback className="text-2xs bg-primary/10 text-primary">
-                {getFirstLettersFromNames(demand.cabinet.name)}
-              </AvatarFallback>
-            </Avatar>
-            <span className="max-w-20 truncate">{demand.cabinet.name}</span>
-          </Link>
-        )}
 
         {userOwnsDemand ? (
           <DropdownMenu>

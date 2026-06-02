@@ -68,6 +68,7 @@ export function CabinetBrandingCard() {
   const handleBannerSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
+    if (bannerInputRef.current) bannerInputRef.current.value = ""
     if (bannerPreview) URL.revokeObjectURL(bannerPreview)
     setSelectedBanner(file)
     setBannerPreview(URL.createObjectURL(file))

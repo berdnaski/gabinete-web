@@ -2,12 +2,13 @@ import { useGetDemandsByCabinetSlug } from "@/api/demands/hooks"
 import { useAuth } from "@/hooks/use-auth"
 import { useCurrentMember } from "@/hooks/use-current-member"
 import { cn } from "@/lib/utils"
-import { Building2, CheckSquare, ClipboardListIcon, Flag, Home, Newspaper, Users, BarChart3 } from "lucide-react"
+import { Building2, CheckSquare, ClipboardListIcon, Flag, ExternalLink, Globe, Home, LayoutDashboard, Newspaper, Users, BarChart3, Map } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
 import Logo from "../../../assets/logo.png"
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupLabel,
   SidebarHeader,
@@ -39,8 +40,9 @@ function MyTasksBadge() {
 
 export function AppSidebar() {
   const { pathname } = useLocation()
-  const { hasRoleAdmin } = useAuth()
+  const { hasRoleAdmin, cabinet, user } = useAuth()
   const isAdmin = hasRoleAdmin()
+  const isCitizen = user?.role === "CITIZEN"
 
   if (isAdmin) {
     return (
@@ -66,10 +68,10 @@ export function AppSidebar() {
                 <SidebarMenuButton
                   asChild
                   tooltip="Usuários"
-                  isActive={pathname === "/admin/usuarios"}
+                  isActive={pathname === "/admin/users"}
                 >
-                  <Link to="/admin/usuarios">
-                    <Users className={cn({ "text-primary": pathname === "/admin/usuarios" })} />
+                  <Link to="/admin/users">
+                    <Users className={cn({ "text-primary": pathname === "/admin/users" })} />
                     <span>Usuários</span>
                   </Link>
                 </SidebarMenuButton>
@@ -83,6 +85,14 @@ export function AppSidebar() {
                   <Link to="/admin/denuncias">
                     <Flag className={cn({ "text-primary": pathname === "/admin/denuncias" })} />
                     <span>Denúncias</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip="Mapa" isActive={pathname === "/mapa"}>
+                  <Link to="/mapa">
+                    <Map className={cn({ "text-primary": pathname === "/mapa" })} />
+                    <span>Mapa</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -112,66 +122,105 @@ export function AppSidebar() {
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild tooltip="Mapa" isActive={pathname === "/mapa"}>
+                <Link to="/mapa">
+                  <Map className={cn({ "text-primary": pathname === "/mapa" })} />
+                  <span>Mapa</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            {isCitizen && (
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip="Minhas Demandas" isActive={pathname === "/my-demands"}>
+                  <Link to="/my-demands">
+                    <LayoutDashboard className={cn({ "text-primary": pathname === "/my-demands" })} />
+                    <span>Minhas Demandas</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )}
           </SidebarMenu>
 
-          <SidebarGroupLabel className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground">
-            Gabinete
-          </SidebarGroupLabel>
-          <SidebarMenu className="space-y-0.5">
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Início" isActive={pathname === "/home"}>
-                <Link to="/home">
-                  <Home className={cn({ "text-primary": pathname === "/home" })} />
-                  <span>Início</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
+          {!isCitizen && (
+            <>
+              <SidebarGroupLabel className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground">
+                Gabinete
+              </SidebarGroupLabel>
+              <SidebarMenu className="space-y-0.5">
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild tooltip="Início" isActive={pathname === "/home"}>
+                    <Link to="/home">
+                      <Home className={cn({ "text-primary": pathname === "/home" })} />
+                      <span>Início</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
 
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Demandas" isActive={pathname === "/demands"}>
-                <Link to="/demands">
-                  <ClipboardListIcon className={cn({ "text-primary": pathname === "/demands" })} />
-                  <span>Demandas</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild tooltip="Demandas" isActive={pathname === "/demands"}>
+                    <Link to="/demands">
+                      <ClipboardListIcon className={cn({ "text-primary": pathname === "/demands" })} />
+                      <span>Demandas</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
 
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                asChild
-                tooltip="Minhas Tarefas"
-                isActive={pathname === "/minhas-tarefas"}
-              >
-                <Link to="/minhas-tarefas" className="flex items-center gap-2 w-full">
-                  <CheckSquare
-                    className={cn({ "text-primary": pathname === "/minhas-tarefas" })}
-                  />
-                  <span>Minhas Tarefas</span>
-                  <MyTasksBadge />
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    tooltip="Minhas Tarefas"
+                    isActive={pathname === "/minhas-tarefas"}
+                  >
+                    <Link to="/minhas-tarefas" className="flex items-center gap-2 w-full">
+                      <CheckSquare
+                        className={cn({ "text-primary": pathname === "/minhas-tarefas" })}
+                      />
+                      <span>Minhas Tarefas</span>
+                      <MyTasksBadge />
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
 
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Equipe" isActive={pathname === "/equipe"}>
-                <Link to="/equipe">
-                  <Users className={cn({ "text-primary": pathname === "/equipe" })} />
-                  <span>Equipe</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild tooltip="Equipe" isActive={pathname === "/equipe"}>
+                    <Link to="/equipe">
+                      <Users className={cn({ "text-primary": pathname === "/equipe" })} />
+                      <span>Equipe</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
 
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Relatórios" isActive={pathname === "/relatorios"}>
-                <Link to="/relatorios">
-                  <BarChart3 className={cn({ "text-primary": pathname === "/relatorios" })} />
-                  <span>Relatórios</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild tooltip="Relatórios" isActive={pathname === "/relatorios"}>
+                    <Link to="/relatorios">
+                      <BarChart3 className={cn({ "text-primary": pathname === "/relatorios" })} />
+                      <span>Relatórios</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </>
+          )}
+
         </SidebarGroup>
       </SidebarContent>
+
+      {cabinet?.slug && (
+        <SidebarFooter className="border-t border-border">
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild tooltip={cabinet.name ?? "Perfil público"}>
+                <Link to={`/${cabinet.slug}`} target="_blank" rel="noopener noreferrer">
+                  <Globe className="text-muted-foreground" />
+                  <span className="truncate">{cabinet.name ?? "Ver perfil"}</span>
+                  <ExternalLink className="ml-auto size-3 shrink-0 text-muted-foreground/50" />
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarFooter>
+      )}
     </Sidebar>
   )
 }

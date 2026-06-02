@@ -65,7 +65,7 @@ export function DemandComments() {
     }
   }
 
-  if (isLoadingDemand || !demand) return <Loading />
+  if (isLoadingDemand || !demand) return <Loading fullPage />
 
   const commentList = comments?.items ?? []
   const resultList = resultsData?.items ?? []

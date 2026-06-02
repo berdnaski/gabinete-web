@@ -251,11 +251,11 @@ function ProfileHeader({ accent }: { accent: string }) {
 function CabinetBanner({ cabinet, accent }: { cabinet: Cabinet; accent: string }) {
   if (cabinet.bannerUrl) {
     return (
-      <div className="relative w-full h-44 sm:h-52 overflow-hidden">
+      <div className="relative w-full h-44 sm:h-56 md:h-72 lg:h-80 overflow-hidden">
         <img
           src={cabinet.bannerUrl}
           alt={`Banner de ${cabinet.name}`}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover object-center"
         />
         <div
           className="absolute inset-0"
@@ -269,7 +269,7 @@ function CabinetBanner({ cabinet, accent }: { cabinet: Cabinet; accent: string }
 
   return (
     <div
-      className="relative w-full h-44 sm:h-52 overflow-hidden"
+      className="relative w-full h-44 sm:h-56 md:h-72 lg:h-80 overflow-hidden"
       style={{
         background: `linear-gradient(145deg, ${accent}dd 0%, ${accent} 60%, ${accent}bb 100%)`,
       }}
@@ -382,7 +382,7 @@ export function PublicCabinetProfile() {
 
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
           {/* ── Avatar + CTA row ── */}
-          <div className="flex items-end justify-between -mt-12 sm:-mt-14 mb-4">
+          <div className="flex items-end justify-between -mt-12 sm:-mt-14 md:-mt-16 mb-4">
             <Avatar className="size-24 sm:size-28 shrink-0 ring-[3px] ring-background shadow-xl">
               <AvatarImage src={cabinet.logoUrl ?? cabinet.avatarUrl ?? undefined} className={cabinet.logoUrl ? "object-contain p-1 bg-white" : "object-cover"} />
               <AvatarFallback

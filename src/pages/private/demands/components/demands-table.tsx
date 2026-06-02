@@ -1,13 +1,17 @@
 import { useGetCabinetMembers } from "@/api/cabinets/hooks"
+import { DemandsApi } from "@/api/demands"
 import { useGetDemandsByCabinetSlug } from "@/api/demands/hooks"
-import type { DemandPriority, DemandStatus } from "@/api/demands/types"
+import type { Demand, DemandPriority, DemandStatus } from "@/api/demands/types"
 import { DataTable, type DataTableFilterField } from "@/components/data-table"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/hooks/use-auth"
 import { useDataTable } from "@/hooks/use-data-table"
 import { cn } from "@/lib/utils"
-import { useMemo } from "react"
+import { format } from "date-fns"
+import { Download, Loader2 } from "lucide-react"
+import { useMemo, useState } from "react"
 import { useSearchParams } from "react-router-dom"
+import { toast } from "sonner"
 import { PRIORITY_OPTIONS, STATUS_OPTIONS } from "./demand-utils"
 import { demandsColumns } from "./demands-columns"
 import { DemandsForm } from "./demands-form"
@@ -27,10 +31,56 @@ const filterFields: DataTableFilterField[] = [
   },
 ]
 
+const STATUS_LABELS: Record<string, string> = {
+  SUBMITTED: "Enviada",
+  IN_ANALYSIS: "Em análise",
+  IN_PROGRESS: "Em progresso",
+  RESOLVED: "Resolvida",
+  REJECTED: "Rejeitada",
+  CANCELED: "Cancelada",
+}
+
+const PRIORITY_LABELS: Record<string, string> = {
+  URGENT: "Urgente",
+  HIGH: "Alta",
+  MEDIUM: "Média",
+  LOW: "Baixa",
+}
+
+function exportDemandsCSV(demands: Demand[], cabinetName: string) {
+  const header = ["ID", "Título", "Descrição", "Categoria", "Prioridade", "Status", "Endereço", "Bairro", "Relator", "Responsável", "Curtidas", "Comentários", "Criada em"]
+  const rows = demands.map((d) => [
+    d.id,
+    d.title,
+    d.description,
+    d.category?.name ?? "",
+    PRIORITY_LABELS[d.priority ?? ""] ?? d.priority ?? "",
+    STATUS_LABELS[d.status] ?? d.status,
+    d.address ?? "",
+    d.neighborhood ?? "",
+    d.reporter?.name ?? d.guestEmail ?? "",
+    "",
+    String(d.likesCount),
+    String(d.commentsCount),
+    d.createdAt ? format(new Date(d.createdAt), "dd/MM/yyyy HH:mm") : "",
+  ])
+  const csv = [header, ...rows]
+    .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))
+    .join("\n")
+  const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement("a")
+  a.href = url
+  a.download = `demandas-${cabinetName.toLowerCase().replace(/\s+/g, "-")}-${format(new Date(), "yyyy-MM-dd")}.csv`
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
 export function DemandsTable() {
   const { cabinet, user } = useAuth()
   const columns = useMemo(() => demandsColumns, [])
   const [searchParams, setSearchParams] = useSearchParams()
+  const [isExporting, setIsExporting] = useState(false)
 
   const assigneeMemberIdParam = searchParams.get("assigneeMemberId") ?? undefined
 
@@ -62,6 +112,28 @@ export function DemandsTable() {
       }
       return next
     })
+  }
+
+  async function handleExport() {
+    if (!cabinet?.slug || isExporting) return
+    setIsExporting(true)
+    try {
+      const result = await DemandsApi.listDemandsByCabinetSlug({
+        slug: cabinet.slug,
+        page: 1,
+        limit: 9999,
+        search: searchParams.get("search") ?? undefined,
+        status: (searchParams.get("status") as DemandStatus) || undefined,
+        priority: (searchParams.get("priority") as DemandPriority) || undefined,
+        assigneeMemberId: assigneeMemberIdParam,
+      })
+      exportDemandsCSV(result.items, cabinet.name)
+      toast.success(`${result.items.length} demandas exportadas`)
+    } catch {
+      toast.error("Erro ao exportar demandas")
+    } finally {
+      setIsExporting(false)
+    }
   }
 
   const { data: demands, isLoading } = useGetDemandsByCabinetSlug({
@@ -113,7 +185,20 @@ export function DemandsTable() {
             Minhas tarefas
           </Button>
         </div>
-        <DemandsForm sizeTrigger="default" />
+        <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-8 gap-1.5 text-xs text-muted-foreground"
+            onClick={handleExport}
+            disabled={isExporting || !demands?.meta.total}
+          >
+            {isExporting ? <Loader2 className="size-3.5 animate-spin" /> : <Download className="size-3.5" />}
+            <span className="hidden sm:inline">Exportar CSV</span>
+            {demands?.meta.total ? <span className="tabular-nums">({demands.meta.total})</span> : null}
+          </Button>
+          <DemandsForm sizeTrigger="default" />
+        </div>
       </div>
       <DataTable
         table={table}

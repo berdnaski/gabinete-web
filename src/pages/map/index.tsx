@@ -27,7 +27,7 @@ function PointMarker({ point }: { point: HeatmapPoint }) {
   return (
     <AdvancedMarker
       position={{ lat: point.lat, lng: point.lng }}
-      onClick={() => navigate(`/comments/${point.id}`)}
+      onClick={() => navigate(`/demand/${point.id}`)}
     >
       <div className="relative flex flex-col items-center">
         {hovered && (

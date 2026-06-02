@@ -5,7 +5,7 @@ import { ChartContainer, ChartTooltip } from "@/components/ui/chart"
 import { useAuth } from "@/hooks/use-auth"
 import { usePageTitle } from "@/hooks/use-page-title"
 import { cn } from "@/lib/utils"
-import { format, subDays, subMonths, subYears } from "date-fns"
+import { format, subDays, subMonths, subYears, parseISO } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import {
   CheckCircle2,
@@ -14,6 +14,7 @@ import {
   Loader2,
   BarChart3,
 } from "lucide-react"
+import { motion } from "framer-motion"
 import { useEffect, useMemo, useState } from "react"
 
 import {
@@ -73,8 +74,10 @@ function formatPeriodLabel(start: string, end: string) {
   return `${format(s, "dd 'de' MMM 'de' yyyy", { locale: ptBR })} – ${format(e, "dd 'de' MMM 'de' yyyy", { locale: ptBR })}`
 }
 
-function formatShortDate(dateStr: string) {
-  return format(new Date(dateStr + "T12:00:00"), "dd/MM", { locale: ptBR })
+function formatTrendLabel(dateStr: string, periodDays: number): string {
+  const date = parseISO(dateStr + "T12:00:00")
+  if (periodDays > 180) return format(date, "MMM/yy", { locale: ptBR })
+  return format(date, "dd/MM", { locale: ptBR })
 }
 
 function exportCSV(report: CabinetReport, cabinetName: string) {
@@ -142,37 +145,26 @@ export function Reports() {
 
   const trendData = useMemo(() => {
     if (!report) return []
-    const days = report.trend.length
-    if (days <= 60) return report.trend.map(t => ({ ...t, label: formatShortDate(t.date) }))
-    if (days <= 180) {
-      const weekly: typeof report.trend = []
-      for (let i = 0; i < days; i += 7) {
-        const slice = report.trend.slice(i, i + 7)
-        weekly.push({
-          date: slice[0].date,
-          created: slice.reduce((s, d) => s + d.created, 0),
-          resolved: slice.reduce((s, d) => s + d.resolved, 0),
-        })
-      }
-      return weekly.map(t => ({ ...t, label: formatShortDate(t.date) }))
-    }
-    const monthly: typeof report.trend = []
-    for (let i = 0; i < days; i += 30) {
-      const slice = report.trend.slice(i, i + 30)
-      monthly.push({
-        date: slice[0].date,
-        created: slice.reduce((s, d) => s + d.created, 0),
-        resolved: slice.reduce((s, d) => s + d.resolved, 0),
-      })
-    }
-    return monthly.map(t => ({
+    return report.trend.map(t => ({
       ...t,
-      label: format(new Date(t.date + "T12:00:00"), "MMM/yy", { locale: ptBR }),
+      label: formatTrendLabel(t.date, report.period.days),
     }))
   }, [report])
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
+    <div className="max-w-4xl mx-auto px-4 py-8 space-y-8" id="report-print-root">
+      <div className="report-print-header hidden items-center justify-between pb-4 border-b border-border mb-6">
+        <div>
+          <h1 className="text-lg font-bold text-foreground">{cabinet?.name ?? "Gabinete"}</h1>
+          <p className="text-xs text-muted-foreground">Relatório de Demandas</p>
+        </div>
+        {report && (
+          <p className="text-xs text-muted-foreground">
+            {formatPeriodLabel(report.period.start, report.period.end)}
+          </p>
+        )}
+      </div>
+
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold text-foreground">Relatórios</h1>
@@ -252,7 +244,7 @@ export function Reports() {
               <div className="space-y-2.5">
                 {report.byStatus
                   .sort((a, b) => b.count - a.count)
-                  .map(s => {
+                  .map((s, i) => {
                     const cfg = STATUS_CONFIG[s.status]
                     return (
                       <DistBar
@@ -262,6 +254,7 @@ export function Reports() {
                         percentage={s.percentage}
                         color={cfg?.bg ?? "bg-muted-foreground/40"}
                         total={report.summary.totalInPeriod}
+                        index={i}
                       />
                     )
                   })}
@@ -274,7 +267,7 @@ export function Reports() {
               <div className="space-y-2.5">
                 {report.byPriority
                   .sort((a, b) => b.count - a.count)
-                  .map(p => {
+                  .map((p, i) => {
                     const cfg = PRIORITY_CONFIG[p.priority]
                     return (
                       <DistBar
@@ -284,6 +277,7 @@ export function Reports() {
                         percentage={p.percentage}
                         color={cfg?.bg ?? "bg-muted-foreground/40"}
                         total={report.summary.totalInPeriod}
+                        index={i}
                       />
                     )
                   })}
@@ -306,10 +300,12 @@ export function Reports() {
                           {c.count} · {c.percentage}%
                         </span>
                       </div>
-                      <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-                        <div
-                          className="h-full rounded-full bg-primary/70 transition-all duration-500"
-                          style={{ width: `${c.percentage}%` }}
+                      <div className="h-2 rounded-full bg-muted overflow-hidden">
+                        <motion.div
+                          className="h-full rounded-full bg-primary/70"
+                          initial={{ width: 0 }}
+                          animate={{ width: `${c.percentage}%` }}
+                          transition={{ duration: 0.55, ease: "easeOut", delay: 0.1 + i * 0.04 }}
                         />
                       </div>
                     </div>
@@ -324,6 +320,7 @@ export function Reports() {
               <div className="space-y-1.5">
                 {report.byNeighborhood.map((n, i) => {
                   const max = report.byNeighborhood[0].count
+                  const pct = Math.round((n.count / max) * 100)
                   return (
                     <div key={n.neighborhood} className="flex items-center gap-3">
                       <span className="text-xs tabular-nums text-muted-foreground/50 w-4 shrink-0">
@@ -334,10 +331,12 @@ export function Reports() {
                           <span className="text-sm text-foreground truncate">{n.neighborhood}</span>
                           <span className="text-xs tabular-nums text-muted-foreground shrink-0">{n.count}</span>
                         </div>
-                        <div className="h-1 rounded-full bg-muted overflow-hidden">
-                          <div
-                            className="h-full rounded-full bg-muted-foreground/30 transition-all duration-500"
-                            style={{ width: `${Math.round((n.count / max) * 100)}%` }}
+                        <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                          <motion.div
+                            className="h-full rounded-full bg-muted-foreground/30"
+                            initial={{ width: 0 }}
+                            animate={{ width: `${pct}%` }}
+                            transition={{ duration: 0.55, ease: "easeOut", delay: 0.1 + i * 0.04 }}
                           />
                         </div>
                       </div>
@@ -354,79 +353,101 @@ export function Reports() {
                 <LegendDot color="bg-primary" label="Recebidas" />
                 <LegendDot color="bg-emerald-500" label="Resolvidas" />
               </div>
-              <ChartContainer
-                config={{
-                  created:  { label: "Recebidas",  color: "#0058F3" },
-                  resolved: { label: "Resolvidas", color: "#22c55e" },
-                }}
-                className="h-52 w-full"
-              >
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={trendData} margin={{ top: 4, right: 4, left: -28, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="grad-created" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%"  stopColor="#0058F3" stopOpacity={0.15} />
-                        <stop offset="95%" stopColor="#0058F3" stopOpacity={0} />
-                      </linearGradient>
-                      <linearGradient id="grad-resolved" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%"  stopColor="#22c55e" stopOpacity={0.15} />
-                        <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid vertical={false} stroke="hsl(var(--border))" strokeOpacity={0.6} />
-                    <XAxis
-                      dataKey="label"
-                      tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
-                      axisLine={false}
-                      tickLine={false}
-                      interval="preserveStartEnd"
-                    />
-                    <YAxis
-                      tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
-                      axisLine={false}
-                      tickLine={false}
-                      allowDecimals={false}
-                    />
-                    <ChartTooltip
-                      content={({ active, payload, label }) => {
-                        if (!active || !payload?.length) return null
-                        return (
-                          <div className="rounded-lg border border-border bg-background px-3 py-2 shadow-md text-xs">
-                            <p className="font-medium text-foreground mb-1">{label}</p>
-                            {payload.map((p, i) => (
-                              <div key={i} className="flex items-center gap-1.5">
-                                <span className="size-1.5 rounded-full shrink-0" style={{ background: p.color }} />
-                                <span className="text-muted-foreground">{p.name}:</span>
-                                <span className="font-medium text-foreground">{p.value}</span>
-                              </div>
-                            ))}
-                          </div>
-                        )
-                      }}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="created"
-                      name="Recebidas"
-                      stroke="#0058F3"
-                      strokeWidth={2}
-                      fill="url(#grad-created)"
-                      dot={false}
-                      activeDot={{ r: 3, fill: "#0058F3" }}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="resolved"
-                      name="Resolvidas"
-                      stroke="#22c55e"
-                      strokeWidth={2}
-                      fill="url(#grad-resolved)"
-                      dot={false}
-                      activeDot={{ r: 3, fill: "#22c55e" }}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </ChartContainer>
+
+              <div className="report-chart-screen">
+                <ChartContainer
+                  config={{
+                    created:  { label: "Recebidas",  color: "#0058F3" },
+                    resolved: { label: "Resolvidas", color: "#22c55e" },
+                  }}
+                  className="h-64 w-full"
+                >
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={trendData} margin={{ top: 8, right: 4, left: -24, bottom: 0 }}>
+                      <defs>
+                        <linearGradient id="grad-created" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%"  stopColor="#0058F3" stopOpacity={0.22} />
+                          <stop offset="85%" stopColor="#0058F3" stopOpacity={0.02} />
+                        </linearGradient>
+                        <linearGradient id="grad-resolved" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%"  stopColor="#22c55e" stopOpacity={0.22} />
+                          <stop offset="85%" stopColor="#22c55e" stopOpacity={0.02} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid vertical={false} strokeDasharray="3 6" stroke="hsl(var(--border))" strokeOpacity={0.7} />
+                      <XAxis
+                        dataKey="label"
+                        tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                        axisLine={false}
+                        tickLine={false}
+                        interval="preserveStartEnd"
+                      />
+                      <YAxis
+                        tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                        axisLine={false}
+                        tickLine={false}
+                        allowDecimals={false}
+                        width={28}
+                      />
+                      <ChartTooltip
+                        cursor={{ stroke: "hsl(var(--border))", strokeWidth: 1, strokeDasharray: "4 4" }}
+                        content={({ active, payload, label }) => {
+                          if (!active || !payload?.length) return null
+                          return (
+                            <div className="rounded-xl border border-border/60 bg-background/98 px-3.5 py-3 shadow-lg shadow-black/8 min-w-40 space-y-2.5">
+                              <p className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground">{label}</p>
+                              <div className="h-px bg-border/50" />
+                              {payload.map((p, i) => (
+                                <div key={i} className="flex items-center justify-between gap-6">
+                                  <div className="flex items-center gap-2">
+                                    <span className="size-2 rounded-full shrink-0" style={{ background: p.color }} />
+                                    <span className="text-xs text-muted-foreground">{p.name}</span>
+                                  </div>
+                                  <span className="font-mono text-sm font-bold tabular-nums text-foreground">{p.value}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )
+                        }}
+                      />
+                      <Area type="monotone" dataKey="created" name="Recebidas" stroke="#0058F3" strokeWidth={2.5} fill="url(#grad-created)" dot={false} activeDot={{ r: 5, fill: "#0058F3", stroke: "white", strokeWidth: 2 }} animationDuration={900} animationEasing="ease-out" />
+                      <Area type="monotone" dataKey="resolved" name="Resolvidas" stroke="#22c55e" strokeWidth={2.5} fill="url(#grad-resolved)" dot={false} activeDot={{ r: 5, fill: "#22c55e", stroke: "white", strokeWidth: 2 }} animationDuration={900} animationBegin={150} animationEasing="ease-out" />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </ChartContainer>
+              </div>
+
+              <div className="report-trend-print hidden">
+                <table className="w-full text-xs border-collapse">
+                  <thead>
+                    <tr className="border-b border-border">
+                      <th className="text-left py-1.5 text-muted-foreground font-medium">Data</th>
+                      <th className="text-right py-1.5 text-muted-foreground font-medium">Recebidas</th>
+                      <th className="text-right py-1.5 text-muted-foreground font-medium">Resolvidas</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {trendData.filter(d => d.created > 0 || d.resolved > 0).map((d, i) => (
+                      <tr key={i} className="border-b border-border/40">
+                        <td className="py-1 text-foreground">{d.label}</td>
+                        <td className="py-1 text-right tabular-nums font-medium" style={{ color: "#0058F3" }}>{d.created}</td>
+                        <td className="py-1 text-right tabular-nums font-medium" style={{ color: "#22c55e" }}>{d.resolved}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot>
+                    <tr className="border-t border-border">
+                      <td className="py-1.5 font-semibold text-foreground">Total</td>
+                      <td className="py-1.5 text-right tabular-nums font-bold" style={{ color: "#0058F3" }}>
+                        {trendData.reduce((s, d) => s + d.created, 0)}
+                      </td>
+                      <td className="py-1.5 text-right tabular-nums font-bold" style={{ color: "#22c55e" }}>
+                        {trendData.reduce((s, d) => s + d.resolved, 0)}
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
             </ReportSection>
           )}
 
@@ -486,7 +507,7 @@ function ReportSection({
   children: React.ReactNode
 }) {
   return (
-    <div className="rounded-xl border border-border bg-background p-5">
+    <div className="report-section rounded-xl border border-border bg-background p-5">
       <div className="flex items-center gap-2 mb-4">
         <span className="text-xs font-semibold tabular-nums text-muted-foreground/40">{number}</span>
         {icon}
@@ -503,22 +524,26 @@ function DistBar({
   percentage,
   color,
   total,
+  index = 0,
 }: {
   label: string
   count: number
   percentage: number
   color: string
   total: number
+  index?: number
 }) {
   return (
     <div className="flex items-center gap-3">
       <div className="w-28 shrink-0">
         <span className="text-sm text-foreground">{label}</span>
       </div>
-      <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
-        <div
-          className={cn("h-full rounded-full transition-all duration-500", color)}
-          style={{ width: total > 0 ? `${percentage}%` : "0%" }}
+      <div className="flex-1 h-2.5 rounded-full bg-muted overflow-hidden">
+        <motion.div
+          className={cn("h-full rounded-full", color)}
+          initial={{ width: 0 }}
+          animate={{ width: total > 0 ? `${percentage}%` : "0%" }}
+          transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 + index * 0.05 }}
         />
       </div>
       <div className="w-16 text-right shrink-0">

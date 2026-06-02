@@ -30,7 +30,6 @@ const Settings = lazy(() => import("@/pages/settings").then((m) => ({ default: m
 const DemandComments = lazy(() => import("@/pages/demand-comments").then((m) => ({ default: m.DemandComments })));
 const Profile = lazy(() => import("@/pages/profile").then((m) => ({ default: m.Profile })));
 const Cabinets = lazy(() => import("@/pages/cabinets").then((m) => ({ default: m.Cabinets })));
-const CabinetDetail = lazy(() => import("@/pages/cabinet-detail").then((m) => ({ default: m.CabinetDetail })));
 const Map = lazy(() => import("@/pages/map").then((m) => ({ default: m.Map })));
 
 const Demands = lazy(() => import("@/pages/private/demands").then((m) => ({ default: m.Demands })));
@@ -38,9 +37,11 @@ const Home = lazy(() => import("@/pages/private/home").then((m) => ({ default: m
 const Team = lazy(() => import("@/pages/private/team").then((m) => ({ default: m.Team })));
 const MyTasks = lazy(() => import("@/pages/private/my-tasks").then((m) => ({ default: m.MyTasks })));
 const Reports = lazy(() => import("@/pages/private/reports").then((m) => ({ default: m.Reports })));
+const MyDemands = lazy(() => import("@/pages/my-demands").then((m) => ({ default: m.MyDemands })));
 
 const onlyMember = [UserRole.MEMBER];
 const onlyAdmin = [UserRole.ADMIN];
+const onlyCitizen = [UserRole.CITIZEN];
 
 function PageLoader() {
   return (
@@ -51,6 +52,17 @@ function PageLoader() {
 }
 
 export function AppRouter() {
+  if (window.location.hostname.startsWith("lp.")) {
+    return (
+      <Routes>
+        <Route
+          path="*"
+          element={<Suspense fallback={<PageLoader />}><LandingPage /></Suspense>}
+        />
+      </Routes>
+    )
+  }
+
   return (
     <Routes>
       <Route path="/sign-up" element={<SignUp />} />
@@ -77,36 +89,7 @@ export function AppRouter() {
         path="/politica-de-privacidade"
         element={<Suspense fallback={<PageLoader />}><PrivacyPolicyPage /></Suspense>}
       />
-      <Route
-        path="/landingpage"
-        element={<Suspense fallback={<PageLoader />}><LandingPage /></Suspense>}
-      />
-
       <Route path="/" element={<Layout />}>
-        <Route index element={<Feed />} />
-        <Route path="settings" element={<Settings />} />
-        <Route path="comments/:demandId" element={<DemandComments />} />
-        <Route path="demands/:demandId" element={<DemandComments />} />
-        <Route path="profile/:userId" element={<Profile />} />
-        <Route path="gabinetes" element={<Cabinets />} />
-        <Route path="gabinetes/:slug" element={<CabinetDetail />} />
-        <Route path="mapa" element={<Map />} />
-        <Route
-          path="admin"
-          element={
-            <ProtectedRoute allowedRoles={onlyAdmin}>
-              <Admin />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="admin/usuarios"
-          element={
-            <ProtectedRoute allowedRoles={onlyAdmin}>
-              <AdminUsers />
-            </ProtectedRoute>
-          }
-        />
         <Route
           path="admin/denuncias"
           element={
@@ -120,16 +103,16 @@ export function AppRouter() {
           element={<Suspense fallback={<PageLoader />}><Feed /></Suspense>}
         />
         <Route
-          path="settings"
-          element={<Suspense fallback={<PageLoader />}><Settings /></Suspense>}
+          path="demand/:demandId"
+          element={<Suspense fallback={<PageLoader />}><DemandComments /></Suspense>}
         />
         <Route
           path="comments/:demandId"
           element={<Suspense fallback={<PageLoader />}><DemandComments /></Suspense>}
         />
         <Route
-          path="demands/:demandId"
-          element={<Suspense fallback={<PageLoader />}><DemandComments /></Suspense>}
+          path="settings"
+          element={<Suspense fallback={<PageLoader />}><Settings /></Suspense>}
         />
         <Route
           path="profile/:userId"
@@ -140,12 +123,35 @@ export function AppRouter() {
           element={<Suspense fallback={<PageLoader />}><Cabinets /></Suspense>}
         />
         <Route
-          path="gabinetes/:slug"
-          element={<Suspense fallback={<PageLoader />}><CabinetDetail /></Suspense>}
-        />
-        <Route
           path="mapa"
           element={<Suspense fallback={<PageLoader />}><Map /></Suspense>}
+        />
+        <Route
+          path="my-demands"
+          element={
+            <ProtectedRoute allowedRoles={onlyCitizen}>
+              <Suspense fallback={<PageLoader />}>
+                <MyDemands />
+              </Suspense>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="admin"
+          element={
+            <ProtectedRoute allowedRoles={onlyAdmin}>
+              <Admin />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="admin/users"
+          element={
+            <ProtectedRoute allowedRoles={onlyAdmin}>
+              <AdminUsers />
+            </ProtectedRoute>
+          }
         />
 
         <Route

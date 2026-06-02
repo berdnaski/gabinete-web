@@ -107,11 +107,14 @@ apiClient.interceptors.response.use(
 		const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
 		if (error.response?.status === 401 && !originalRequest._retry) {
-			if (
-				window.location.pathname === "/login" ||
-				originalRequest.url?.includes("/auth/refresh")
-			) {
+			if (window.location.pathname === "/login") {
 				handleUnauthorized();
+				return Promise.reject(error);
+			}
+
+			if (originalRequest.url?.includes("/auth/refresh")) {
+				localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
+				localStorage.removeItem(STORAGE_KEYS.USER);
 				return Promise.reject(error);
 			}
 
@@ -154,8 +157,5 @@ apiClient.interceptors.response.use(
 function handleUnauthorized() {
 	localStorage.removeItem(STORAGE_KEYS.USER);
 	localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
-
-	if (window.location.pathname !== "/login") {
-		window.location.href = "/login";
-	}
+	window.dispatchEvent(new Event("auth:unauthorized"));
 }

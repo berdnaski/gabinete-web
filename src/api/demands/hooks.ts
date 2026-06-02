@@ -230,6 +230,15 @@ export function useGetCabinetReport(params: GetCabinetReportParams & { enabled?:
 export function useReportDemand() {
   return useMutation({
     mutationFn: ({ id, reason }: { id: string; reason: string }) =>
-      DemandsApi.reportDemand(id, reason),
+      DemandsApi.reportDemand(id, reason)
+    });
+}
+
+export function useGetMyDemandsSummary(enabled = true) {
+  return useQuery({
+    queryKey: ["my-demands-summary"],
+    queryFn: DemandsApi.getMyDemandsSummary,
+    enabled,
+    staleTime: 1000 * 60 * 2,
   });
 }
