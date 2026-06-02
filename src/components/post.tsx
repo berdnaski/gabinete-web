@@ -362,7 +362,7 @@ function PostHeader({ demand, authorName, profilePath, showStatus, userOwnsDeman
   const postInfo = (
     <PostInfo authorName={authorName} category={demand?.category?.name} dateToNow={formatDateToNow(demand.createdAt)} />
   )
-  
+
   return (
     <div className="flex items-start justify-between px-4 py-3 gap-2">
       <div className="flex items-start gap-3 min-w-0 flex-1" onClick={(e) => e.stopPropagation()}>
@@ -431,7 +431,8 @@ function PostHeader({ demand, authorName, profilePath, showStatus, userOwnsDeman
             <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
               <DropdownMenuItem
                 onClick={onReport}
-                className="text-destructive focus:text-destructive"
+                variant="destructive"
+                className="text-destructive "
               >
                 <FlagIcon className="size-3.5" />
                 Denunciar
