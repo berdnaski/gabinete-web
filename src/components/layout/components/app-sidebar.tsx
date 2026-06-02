@@ -2,7 +2,7 @@ import { useGetDemandsByCabinetSlug } from "@/api/demands/hooks"
 import { useAuth } from "@/hooks/use-auth"
 import { useCurrentMember } from "@/hooks/use-current-member"
 import { cn } from "@/lib/utils"
-import { Building2, CheckSquare, ClipboardListIcon, ExternalLink, Globe, Home, Newspaper, Users, BarChart3, Map } from "lucide-react"
+import { Building2, CheckSquare, ClipboardListIcon, ExternalLink, Globe, Home, LayoutDashboard, Newspaper, Users, BarChart3, Map } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
 import Logo from "../../../assets/logo.png"
 import {
@@ -40,8 +40,9 @@ function MyTasksBadge() {
 
 export function AppSidebar() {
   const { pathname } = useLocation()
-  const { hasRoleAdmin, cabinet } = useAuth()
+  const { hasRoleAdmin, cabinet, user } = useAuth()
   const isAdmin = hasRoleAdmin()
+  const isCitizen = user?.role === "CITIZEN"
 
   if (isAdmin) {
     return (
@@ -117,6 +118,16 @@ export function AppSidebar() {
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
+            {isCitizen && (
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip="Minhas Demandas" isActive={pathname === "/my-demands"}>
+                  <Link to="/my-demands">
+                    <LayoutDashboard className={cn({ "text-primary": pathname === "/my-demands" })} />
+                    <span>Minhas Demandas</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )}
           </SidebarMenu>
 
           <SidebarGroupLabel className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground">

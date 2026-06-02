@@ -226,3 +226,12 @@ export function useGetCabinetReport(params: GetCabinetReportParams & { enabled?:
     staleTime: 1000 * 60 * 5,
   });
 }
+
+export function useGetMyDemandsSummary(enabled = true) {
+  return useQuery({
+    queryKey: ["my-demands-summary"],
+    queryFn: DemandsApi.getMyDemandsSummary,
+    enabled,
+    staleTime: 1000 * 60 * 2,
+  });
+}

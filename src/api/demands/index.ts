@@ -1,5 +1,5 @@
 import { apiClient } from "..";
-import type { CabinetDashboardSummary, CabinetReport, CreateDemandCommentProps, CreateDemandProps, Demand, DemandCommmentsPaginatedResponse, DemandStatus, GetCabinetReportParams, HeatmapResponse, ListDemandCommentsParams, ListDemandsByCabinetSlugParams, ListDemandsParams, NeighborhoodCount, PaginatedResponse } from "./types";
+import type { CabinetDashboardSummary, CabinetReport, CreateDemandCommentProps, CreateDemandProps, Demand, DemandCommmentsPaginatedResponse, DemandStatus, GetCabinetReportParams, HeatmapResponse, ListDemandCommentsParams, ListDemandsByCabinetSlugParams, ListDemandsParams, MyDemandsSummary, NeighborhoodCount, PaginatedResponse } from "./types";
 
 export type { CreateDemandProps } from "./types";
 
@@ -182,5 +182,10 @@ export const DemandsApi = {
 
 	submitSurvey: async (token: string, rating: number, comment?: string): Promise<void> => {
 		await apiClient.post(`${baseURL}/survey/${token}`, { rating, comment });
+	},
+
+	getMyDemandsSummary: async (): Promise<MyDemandsSummary> => {
+		const { data } = await apiClient.get<MyDemandsSummary>(`${baseURL}/me/summary`);
+		return data;
 	},
 };

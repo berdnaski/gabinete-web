@@ -36,9 +36,11 @@ const Home = lazy(() => import("@/pages/private/home").then((m) => ({ default: m
 const Team = lazy(() => import("@/pages/private/team").then((m) => ({ default: m.Team })));
 const MyTasks = lazy(() => import("@/pages/private/my-tasks").then((m) => ({ default: m.MyTasks })));
 const Reports = lazy(() => import("@/pages/private/reports").then((m) => ({ default: m.Reports })));
+const MyDemands = lazy(() => import("@/pages/my-demands").then((m) => ({ default: m.MyDemands })));
 
 const onlyMember = [UserRole.MEMBER];
 const onlyAdmin = [UserRole.ADMIN];
+const onlyCitizen = [UserRole.CITIZEN];
 
 function PageLoader() {
   return (
@@ -114,6 +116,16 @@ export function AppRouter() {
         <Route
           path="mapa"
           element={<Suspense fallback={<PageLoader />}><Map /></Suspense>}
+        />
+        <Route
+          path="my-demands"
+          element={
+            <ProtectedRoute allowedRoles={onlyCitizen}>
+              <Suspense fallback={<PageLoader />}>
+                <MyDemands />
+              </Suspense>
+            </ProtectedRoute>
+          }
         />
 
         <Route

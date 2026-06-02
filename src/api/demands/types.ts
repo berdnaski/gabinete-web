@@ -257,3 +257,31 @@ export interface GetCabinetReportParams {
 	startDate?: string;
 	endDate?: string;
 }
+
+export interface ReporterStatusBreakdown {
+	status: DemandStatus;
+	count: number;
+	percentage: number;
+}
+
+export interface ReporterMonthlyActivity {
+	label: string;
+	month: number;
+	year: number;
+	count: number;
+}
+
+export interface ReporterCategoryBreakdown {
+	name: string;
+	count: number;
+	resolvedCount: number;
+}
+
+export interface MyDemandsSummary {
+	totalDemands: number;
+	statusBreakdown: ReporterStatusBreakdown[];
+	resolutionRate: number;
+	avgDaysToResolve: number | null;
+	monthlyActivity: ReporterMonthlyActivity[];
+	categoryBreakdown: ReporterCategoryBreakdown[];
+}
