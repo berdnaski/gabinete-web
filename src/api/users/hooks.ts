@@ -26,6 +26,7 @@ export function useGetUsersPaginated(params: {
   limit: number
   search?: string
   role?: UserRole
+  showInactive?: boolean
 }) {
   return useQuery({
     queryKey: ["users", "paginated", params],

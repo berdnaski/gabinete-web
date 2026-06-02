@@ -12,10 +12,11 @@ export interface User {
   phone?: string;
   isCabinetMember?: boolean;
   termsAcceptedAt?: string | Date;
+  disabledAt?: string | null;
 }
 
 export const UsersApi = {
-  list: async (params: { page: number; limit: number; search?: string; role?: UserRole }): Promise<{ items: User[]; total: number }> => {
+  list: async (params: { page: number; limit: number; search?: string; role?: UserRole; showInactive?: boolean }): Promise<{ items: User[]; total: number }> => {
     const response = await apiClient.get<{ items: User[]; total: number }>(baseURL, { params });
     return response.data;
   },
