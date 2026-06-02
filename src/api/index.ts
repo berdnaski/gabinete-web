@@ -157,8 +157,5 @@ apiClient.interceptors.response.use(
 function handleUnauthorized() {
 	localStorage.removeItem(STORAGE_KEYS.USER);
 	localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
-
-	if (window.location.pathname !== "/login") {
-		window.location.href = "/login";
-	}
+	window.dispatchEvent(new Event("auth:unauthorized"));
 }

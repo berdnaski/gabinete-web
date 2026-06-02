@@ -1,7 +1,8 @@
 import { useAuth } from "@/hooks/use-auth";
 import { UserRole } from "@/api/users/types";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { Loading } from "@/components/loading";
+import { useEffect } from "react";
 
 interface ProtectedRouteProps {
   allowedRoles: UserRole[];
@@ -15,6 +16,15 @@ export function ProtectedRoute({
   fallback = "/",
 }: ProtectedRouteProps) {
   const { user, isInitializing, isLoading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    function handleSessionExpired() {
+      navigate("/login", { replace: true });
+    }
+    window.addEventListener("auth:unauthorized", handleSessionExpired);
+    return () => window.removeEventListener("auth:unauthorized", handleSessionExpired);
+  }, [navigate]);
 
   if (isInitializing || isLoading) {
     return (
