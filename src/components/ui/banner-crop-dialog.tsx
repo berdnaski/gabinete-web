@@ -26,6 +26,8 @@ async function cropToFile(imageSrc: string, pixelCrop: Area): Promise<File> {
   const ctx = canvas.getContext("2d")
   if (!ctx) throw new Error("Canvas context unavailable")
 
+  ctx.imageSmoothingEnabled = true
+  ctx.imageSmoothingQuality = "high"
   ctx.drawImage(
     bitmap,
     pixelCrop.x,
@@ -43,10 +45,9 @@ async function cropToFile(imageSrc: string, pixelCrop: Area): Promise<File> {
     canvas.toBlob(
       (result) => {
         if (!result) { reject(new Error("Empty canvas")); return }
-        resolve(new File([result], "banner.webp", { type: "image/webp" }))
+        resolve(new File([result], "banner.png", { type: "image/png" }))
       },
-      "image/webp",
-      0.93,
+      "image/png",
     )
   })
 }
@@ -148,7 +149,7 @@ export function BannerCropDialog({ open, imageSrc, onConfirm, onCancel }: Banner
           </div>
 
           <p className="text-2xs text-muted-foreground text-center pb-2">
-            Saída: 1200 × 400 px · WebP · Alta qualidade
+            Saída: 1200 × 400 px · PNG · Sem perda de qualidade
           </p>
         </div>
 
