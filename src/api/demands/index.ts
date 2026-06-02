@@ -183,4 +183,9 @@ export const DemandsApi = {
 	submitSurvey: async (token: string, rating: number, comment?: string): Promise<void> => {
 		await apiClient.post(`${baseURL}/survey/${token}`, { rating, comment });
 	},
+
+	reportDemand: async (id: string, reason: string): Promise<{ message: string }> => {
+		const { data } = await apiClient.post<{ message: string }>(`${baseURL}/${id}/report`, { reason });
+		return data;
+	},
 };

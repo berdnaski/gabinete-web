@@ -226,3 +226,10 @@ export function useGetCabinetReport(params: GetCabinetReportParams & { enabled?:
     staleTime: 1000 * 60 * 5,
   });
 }
+
+export function useReportDemand() {
+  return useMutation({
+    mutationFn: ({ id, reason }: { id: string; reason: string }) =>
+      DemandsApi.reportDemand(id, reason),
+  });
+}
