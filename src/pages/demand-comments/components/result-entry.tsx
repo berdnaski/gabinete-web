@@ -1,7 +1,7 @@
 import { useDeleteResult } from "@/api/results/hooks"
 import type { Result, ResultImage, ResultType } from "@/api/results/types"
 import { cn } from "@/lib/utils"
-import { formatDateToNow } from "@/utils/format-date-to-now"
+import { formatDateToNow } from "@/utils/date"
 import { FileText, Trash2 } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"

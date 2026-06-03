@@ -26,6 +26,7 @@ const PrivacyPolicyPage = lazy(() => import("@/pages/public/privacy-policy").the
 const LandingPage = lazy(() => import("@/pages/public/landing").then((m) => ({ default: m.LandingPage })));
 
 const Feed = lazy(() => import("@/pages/feed").then((m) => ({ default: m.Feed })));
+const MyNeighborhood = lazy(() => import("@/pages/my-neighborhood").then((m) => ({ default: m.MyNeighborhood })));
 const Settings = lazy(() => import("@/pages/settings").then((m) => ({ default: m.Settings })));
 const DemandComments = lazy(() => import("@/pages/demand-comments").then((m) => ({ default: m.DemandComments })));
 const Profile = lazy(() => import("@/pages/profile").then((m) => ({ default: m.Profile })));
@@ -117,6 +118,14 @@ export function AppRouter() {
         <Route
           path="profile/:userId"
           element={<Suspense fallback={<PageLoader />}><Profile /></Suspense>}
+        />
+        <Route
+          path="my-neighborhood"
+          element={
+            <ProtectedRoute allowedRoles={onlyCitizen}>
+              <Suspense fallback={<PageLoader />}><MyNeighborhood /></Suspense>
+            </ProtectedRoute>
+          }
         />
         <Route
           path="gabinetes"

@@ -1,6 +1,6 @@
 import type { DemandComments } from "@/api/demands/types"
 import { UserAvatar } from "@/components/user-avatar"
-import { formatDateToNow } from "@/utils/format-date-to-now"
+import { formatDateToNow } from "@/utils/date"
 import { Building2 } from "lucide-react"
 
 interface CommentItemProps {

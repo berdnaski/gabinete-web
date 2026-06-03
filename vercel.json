@@ -1,4 +1,10 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "rewrites": [
+    {
+      "source": "/demands/cabinet/:slug/opendata",
+      "destination": "https://api.gabineteapp.com.br/api/demands/cabinet/:slug/opendata"
+    },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }
 

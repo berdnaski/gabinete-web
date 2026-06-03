@@ -8,11 +8,14 @@ import {
   ChartTooltip,
   type ChartConfig,
 } from "@/components/ui/chart"
+import { ChartTooltip as DashboardChartTooltip } from "@/components/dashboard/chart-tooltip"
 import { useAuth } from "@/hooks/use-auth"
 import { useCurrentMember } from "@/hooks/use-current-member"
 import { usePageTitle } from "@/hooks/use-page-title"
-import { cn } from "@/lib/utils"
-import { formatDateToNow } from "@/utils/format-date-to-now"
+import { formatDateToNow, getGreeting, getFormattedDate, getMonthYear } from "@/utils/date"
+import { KpiCard } from "@/components/dashboard/kpi-card"
+import { fadeUp, stagger } from "@/utils/animation"
+import { BRAND, CAT_COLORS } from "@/utils/colors"
 import {
   AlertTriangle,
   ArrowRight,
@@ -32,90 +35,12 @@ import { useNavigate } from "react-router-dom"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
 import { DemandPriority } from "../demands/components/demand-priority"
 
-const BRAND = {
-  primary: "#0058F3",
-  blue2: "#008EFF",
-  green: "#34D144",
-}
-
-const CAT_COLORS = ["#EF4444", "#F59E0B", "#0058F3", "#34D144", "#8B5CF6", "#06B6D4"]
-
 const trendConfig: ChartConfig = {
   created: { label: "Recebidas", color: BRAND.primary },
   resolved: { label: "Resolvidas", color: BRAND.green },
 }
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 16, filter: "blur(4px)" },
-  visible: (delay = 0) => ({
-    opacity: 1,
-    y: 0,
-    filter: "blur(0px)",
-    transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] as [number, number, number, number], delay },
-  }),
-}
 
-const stagger = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.07 } },
-}
-
-const cardVariant = {
-  hidden: { opacity: 0, y: 14, filter: "blur(3px)" },
-  visible: {
-    opacity: 1,
-    y: 0,
-    filter: "blur(0px)",
-    transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
-  },
-}
-
-function getGreeting(): string {
-  const h = new Date().getHours()
-  if (h < 12) return "Bom dia"
-  if (h < 18) return "Boa tarde"
-  return "Boa noite"
-}
-
-function getFormattedDate(): string {
-  return new Intl.DateTimeFormat("pt-BR", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-  }).format(new Date())
-}
-
-function getMonthYear(): string {
-  return new Intl.DateTimeFormat("pt-BR", { month: "long", year: "numeric" }).format(new Date())
-}
-
-function ChartTip({
-  active,
-  payload,
-  labelKey = "label",
-}: {
-  active?: boolean
-  payload?: Array<{ name?: string; value: number; color?: string; payload: Record<string, string | number> }>
-  labelKey?: string
-}) {
-  if (!active || !payload?.length) return null
-  const label = String(payload[0].payload[labelKey] ?? "")
-  return (
-    <div className="rounded-xl border border-border/60 bg-background/98 px-3.5 py-3 shadow-lg shadow-black/[0.08] min-w-40 space-y-2.5">
-      <p className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground">{label}</p>
-      <div className="h-px bg-border/50" />
-      {payload.map((item, i) => (
-        <div key={i} className="flex items-center justify-between gap-6">
-          <div className="flex items-center gap-2">
-            <div className="size-2 rounded-full shrink-0" style={{ background: item.color }} />
-            <span className="text-xs text-muted-foreground">{item.name}</span>
-          </div>
-          <span className="font-mono text-sm font-bold tabular-nums text-foreground">{item.value}</span>
-        </div>
-      ))}
-    </div>
-  )
-}
 
 export function Home() {
   const { setTitle } = usePageTitle()
@@ -342,7 +267,7 @@ export function Home() {
                 />
                 <ChartTooltip
                   cursor={{ fill: "hsl(var(--muted))", opacity: 0.5, radius: 6 }}
-                  content={<ChartTip labelKey="label" />}
+                  content={<DashboardChartTooltip labelKey="label" />}
                 />
                 <Bar dataKey="created" name="Recebidas" fill="url(#createdGrad)" radius={[5, 5, 2, 2]} maxBarSize={34} animationDuration={700} animationEasing="ease-out" />
                 <Bar dataKey="resolved" name="Resolvidas" fill="url(#resolvedGrad)" radius={[5, 5, 2, 2]} maxBarSize={34} animationDuration={700} animationBegin={120} animationEasing="ease-out" />
@@ -481,66 +406,6 @@ export function Home() {
   )
 }
 
-function KpiCard({
-  icon, iconBg, iconColor, label, value, badge, loading, onClick,
-}: {
-  icon: React.ReactNode
-  iconBg: string
-  iconColor: string
-  label: string
-  value: string
-  badge?: { text: string; variant: "success" | "warning" | "danger" | "info" }
-  loading?: boolean
-  onClick?: () => void
-}) {
-  return (
-    <motion.button
-      variants={cardVariant}
-      onClick={onClick}
-      disabled={!onClick}
-      whileHover={onClick ? { y: -1, transition: { duration: 0.15 } } : undefined}
-      whileTap={onClick ? { scale: 0.99 } : undefined}
-      className={cn(
-        "relative w-full rounded-2xl border border-border bg-card p-4 sm:p-5 flex flex-col gap-3 sm:gap-4 text-left overflow-hidden",
-        "transition-all duration-150",
-        onClick ? "hover:shadow-md hover:border-border/60 cursor-pointer" : "cursor-default",
-      )}
-    >
-      <div className="flex items-start justify-between gap-2">
-        <div className={cn("flex items-center justify-center size-9 rounded-xl shrink-0", iconBg)}>
-          <span className={cn("flex items-center justify-center", iconColor)}>{icon}</span>
-        </div>
-        {badge && <KpiBadge text={badge.text} variant={badge.variant} />}
-      </div>
-      {loading ? (
-        <div className="h-9 flex items-center">
-          <Loader2 className="size-4 text-muted-foreground animate-spin" />
-        </div>
-      ) : (
-        <div className="flex flex-col gap-1">
-          <p className="text-2xl sm:text-3xl font-bold font-brand tabular-nums text-foreground leading-none tracking-tight">
-            {value}
-          </p>
-          <p className="text-xs text-muted-foreground leading-snug">{label}</p>
-        </div>
-      )}
-    </motion.button>
-  )
-}
-
-function KpiBadge({ text, variant }: { text: string; variant: "success" | "warning" | "danger" | "info" }) {
-  const styles: Record<string, string> = {
-    success: "bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800",
-    warning: "bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-800",
-    danger: "bg-red-50 text-red-600 border-red-100 dark:bg-red-950/30 dark:text-red-400 dark:border-red-800",
-    info: "bg-primary/5 text-primary border-primary/15",
-  }
-  return (
-    <span className={cn("inline-flex items-center px-2 py-0.5 rounded-full border text-xs font-semibold", styles[variant])}>
-      {text}
-    </span>
-  )
-}
 
 function UrgencyRow({ demand, onNavigate }: { demand: Demand; onNavigate: (path: string) => void }) {
   return (
