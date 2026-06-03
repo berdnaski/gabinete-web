@@ -4,7 +4,8 @@ import { SidebarInset, SidebarProvider } from "../ui/sidebar";
 import { AppSidebar } from "./components/app-sidebar";
 import { Header } from "./components/header";
 import { CitizenHeader } from "./components/citizen-header";
-import { ConsentOverlay } from "../auth/consent-overlay";
+import { ConsentOverlay } from "../auth/consent-overlay"
+import { NeighborhoodOnboardingModal } from "./components/neighborhood-onboarding-modal";
 
 import { UserRole } from "@/api/users/types";
 
@@ -47,6 +48,7 @@ export function Layout() {
         <Outlet />
       </div>
       <ConsentOverlay />
+      <NeighborhoodOnboardingModal />
     </div>
   );
 }
