@@ -42,6 +42,7 @@ interface ReportDetailSheetProps {
 
 export function ReportDetailSheet({ item, open, onOpenChange }: ReportDetailSheetProps) {
   const [confirmDelete, setConfirmDelete] = useState(false)
+  const [confirmDismiss, setConfirmDismiss] = useState(false)
   const [pendingDisableUserId, setPendingDisableUserId] = useState<string | null>(null)
   const [pendingDisableUserName, setPendingDisableUserName] = useState<string | null>(null)
 
@@ -54,7 +55,7 @@ export function ReportDetailSheet({ item, open, onOpenChange }: ReportDetailShee
 
   function handleDismiss() {
     if (!item) return
-    dismiss(item.demand.id)
+    dismiss(item.demand.id, { onSuccess: () => setConfirmDismiss(false) })
   }
 
   function handleDelete() {
@@ -209,9 +210,9 @@ export function ReportDetailSheet({ item, open, onOpenChange }: ReportDetailShee
                   size="sm"
                   className="gap-1.5"
                   disabled={isDismissed || isDismissing}
-                  onClick={handleDismiss}
+                  onClick={() => setConfirmDismiss(true)}
                 >
-                  {isDismissing ? <Loader2 className="size-3.5 animate-spin" /> : <CheckCircle className="size-3.5" />}
+                  <CheckCircle className="size-3.5" />
                   Ignorar denúncias
                 </Button>
                 <div className="flex items-center gap-2">
@@ -241,6 +242,30 @@ export function ReportDetailSheet({ item, open, onOpenChange }: ReportDetailShee
           )}
         </SheetContent>
       </Sheet>
+
+      {/* Confirm dismiss reports */}
+      <Dialog open={confirmDismiss} onOpenChange={setConfirmDismiss}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CheckCircle className="size-4 text-muted-foreground" />
+              Ignorar denúncias
+            </DialogTitle>
+            <DialogDescription>
+              As denúncias serão marcadas como ignoradas e novos reportes desta demanda serão bloqueados. Tem certeza?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfirmDismiss(false)} disabled={isDismissing}>
+              Cancelar
+            </Button>
+            <Button variant="default" onClick={handleDismiss} disabled={isDismissing}>
+              {isDismissing ? <Loader2 className="size-3.5 animate-spin mr-1" /> : null}
+              Ignorar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Confirm delete demand */}
       <Dialog open={confirmDelete} onOpenChange={setConfirmDelete}>
