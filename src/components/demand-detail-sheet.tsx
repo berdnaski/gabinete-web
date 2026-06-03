@@ -18,7 +18,7 @@ import { useAuth } from "@/hooks/use-auth"
 import { useCurrentMember } from "@/hooks/use-current-member"
 import { cn } from "@/lib/utils"
 import { getFirstLettersFromNames } from "@/utils/get-first-letters-from-names"
-import { formatDateToNow } from "@/utils/format-date-to-now"
+import { formatDateToNow } from "@/utils/date"
 import {
   CalendarIcon,
   ExternalLinkIcon,

@@ -10,7 +10,7 @@ import { useCurrentMember } from "@/hooks/use-current-member"
 import { usePageTitle } from "@/hooks/use-page-title"
 import { cn } from "@/lib/utils"
 import { getFirstLettersFromNames } from "@/utils/get-first-letters-from-names"
-import { formatDateToNow } from "@/utils/format-date-to-now"
+import { formatDateToNow } from "@/utils/date"
 import { DEMAND_STATUS_CONFIG } from "../demands/components/demand-utils"
 import { DemandPriority } from "../demands/components/demand-priority"
 import {

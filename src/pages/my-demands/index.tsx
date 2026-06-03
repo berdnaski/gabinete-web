@@ -1,11 +1,13 @@
 import { useGetMyDemands, useGetMyDemandsSummary } from "@/api/demands/hooks"
 import type { Demand } from "@/api/demands/types"
 import { DemandStatusBadge } from "@/components/demand-status-badge"
+import { KpiCard } from "@/components/dashboard/kpi-card"
 import { useAuth } from "@/hooks/use-auth"
 import { usePageTitle } from "@/hooks/use-page-title"
 import { cn } from "@/lib/utils"
-import { formatDistanceToNow } from "date-fns"
-import { ptBR } from "date-fns/locale"
+import { fadeUp, stagger } from "@/utils/animation"
+import { CAT_COLORS } from "@/utils/colors"
+import { formatDateToNow, getGreeting } from "@/utils/date"
 import { motion } from "framer-motion"
 import {
   ArrowRight,
@@ -26,85 +28,6 @@ import { ActivityChart } from "./components/activity-chart"
 import { ResolutionRing } from "./components/resolution-ring"
 import { StatusBreakdown } from "./components/status-breakdown"
 
-const CAT_COLORS = ["#0058F3", "#8B5CF6", "#06B6D4", "#34D144", "#F59E0B", "#EF4444"]
-
-function getGreeting(): string {
-  const h = new Date().getHours()
-  if (h < 12) return "Bom dia"
-  if (h < 18) return "Boa tarde"
-  return "Boa noite"
-}
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 16, filter: "blur(4px)" },
-  visible: (delay = 0) => ({
-    opacity: 1,
-    y: 0,
-    filter: "blur(0px)",
-    transition: {
-      duration: 0.45,
-      ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
-      delay,
-    },
-  }),
-}
-
-const stagger = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.07 } },
-}
-
-const cardVariant = {
-  hidden: { opacity: 0, y: 14, filter: "blur(3px)" },
-  visible: {
-    opacity: 1,
-    y: 0,
-    filter: "blur(0px)",
-    transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
-  },
-}
-
-function KpiCard({
-  icon,
-  iconBg,
-  iconColor,
-  label,
-  value,
-  sub,
-  loading,
-}: {
-  icon: React.ReactNode
-  iconBg: string
-  iconColor: string
-  label: string
-  value: string
-  sub?: string
-  loading?: boolean
-}) {
-  return (
-    <motion.div
-      variants={cardVariant}
-      className="relative rounded-2xl border border-border bg-card p-4 sm:p-5 flex flex-col gap-3 overflow-hidden"
-    >
-      <div className={cn("flex items-center justify-center size-9 rounded-xl shrink-0", iconBg)}>
-        <span className={cn("flex items-center justify-center", iconColor)}>{icon}</span>
-      </div>
-      {loading ? (
-        <div className="h-9 flex items-center">
-          <Loader2 className="size-4 text-muted-foreground animate-spin" />
-        </div>
-      ) : (
-        <div className="flex flex-col gap-1">
-          <p className="text-2xl sm:text-3xl font-bold tabular-nums text-foreground leading-none tracking-tight">
-            {value}
-          </p>
-          <p className="text-xs text-muted-foreground leading-snug">{label}</p>
-          {sub && <p className="text-2xs text-muted-foreground/70 leading-snug">{sub}</p>}
-        </div>
-      )}
-    </motion.div>
-  )
-}
 
 function DemandRow({ demand }: { demand: Demand }) {
   const navigate = useNavigate()
@@ -136,7 +59,7 @@ function DemandRow({ demand }: { demand: Demand }) {
       <div className="hidden sm:flex items-center gap-3">
         <DemandStatusBadge status={demand.status} />
         <span className="text-xs text-muted-foreground tabular-nums whitespace-nowrap">
-          {formatDistanceToNow(new Date(demand.createdAt), { addSuffix: true, locale: ptBR })}
+          {formatDateToNow(demand.createdAt)}
         </span>
       </div>
       <div className="flex items-center justify-end">

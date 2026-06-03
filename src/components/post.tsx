@@ -11,10 +11,11 @@ import { Gallery } from "./gallery"
 import { UserAvatar } from "./user-avatar"
 import { Separator } from "./ui/separator"
 import { PostInfo } from "./post-info"
-import { formatDateToNow } from "@/utils/format-date-to-now"
+import { formatDateToNow } from "@/utils/date"
 import { Button } from "./ui/button"
 import { AuthRequiredModal } from "./auth-required-modal"
 import { DemandStatusBadge } from "./demand-status-badge"
+import { DemandStaleBadge } from "./demand-stale-badge"
 import { ClaimDemandFlow } from "./claim-demand-flow"
 import {
   DropdownMenu,
@@ -368,7 +369,8 @@ function PostHeader({ demand, authorName, profilePath, showStatus, userOwnsDeman
         </div>
       </div>
 
-      <div className="flex items-center gap-1.5 shrink-0">
+      <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
+        <DemandStaleBadge status={demand.status} updatedAt={demand.updatedAt} />
         {showStatus && <DemandStatusBadge status={demand.status} />}
 
         {userOwnsDemand && (
