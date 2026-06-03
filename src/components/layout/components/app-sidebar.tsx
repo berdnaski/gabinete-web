@@ -2,7 +2,7 @@ import { useGetDemandsByCabinetSlug } from "@/api/demands/hooks"
 import { useAuth } from "@/hooks/use-auth"
 import { useCurrentMember } from "@/hooks/use-current-member"
 import { cn } from "@/lib/utils"
-import { Building2, CheckSquare, ClipboardListIcon, Flag, ExternalLink, Globe, Home, LayoutDashboard, Newspaper, Users, BarChart3, Map } from "lucide-react"
+import { Building2, CheckSquare, ClipboardListIcon, Flag, ExternalLink, Globe, Home, LayoutDashboard, MapPin, Newspaper, Users, BarChart3, Map } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
 import Logo from "../../../assets/logo.png"
 import {
@@ -127,6 +127,14 @@ export function AppSidebar() {
                 <Link to="/mapa">
                   <Map className={cn({ "text-primary": pathname === "/mapa" })} />
                   <span>Mapa</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild tooltip="Meu Bairro" isActive={pathname === "/meu-bairro"}>
+                <Link to="/meu-bairro">
+                  <MapPin className={cn({ "text-primary": pathname === "/meu-bairro" })} />
+                  <span>Meu Bairro</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

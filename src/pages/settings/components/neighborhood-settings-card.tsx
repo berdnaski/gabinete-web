@@ -57,6 +57,7 @@ async function reverseGeocode(lat: number, lng: number) {
 export function NeighborhoodSettingsCard() {
   const [open, setOpen] = useState(false)
   const [detecting, setDetecting] = useState(false)
+  const [gpsError, setGpsError] = useState<string | null>(null)
   const [form, setForm] = useState({ neighborhood: "", city: "", state: "", label: "" })
 
   const { data: neighborhoods = [], isLoading } = useListUserNeighborhoods()
@@ -65,7 +66,12 @@ export function NeighborhoodSettingsCard() {
   const { mutate: setPrimary } = useSetPrimaryNeighborhood()
 
   async function handleDetect() {
+    if (!navigator.geolocation) {
+      setGpsError("Seu navegador não suporta geolocalização.")
+      return
+    }
     setDetecting(true)
+    setGpsError(null)
     try {
       await new Promise<void>((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(
@@ -74,13 +80,22 @@ export function NeighborhoodSettingsCard() {
               const loc = await reverseGeocode(pos.coords.latitude, pos.coords.longitude)
               setForm((f) => ({ ...f, ...loc }))
               resolve()
-            } catch { reject() }
+            } catch {
+              reject(new Error("geocoding"))
+            }
           },
-          reject,
-          { timeout: 10000 },
+          (err) => reject(err),
+          { timeout: 10000, enableHighAccuracy: false, maximumAge: 60000 },
         )
       })
-    } catch {
+    } catch (err: unknown) {
+      if (err instanceof GeolocationPositionError && err.code === GeolocationPositionError.PERMISSION_DENIED) {
+        setGpsError("Permissão negada. Preencha o bairro manualmente.")
+      } else if (err instanceof GeolocationPositionError && err.code === GeolocationPositionError.TIMEOUT) {
+        setGpsError("Tempo esgotado. Verifique se a localização está ativada no Windows.")
+      } else {
+        setGpsError("Não foi possível detectar a localização. Preencha manualmente.")
+      }
     } finally {
       setDetecting(false)
     }
@@ -220,7 +235,7 @@ export function NeighborhoodSettingsCard() {
         </CardContent>
       </Card>
 
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) setGpsError(null) }}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle className="text-base">Adicionar bairro</DialogTitle>
@@ -241,6 +256,9 @@ export function NeighborhoodSettingsCard() {
               )}
               {detecting ? "Detectando..." : "Detectar localização"}
             </Button>
+            {gpsError && (
+              <p className="text-xs text-destructive -mt-1">{gpsError}</p>
+            )}
 
             <div className="space-y-3">
               <div className="space-y-1.5">
