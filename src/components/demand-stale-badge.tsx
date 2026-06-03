@@ -27,15 +27,15 @@ export function DemandStaleBadge({ status, updatedAt, className }: DemandStaleBa
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-2xs font-medium leading-none h-5",
+        "inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-xs font-medium leading-none h-5",
         isUrgent
           ? "border-red-200 bg-red-50 text-red-600 dark:border-red-800 dark:bg-red-950/30 dark:text-red-400"
           : "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-400",
         className,
       )}
     >
-      <Clock className="size-2.5 shrink-0" />
-      {days}d sem atualização
+      <Clock className="size-3 shrink-0" />
+      Parada há {days}d
     </span>
   )
 }
