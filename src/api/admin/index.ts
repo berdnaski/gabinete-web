@@ -1,5 +1,6 @@
 import { apiClient } from ".."
 import { UserRole } from "@/api/users/types"
+import type { Demand } from "@/api/demands/types"
 
 export interface CreateCabinetWithOwnerRequest {
   ownerUserId: string
@@ -65,6 +66,30 @@ export interface UpdateAdminUserRequest {
   password?: string
   role: UserRole
   avatarUrl?: string
+}
+
+export interface ReportedDemandItem {
+  demand: Demand
+  reportsCount: number
+  firstReportedAt: string
+}
+
+export interface ReportReasonItem {
+  id: string
+  reason: string
+  status: "PENDING" | "RESOLVED" | "DISMISSED"
+  createdAt: string
+  user: { id: string; name: string; avatarUrl: string | null } | null
+}
+
+export interface PaginatedAdminResponse<T> {
+  items: T[]
+  meta: {
+    total: number
+    page: number
+    limit: number
+    totalPages: number
+  }
 }
 
 export const AdminApi = {
@@ -147,5 +172,31 @@ export const AdminApi = {
   updateUser: async (id: string, data: UpdateAdminUserRequest): Promise<CreateAdminUserResponse> => {
     const response = await apiClient.patch<CreateAdminUserResponse>(`/admin/users/${id}`, data)
     return response.data
+  },
+
+  listReportedDemands: async (params: { page: number; limit: number }): Promise<PaginatedAdminResponse<ReportedDemandItem>> => {
+    const response = await apiClient.get<PaginatedAdminResponse<ReportedDemandItem>>("/admin/reports", { params })
+    return response.data
+  },
+
+  listReportReasons: async (demandId: string, params: { page: number; limit: number }): Promise<PaginatedAdminResponse<ReportReasonItem>> => {
+    const response = await apiClient.get<PaginatedAdminResponse<ReportReasonItem>>(`/admin/reports/${demandId}/reasons`, { params })
+    return response.data
+  },
+
+  dismissDemandReports: async (demandId: string): Promise<void> => {
+    await apiClient.patch(`/admin/reports/${demandId}/dismiss`)
+  },
+
+  adminDeleteDemand: async (demandId: string): Promise<void> => {
+    await apiClient.delete(`/admin/demands/${demandId}`)
+  },
+
+  disableUser: async (userId: string): Promise<void> => {
+    await apiClient.patch(`/admin/users/${userId}/disable`)
+  },
+
+  enableUser: async (userId: string): Promise<void> => {
+    await apiClient.patch(`/admin/users/${userId}/enable`)
   },
 }

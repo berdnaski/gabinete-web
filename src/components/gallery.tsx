@@ -1,10 +1,6 @@
 import { type Evidence } from "@/api/demands/types";
-import {
-  Dialog,
-  DialogOverlay,
-  DialogPortal,
-} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { Dialog as DialogPrimitive } from "radix-ui";
 import { ChevronLeftIcon, ChevronRightIcon, XIcon } from "lucide-react";
 import { useState } from "react";
 
@@ -15,10 +11,10 @@ interface GalleryProps {
 
 export function Gallery({ images, className }: GalleryProps) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const isOpen = lightboxIndex !== null;
 
   if (!images || images.length === 0) return null;
 
-  const open = (index: number) => setLightboxIndex(index);
   const close = () => setLightboxIndex(null);
   const prev = () =>
     setLightboxIndex((i) => (i === null ? null : (i - 1 + images.length) % images.length));
@@ -33,87 +29,92 @@ export function Gallery({ images, className }: GalleryProps) {
 
   return (
     <>
-      <GalleryGrid images={images} onOpen={open} className={className} />
+      <GalleryGrid images={images} onOpen={setLightboxIndex} className={className} />
 
-      <Dialog open={lightboxIndex !== null} onOpenChange={(open) => !open && close()}>
-        <DialogPortal>
-          <DialogOverlay className="bg-black/90 backdrop-blur-none" />
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center outline-none"
-            tabIndex={0}
+      <DialogPrimitive.Root open={isOpen} onOpenChange={(v) => { if (!v) close(); }}>
+        <DialogPrimitive.Portal>
+          <DialogPrimitive.Overlay className="fixed inset-0 bg-black/90 z-9998" />
+          <DialogPrimitive.Content
+            className="fixed inset-0 z-9999 flex items-center justify-center outline-none"
+            onInteractOutside={(e) => e.preventDefault()}
+            onOpenAutoFocus={(e) => e.preventDefault()}
             onKeyDown={handleKeyDown}
-            onClick={(e) => e.stopPropagation()}
           >
-            <button
-              onClick={close}
-              className="absolute top-4 right-4 z-10 flex items-center justify-center size-10 rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white"
-              aria-label="Fechar"
-            >
-              <XIcon className="size-5" />
-            </button>
+            <DialogPrimitive.Title className="sr-only">Galeria de fotos</DialogPrimitive.Title>
 
-            {images.length > 1 && lightboxIndex !== null && (
-              <span className="absolute top-4 left-1/2 -translate-x-1/2 text-white/70 text-sm">
-                {lightboxIndex + 1} / {images.length}
-              </span>
-            )}
+            {images.length > 1 && lightboxIndex !== null  && (
+              <>
+                <button
+                  onClick={close}
+                  className="absolute top-4 right-4 z-10 flex items-center justify-center size-10 rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white"
+                  aria-label="Fechar"
+                >
+                  <XIcon className="size-5" />
+                </button>
 
-            {/* Prev */}
-            {images.length > 1 && (
-              <button
-                onClick={prev}
-                className="absolute left-4 flex items-center justify-center size-10 rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white"
-                aria-label="Anterior"
-              >
-                <ChevronLeftIcon className="size-5" />
-              </button>
-            )}
+                {images.length > 1 && (
+                  <span className="absolute top-4 left-1/2 -translate-x-1/2 text-white/70 text-sm select-none pointer-events-none">
+                    {lightboxIndex + 1} / {images.length}
+                  </span>
+                )}
 
-            {lightboxIndex !== null && (
-              <img
-                key={lightboxIndex}
-                src={images[lightboxIndex].url}
-                alt={`Evidência ${lightboxIndex + 1}`}
-                className="max-h-[90vh] max-w-[90vw] rounded-lg object-contain select-none shadow-2xl"
-                draggable={false}
-              />
-            )}
-
-            {images.length > 1 && (
-              <button
-                onClick={next}
-                className="absolute right-4 flex items-center justify-center size-10 rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white"
-                aria-label="Próxima"
-              >
-                <ChevronRightIcon className="size-5" />
-              </button>
-            )}
-
-            {images.length > 1 && lightboxIndex !== null && (
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 max-w-[90vw] overflow-x-auto pb-1">
-                {images.map((img, i) => (
+                {images.length > 1 && (
                   <button
-                    key={img.id}
-                    onClick={() => setLightboxIndex(i)}
-                    className={cn(
-                      "shrink-0 size-12 rounded-md overflow-hidden border-2 transition-all",
-                      i === lightboxIndex
-                        ? "border-white scale-110"
-                        : "border-white/30 opacity-60 hover:opacity-90"
-                    )}
+                    onClick={(e) => { e.stopPropagation(); prev(); }}
+                    className="absolute left-4 flex items-center justify-center size-10 rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white"
+                    aria-label="Anterior"
                   >
-                    <img
-                      src={img.url}
-                      alt={`Miniatura ${i + 1}`}
-                      className="w-full h-full object-cover"
-                    />
+                    <ChevronLeftIcon className="size-5" />
                   </button>
-                ))}
-              </div>
+                )}
+
+                {lightboxIndex !== null && (
+                  <img
+                    key={lightboxIndex}
+                    src={images[lightboxIndex].url}
+                    alt={`Evidência ${lightboxIndex + 1}`}
+                    className="max-h-[90vh] max-w-[90vw] rounded-lg object-contain select-none shadow-2xl"
+                    draggable={false}
+                  />
+                )}
+
+                {images.length > 1 && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); next(); }}
+                    className="absolute right-4 flex items-center justify-center size-10 rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white"
+                    aria-label="Próxima"
+                  >
+                    <ChevronRightIcon className="size-5" />
+                  </button>
+                )}
+
+                {images.length > 1 && lightboxIndex !== null && (
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 max-w-[90vw] overflow-x-auto pb-1">
+                    {images.map((img, i) => (
+                      <button
+                        key={img.id}
+                        onClick={(e) => { e.stopPropagation(); setLightboxIndex(i); }}
+                        className={cn(
+                          "shrink-0 size-12 rounded-md overflow-hidden border-2 transition-all",
+                          i === lightboxIndex
+                            ? "border-white scale-110"
+                            : "border-white/30 opacity-60 hover:opacity-90"
+                        )}
+                      >
+                        <img
+                          src={img.url}
+                          alt={`Miniatura ${i + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </>
             )}
-          </div>
-        </DialogPortal>
-      </Dialog>
+          </DialogPrimitive.Content>
+        </DialogPrimitive.Portal>
+      </DialogPrimitive.Root>
     </>
   );
 }
@@ -205,7 +206,6 @@ function GalleryGrid({ images, onOpen, className }: GalleryGridProps) {
     );
   }
 
-  // 5+ images: show first 5 in a 2+3 layout with "+N" on the last
   return (
     <div className={cn("grid grid-cols-2 gap-1 rounded-lg overflow-hidden", className)}>
       <div className="grid grid-rows-2 gap-1">

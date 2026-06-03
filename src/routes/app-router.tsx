@@ -4,8 +4,6 @@ import { UserRole } from "@/api/users/types";
 import { Route, Routes } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import { Loader2 } from "lucide-react";
-import { Admin } from "@/pages/admin";
-import { AdminUsers } from "@/pages/admin/users";
 
 // Public pages — small, load eagerly
 import { Login } from "@/pages/public/login";
@@ -15,6 +13,9 @@ import { ResetPassword } from "@/pages/public/reset-password";
 import { VerifyEmail } from "@/pages/public/verify-email";
 import { GoogleCallback } from "@/pages/public/google-callback";
 import { ConfirmPasswordPage } from "@/pages/public/confirm-password";
+import { Admin } from "@/pages/admin";
+import { AdminUsers } from "@/pages/admin/users";
+import { AdminReports } from "@/pages/admin/reports";
 import { AcceptInvite } from "@/pages/public/accept-invite";
 
 const Sandbox = lazy(() => import("@/pages/public/sandbox").then((m) => ({ default: m.Sandbox })));
@@ -89,6 +90,14 @@ export function AppRouter() {
         element={<Suspense fallback={<PageLoader />}><PrivacyPolicyPage /></Suspense>}
       />
       <Route path="/" element={<Layout />}>
+        <Route
+          path="admin/denuncias"
+          element={
+            <ProtectedRoute allowedRoles={onlyAdmin}>
+              <AdminReports />
+            </ProtectedRoute>
+          }
+        />
         <Route
           index
           element={<Suspense fallback={<PageLoader />}><Feed /></Suspense>}

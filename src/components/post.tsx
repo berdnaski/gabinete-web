@@ -1,6 +1,7 @@
 import { useLikeDemand, useUnlinkDemand } from "@/api/demands/hooks"
 import type { Demand } from "@/api/demands/types"
-import { Building2, ExternalLinkIcon, MapPinIcon, MessageCircle, MoreHorizontal, Share2, ThumbsUp, Unlink, UserCheck } from "lucide-react"
+import { ReportDemandDialog } from "@/components/report-demand-dialog"
+import { Building2, ExternalLinkIcon, MapPinIcon, MessageCircle, MoreHorizontal, FlagIcon, Share2, ThumbsUp, Unlink, UserCheck } from "lucide-react"
 import type { ComponentProps } from "react"
 import { useEffect, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
@@ -50,6 +51,7 @@ export function Post({ demand, className, hideComment = false, showStatus = fals
   const [showClaimFlow, setShowClaimFlow] = useState(false)
   const [showAssignDialog, setShowAssignDialog] = useState(false)
   const [showUnlinkDialog, setShowUnlinkDialog] = useState(false)
+  const [showReportDialog, setShowReportDialog] = useState(false)
 
   const isCabinetMember = user?.isCabinetMember ?? false
   const isUnlinked = !demand.cabinetId
@@ -157,8 +159,17 @@ export function Post({ demand, className, hideComment = false, showStatus = fals
         profilePath={profilePath}
         showStatus={showStatus}
         userOwnsDemand={userOwnsDemand}
+        isAuthenticated={isAuthenticated}
         onAssign={() => setShowAssignDialog(true)}
         onUnlink={() => setShowUnlinkDialog(true)}
+        onReport={() => {
+          if (!isAuthenticated) {
+            setAuthModalVariant("like")
+            setShowAuthModal(true)
+            return
+          }
+          setShowReportDialog(true)
+        }}
       />
 
       <div
@@ -283,6 +294,12 @@ export function Post({ demand, className, hideComment = false, showStatus = fals
 
       <AuthRequiredModal open={showAuthModal} onOpenChange={setShowAuthModal} variant={authModalVariant} />
 
+      <ReportDemandDialog
+        demandId={demand.id}
+        open={showReportDialog}
+        onOpenChange={setShowReportDialog}
+      />
+
       {isCabinetMember && (
         <ClaimDemandFlow demand={demand} open={showClaimFlow} onOpenChange={setShowClaimFlow} />
       )}
@@ -328,11 +345,13 @@ interface PostHeaderProps {
   profilePath: string | null
   showStatus: boolean
   userOwnsDemand: boolean
+  isAuthenticated: boolean
   onAssign: () => void
   onUnlink: () => void
+  onReport: () => void
 }
 
-function PostHeader({ demand, authorName, profilePath, showStatus, userOwnsDemand, onAssign, onUnlink }: PostHeaderProps) {
+function PostHeader({ demand, authorName, profilePath, showStatus, userOwnsDemand , onAssign, onUnlink, onReport }: PostHeaderProps) {
   const avatarEl = profilePath ? (
     <Link to={profilePath} className="shrink-0" onClick={(e) => e.stopPropagation()}>
       <UserAvatar size="lg" name={authorName} avatarUrl={demand?.reporter?.avatarUrl} />
@@ -373,7 +392,7 @@ function PostHeader({ demand, authorName, profilePath, showStatus, userOwnsDeman
         <DemandStaleBadge status={demand.status} updatedAt={demand.updatedAt} />
         {showStatus && <DemandStatusBadge status={demand.status} />}
 
-        {userOwnsDemand && (
+        {userOwnsDemand ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -395,6 +414,30 @@ function PostHeader({ demand, authorName, profilePath, showStatus, userOwnsDeman
               <DropdownMenuItem onClick={onUnlink} className="text-destructive focus:text-destructive">
                 <Unlink className="size-3.5" />
                 Desvincular demanda
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                size="icon"
+                variant="ghost"
+                aria-label="Mais opções"
+                className="text-muted-foreground size-7"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <MoreHorizontal className="size-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+              <DropdownMenuItem
+                onClick={onReport}
+                variant="destructive"
+                className="text-destructive "
+              >
+                <FlagIcon className="size-3.5" />
+                Denunciar
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

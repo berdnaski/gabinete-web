@@ -1,11 +1,39 @@
 import type { User } from "@/api/users"
 import { UserRole, UserRoleLabel } from "@/api/users/types"
+import { useAdminEnableUser } from "@/api/admin/hooks"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { getFirstLettersFromNames } from "@/utils/get-first-letters-from-names"
 import type { ColumnDef } from "@tanstack/react-table"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, Loader2, UserCheck } from "lucide-react"
 import { Link } from "react-router-dom"
+import { toast } from "sonner"
 import { UserEditSheet } from "./user-edit-sheet"
+
+function EnableButton({ userId }: { userId: string }) {
+  const { mutate, isPending } = useAdminEnableUser()
+
+  function handleEnable() {
+    mutate(userId, {
+      onSuccess: () => toast.success("Usuário reativado com sucesso."),
+      onError: () => toast.error("Erro ao reativar usuário."),
+    })
+  }
+
+  return (
+    <Button
+      variant="outline"
+      size="sm"
+      className="gap-1 text-xs h-7 text-green-700 border-green-200 hover:bg-green-50 hover:text-green-800"
+      onClick={handleEnable}
+      disabled={isPending}
+    >
+      {isPending ? <Loader2 className="size-3 animate-spin" /> : <UserCheck className="size-3" />}
+      Ativar
+    </Button>
+  )
+}
 
 export const usersColumns: ColumnDef<User>[] = [
   {
@@ -22,7 +50,12 @@ export const usersColumns: ColumnDef<User>[] = [
             </AvatarFallback>
           </Avatar>
           <div className="flex flex-col gap-0.5 min-w-0">
-            <span className="text-sm font-semibold text-foreground truncate">{u.name}</span>
+            <div className="flex items-center gap-1.5">
+              <span className="text-sm font-semibold text-foreground truncate">{u.name}</span>
+              {u.disabledAt && (
+                <Badge variant="secondary" className="text-2xs px-1.5 py-0 shrink-0">Inativo</Badge>
+              )}
+            </div>
             <span className="text-xs text-muted-foreground truncate">{u.id}</span>
           </div>
         </div>
@@ -58,12 +91,16 @@ export const usersColumns: ColumnDef<User>[] = [
   {
     id: "actions",
     header: "",
-    size: 140,
+    size: 160,
     cell: ({ row }) => {
       const u = row.original
       return (
         <div className="flex items-center justify-end gap-1.5">
-          <UserEditSheet userId={u.id} />
+          {u.disabledAt ? (
+            <EnableButton userId={u.id} />
+          ) : (
+            <UserEditSheet userId={u.id} />
+          )}
           <Link
             to={`/profile/${u.id}`}
             className="inline-flex items-center gap-1 text-xs text-primary hover:underline"

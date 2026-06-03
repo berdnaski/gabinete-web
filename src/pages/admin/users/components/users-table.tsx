@@ -17,6 +17,15 @@ const filterFields: DataTableFilterField[] = [
       { label: "Cidadão", value: UserRole.CITIZEN },
     ],
   },
+  {
+    id: "showInactive",
+    label: "Status",
+    type: "select",
+    options: [
+      { label: "Ativos", value: "false" },
+      { label: "Inativos", value: "true" },
+    ],
+  },
 ]
 
 export function UsersTable() {
@@ -31,8 +40,9 @@ export function UsersTable() {
   const role = (Object.values(UserRole) as string[]).includes(rawRole)
     ? (rawRole as UserRole)
     : undefined
+  const showInactive = searchParams.get("showInactive") === "true"
 
-  const { data, isLoading } = useGetUsersPaginated({ page, limit, search, role })
+  const { data, isLoading } = useGetUsersPaginated({ page, limit, search, role, showInactive })
 
   const { table, ...tableState } = useDataTable({
     data: data?.items ?? [],

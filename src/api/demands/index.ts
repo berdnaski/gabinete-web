@@ -184,6 +184,11 @@ export const DemandsApi = {
 		await apiClient.post(`${baseURL}/survey/${token}`, { rating, comment });
 	},
 
+	reportDemand: async (id: string, reason: string): Promise<{ message: string }> => {
+		const { data } = await apiClient.post<{ message: string }>(`${baseURL}/${id}/report`, { reason });
+		return data;
+	},
+	
 	getMyDemandsSummary: async (): Promise<MyDemandsSummary> => {
 		const { data } = await apiClient.get<MyDemandsSummary>(`${baseURL}/me/summary`);
 		return data;
