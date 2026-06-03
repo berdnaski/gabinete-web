@@ -1,5 +1,6 @@
 import { useGetDemandsByCabinetSlug, useUpdateDemandProgress } from "@/api/demands/hooks"
 import { DemandStatus, type Demand } from "@/api/demands/types"
+import { CreateResultDialog } from "@/components/create-result-dialog"
 import { DemandDetailSheet } from "@/components/demand-detail-sheet"
 import { DemandStatusBadge } from "@/components/demand-status-badge"
 import { UpdateProgressDialog } from "@/components/update-progress-dialog"
@@ -209,9 +210,10 @@ function KanbanColumn({
 interface KanbanBoardProps {
   demands: Demand[]
   onOpenDetail: (d: Demand) => void
+  onNeedsResults: (d: Demand) => void
 }
 
-function KanbanBoard({ demands, onOpenDetail }: KanbanBoardProps) {
+function KanbanBoard({ demands, onOpenDetail, onNeedsResults }: KanbanBoardProps) {
   const [draggingId, setDraggingId] = useState<string | null>(null)
   const [overColumn, setOverColumn] = useState<DemandStatus | null>(null)
   const [pendingMove, setPendingMove] = useState<{ demand: Demand; toStatus: DemandStatus } | null>(null)
@@ -260,7 +262,7 @@ function KanbanBoard({ demands, onOpenDetail }: KanbanBoardProps) {
     const demand = demands.find((d) => d.id === demandId)
     if (!demand) return
 
-    if (STATUSES_REQUIRING_NOTE.includes(toStatus)) {
+    if (STATUSES_REQUIRING_NOTE.includes(toStatus) || toStatus === DemandStatus.RESOLVED) {
       setPendingMove({ demand, toStatus })
     } else {
       updateProgress({ id: demandId, status: toStatus })
@@ -295,6 +297,11 @@ function KanbanBoard({ demands, onOpenDetail }: KanbanBoardProps) {
           defaultStatus={pendingMove.toStatus}
           open={!!pendingMove}
           onOpenChange={(open) => !open && setPendingMove(null)}
+          onNeedsResults={() => {
+            const demand = pendingMove.demand
+            setPendingMove(null)
+            onNeedsResults(demand)
+          }}
         />
       )}
     </>
@@ -317,7 +324,7 @@ function DemandListCard({
       className="group relative flex items-center gap-3 pl-5 pr-3 py-2.5 hover:bg-muted/40 transition-colors cursor-pointer"
       onClick={() => onOpenDetail(demand)}
     >
-      <div className={cn("absolute left-0 inset-y-0 w-[3px] rounded-r-sm", stripeClass)} />
+      <div className={cn("absolute left-0 inset-y-0 w-0.75 rounded-r-sm", stripeClass)} />
 
       {demand.reporter ? (
         <Avatar className="size-7 shrink-0">
@@ -420,6 +427,7 @@ export function MyTasks() {
   const { currentMember } = useCurrentMember()
   const [detailDemand, setDetailDemand] = useState<Demand | null>(null)
   const [progressDemand, setProgressDemand] = useState<Demand | null>(null)
+  const [resultTargetDemand, setResultTargetDemand] = useState<Demand | null>(null)
   const [view, setView] = useState<"list" | "kanban">("list")
 
   useEffect(() => {
@@ -533,7 +541,7 @@ export function MyTasks() {
             onOpenProgress={setProgressDemand}
           />
         ) : (
-          <KanbanBoard demands={allDemands} onOpenDetail={setDetailDemand} />
+          <KanbanBoard demands={allDemands} onOpenDetail={setDetailDemand} onNeedsResults={setResultTargetDemand} />
         )}
       </div>
 
@@ -549,6 +557,19 @@ export function MyTasks() {
           currentStatus={progressDemand.status}
           open={!!progressDemand}
           onOpenChange={(open) => !open && setProgressDemand(null)}
+          onNeedsResults={() => {
+            const demand = progressDemand
+            setProgressDemand(null)
+            setResultTargetDemand(demand)
+          }}
+        />
+      )}
+
+      {resultTargetDemand && (
+        <CreateResultDialog
+          demand={resultTargetDemand}
+          open={!!resultTargetDemand}
+          onOpenChange={(open) => !open && setResultTargetDemand(null)}
         />
       )}
     </>

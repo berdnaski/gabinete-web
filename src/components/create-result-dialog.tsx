@@ -1,5 +1,4 @@
 import { useCreateResult } from "@/api/results/hooks"
-import type { ResultType } from "@/api/results/types"
 import type { Demand } from "@/api/demands/types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -18,6 +17,8 @@ import { useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
 
 const MAX_PROTOCOL_SIZE_MB = 20
+const MAX_IMAGES = 10
+const MAX_FILE_SIZE_MB = 10
 
 function formatBytes(bytes: number) {
   if (bytes < 1024) return `${bytes} B`
@@ -25,53 +26,18 @@ function formatBytes(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
-const RESULT_TYPE_OPTIONS: {
-  value: ResultType
-  label: string
-  className: string
-}[] = [
-  {
-    value: "INFRASTRUCTURE",
-    label: "Infraestrutura",
-    className: "border-blue-200 bg-blue-50 text-blue-700",
-  },
-  {
-    value: "SOCIAL",
-    label: "Social",
-    className: "border-emerald-200 bg-emerald-50 text-emerald-700",
-  },
-  {
-    value: "LEGISLATIVE",
-    label: "Legislativo",
-    className: "border-purple-200 bg-purple-50 text-purple-700",
-  },
-  {
-    value: "OTHER",
-    label: "Outro",
-    className: "border-zinc-200 bg-zinc-50 text-zinc-600",
-  },
-]
-
-const MAX_IMAGES = 10
-const MAX_FILE_SIZE_MB = 10
-
 interface CreateResultDialogProps {
   demand: Demand
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-export function CreateResultDialog({
-  demand,
-  open,
-  onOpenChange,
-}: CreateResultDialogProps) {
+export function CreateResultDialog({ demand, open, onOpenChange }: CreateResultDialogProps) {
   const { cabinet } = useAuth()
   const { mutate, isPending } = useCreateResult()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const protocolInputRef = useRef<HTMLInputElement>(null)
 
-  const [type, setType] = useState<ResultType>("INFRASTRUCTURE")
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
   const [images, setImages] = useState<File[]>([])
@@ -80,7 +46,6 @@ export function CreateResultDialog({
 
   useEffect(() => {
     if (open) {
-      setType("INFRASTRUCTURE")
       setTitle("")
       setDescription("")
       setImages([])
@@ -92,9 +57,7 @@ export function CreateResultDialog({
   useEffect(() => {
     const urls = images.map((f) => URL.createObjectURL(f))
     setPreviews(urls)
-    return () => {
-      urls.forEach((u) => URL.revokeObjectURL(u))
-    }
+    return () => { urls.forEach((u) => URL.revokeObjectURL(u)) }
   }, [images])
 
   function handleFiles(files: FileList | null) {
@@ -113,15 +76,9 @@ export function CreateResultDialog({
     }
     setImages((prev) => {
       const next = [...prev, ...valid].slice(0, MAX_IMAGES)
-      if (prev.length + valid.length > MAX_IMAGES) {
-        toast.error(`Máximo de ${MAX_IMAGES} imagens por resultado.`)
-      }
+      if (prev.length + valid.length > MAX_IMAGES) toast.error(`Máximo de ${MAX_IMAGES} fotos.`)
       return next
     })
-  }
-
-  function removeImage(index: number) {
-    setImages((prev) => prev.filter((_, i) => i !== index))
   }
 
   function handleDrop(e: React.DragEvent) {
@@ -132,12 +89,11 @@ export function CreateResultDialog({
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!cabinet?.slug || !title.trim() || !description.trim()) return
-
     mutate(
       {
         title: title.trim(),
         description: description.trim(),
-        type,
+        type: "OTHER",
         cabinetSlug: cabinet.slug,
         demandId: demand.id,
         images: images.length > 0 ? images : undefined,
@@ -153,66 +109,48 @@ export function CreateResultDialog({
     )
   }
 
+  const canSubmit = !isPending && title.trim().length > 0 && description.trim().length > 0
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg max-h-[90vh] flex flex-col p-0 gap-0">
+      <DialogContent className="sm:max-w-md max-h-[90vh] flex flex-col p-0 gap-0">
         <DialogHeader className="px-5 pt-5 pb-4 border-b border-border shrink-0">
-          <DialogTitle className="text-base">Registrar resultado</DialogTitle>
-        </DialogHeader>
-
-        <div className="flex-1 overflow-y-auto px-5 py-4">
-          <div className="rounded-lg border border-border bg-muted/40 px-3.5 py-2.5 mb-4">
+          <DialogTitle className="text-base font-semibold">Registrar resultado</DialogTitle>
+          <div className="mt-1.5 rounded-lg bg-muted/50 border border-border/60 px-3 py-2">
             <p className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground mb-0.5">
               Demanda
             </p>
-            <p className="text-sm font-medium text-foreground line-clamp-2">
-              {demand.title}
-            </p>
+            <p className="text-sm font-medium text-foreground line-clamp-1">{demand.title}</p>
           </div>
+        </DialogHeader>
 
-          <form id="create-result-form" onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <div className="flex flex-col gap-2">
-              <p className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground">
-                Tipo
-              </p>
-              <div className="grid grid-cols-2 gap-1.5">
-                {RESULT_TYPE_OPTIONS.map((opt) => (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    onClick={() => setType(opt.value)}
-                    className={cn(
-                      "flex items-center justify-center rounded-lg border px-3 py-2 text-sm font-medium transition-all",
-                      type === opt.value
-                        ? cn(opt.className, "ring-1 ring-inset ring-current/20")
-                        : "border-border text-muted-foreground hover:text-foreground hover:border-border/80",
-                    )}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-            </div>
+        <div className="flex-1 overflow-y-auto">
+          <form id="create-result-form" onSubmit={handleSubmit} className="px-5 py-4 flex flex-col gap-4">
 
-            <div className="flex flex-col gap-2">
-              <p className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground">
-                Título
-              </p>
+            {/* Title */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-foreground">
+                O que foi feito?
+                <span className="text-destructive ml-0.5">*</span>
+              </label>
               <Input
                 placeholder="Ex: Calçada reparada na Rua XV"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 maxLength={120}
                 required
+                autoFocus
               />
             </div>
 
-            <div className="flex flex-col gap-2">
-              <p className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground">
-                Descrição
-              </p>
+            {/* Description */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-foreground">
+                Descreva com mais detalhes
+                <span className="text-destructive ml-0.5">*</span>
+              </label>
               <Textarea
-                placeholder="Descreva o que foi realizado, decisões tomadas ou informações relevantes..."
+                placeholder="O que foi realizado, quem executou, quando ficou pronto..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 maxLength={1000}
@@ -221,36 +159,34 @@ export function CreateResultDialog({
                 required
               />
               {description.length > 800 && (
-                <p className="text-xs text-muted-foreground text-right">
+                <p className="text-xs text-muted-foreground text-right tabular-nums">
                   {description.length}/1000
                 </p>
               )}
             </div>
 
+            {/* Images */}
             <div className="flex flex-col gap-2">
               <div className="flex items-center justify-between">
-                <p className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground">
-                  Imagens
-                </p>
+                <label className="text-xs font-semibold text-foreground">
+                  Fotos
+                  <span className="ml-1 font-normal text-muted-foreground">(opcional)</span>
+                </label>
                 {images.length > 0 && (
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-xs text-muted-foreground tabular-nums">
                     {images.length}/{MAX_IMAGES}
                   </span>
                 )}
               </div>
 
-              {images.length > 0 && (
+              {images.length > 0 ? (
                 <div className="grid grid-cols-4 gap-1.5">
                   {previews.map((src, i) => (
                     <div key={i} className="relative group aspect-square rounded-lg overflow-hidden border border-border bg-muted">
-                      <img
-                        src={src}
-                        alt=""
-                        className="w-full h-full object-cover"
-                      />
+                      <img src={src} alt="" className="w-full h-full object-cover" />
                       <button
                         type="button"
-                        onClick={() => removeImage(i)}
+                        onClick={() => setImages((prev) => prev.filter((_, j) => j !== i))}
                         className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity"
                       >
                         <X className="size-4 text-white" />
@@ -267,22 +203,20 @@ export function CreateResultDialog({
                     </button>
                   )}
                 </div>
-              )}
-
-              {images.length === 0 && (
+              ) : (
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   onDrop={handleDrop}
                   onDragOver={(e) => e.preventDefault()}
-                  className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-border bg-muted/20 px-4 py-6 hover:bg-muted/40 transition-colors"
+                  className="flex items-center gap-3 rounded-lg border border-dashed border-border bg-muted/20 px-4 py-3 hover:bg-muted/40 transition-colors text-left"
                 >
-                  <div className="size-8 rounded-full bg-muted flex items-center justify-center">
-                    <ImageIcon className="size-4 text-muted-foreground" />
+                  <div className="size-7 rounded-md bg-muted flex items-center justify-center shrink-0">
+                    <ImageIcon className="size-3.5 text-muted-foreground" />
                   </div>
-                  <div className="text-center">
-                    <p className="text-sm font-medium text-foreground">Adicionar imagens</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
+                  <div>
+                    <p className="text-sm font-medium text-foreground">Adicionar fotos</p>
+                    <p className="text-xs text-muted-foreground">
                       Arraste ou clique · até {MAX_IMAGES} fotos · max {MAX_FILE_SIZE_MB}MB cada
                     </p>
                   </div>
@@ -299,15 +233,12 @@ export function CreateResultDialog({
               />
             </div>
 
+            {/* Protocol */}
             <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-1.5">
-                <p className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground">
-                  Protocolo oficial
-                </p>
-                <span className="text-2xs text-muted-foreground/50 normal-case tracking-normal font-normal">
-                  — opcional
-                </span>
-              </div>
+              <label className="text-xs font-semibold text-foreground">
+                Documento oficial
+                <span className="ml-1 font-normal text-muted-foreground">(opcional)</span>
+              </label>
 
               {protocol ? (
                 <div className="flex items-center gap-2.5 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2.5">
@@ -330,13 +261,16 @@ export function CreateResultDialog({
                 <button
                   type="button"
                   onClick={() => protocolInputRef.current?.click()}
-                  className="flex items-center gap-2.5 rounded-lg border border-dashed border-border px-3 py-2.5 hover:bg-muted/30 transition-colors text-left"
+                  className={cn(
+                    "flex items-center gap-2.5 rounded-lg border border-dashed border-border",
+                    "px-3 py-2.5 hover:bg-muted/30 transition-colors text-left",
+                  )}
                 >
                   <div className="size-7 rounded-md bg-muted flex items-center justify-center shrink-0">
                     <FileTextIcon className="size-3.5 text-muted-foreground" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-foreground">Anexar protocolo</p>
+                    <p className="text-sm font-medium text-foreground">Anexar documento</p>
                     <p className="text-xs text-muted-foreground">
                       PDF, DOC ou imagem · max {MAX_PROTOCOL_SIZE_MB}MB
                     </p>
@@ -366,19 +300,10 @@ export function CreateResultDialog({
 
         <div className="px-5 py-4 border-t border-border shrink-0">
           <DialogFooter>
-            <Button
-              variant="outline"
-              type="button"
-              onClick={() => onOpenChange(false)}
-              disabled={isPending}
-            >
+            <Button variant="outline" type="button" onClick={() => onOpenChange(false)} disabled={isPending}>
               Cancelar
             </Button>
-            <Button
-              type="submit"
-              form="create-result-form"
-              disabled={isPending || !title.trim() || !description.trim()}
-            >
+            <Button type="submit" form="create-result-form" disabled={!canSubmit}>
               {isPending && <Loader2 className="size-4 animate-spin" />}
               Registrar resultado
             </Button>
