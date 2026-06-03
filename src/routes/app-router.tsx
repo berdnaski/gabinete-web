@@ -43,6 +43,7 @@ const MyDemands = lazy(() => import("@/pages/my-demands").then((m) => ({ default
 const onlyMember = [UserRole.MEMBER];
 const onlyAdmin = [UserRole.ADMIN];
 const onlyCitizen = [UserRole.CITIZEN];
+const citizenOrMember = [UserRole.CITIZEN, UserRole.MEMBER];
 
 function PageLoader() {
   return (
@@ -122,7 +123,7 @@ export function AppRouter() {
         <Route
           path="my-neighborhood"
           element={
-            <ProtectedRoute allowedRoles={onlyCitizen}>
+            <ProtectedRoute allowedRoles={citizenOrMember}>
               <Suspense fallback={<PageLoader />}><MyNeighborhood /></Suspense>
             </ProtectedRoute>
           }

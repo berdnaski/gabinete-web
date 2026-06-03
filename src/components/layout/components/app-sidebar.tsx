@@ -130,16 +130,14 @@ export function AppSidebar() {
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
-            {isCitizen && (
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Meu Bairro" isActive={pathname === "/my-neighborhood"}>
-                  <Link to="/my-neighborhood">
-                    <MapPin className={cn({ "text-primary": pathname === "/my-neighborhood" })} />
-                    <span>Meu Bairro</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            )}
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild tooltip="Meu Bairro" isActive={pathname === "/my-neighborhood"}>
+                <Link to="/my-neighborhood">
+                  <MapPin className={cn({ "text-primary": pathname === "/my-neighborhood" })} />
+                  <span>Meu Bairro</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
             {isCitizen && (
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip="Minhas Demandas" isActive={pathname === "/my-demands"}>
