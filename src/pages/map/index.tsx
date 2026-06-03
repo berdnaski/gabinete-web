@@ -97,37 +97,37 @@ export function Map() {
   }, [points]);
 
   return (
-    <div className="max-w-6xl mx-auto flex flex-col gap-4">
-      <div className="flex items-start justify-between flex-wrap gap-2">
-        <div>
-          <h1 className="text-xl font-bold text-foreground tracking-tight">Mapa de demandas</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
+    <div className="max-w-6xl mx-auto flex flex-col gap-3 sm:gap-4">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h1 className="text-base sm:text-xl font-bold text-foreground tracking-tight">Mapa de demandas</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
             Visualize onde as demandas estão concentradas na sua cidade.
           </p>
         </div>
         {!isLoading && (
           <div className="text-right shrink-0">
-            <p className="text-2xl font-bold text-foreground tabular-nums">{points.length}</p>
-            <p className="text-xs text-muted-foreground">demandas mapeadas</p>
+            <p className="text-xl sm:text-2xl font-bold text-foreground tabular-nums">{points.length}</p>
+            <p className="text-2xs sm:text-xs text-muted-foreground">demandas mapeadas</p>
           </div>
         )}
       </div>
 
       {!isLoading && insight && (
-        <div className="flex gap-3 flex-wrap sm:flex-nowrap">
-          <div className="flex-1 min-w-0 rounded-xl border border-border bg-card px-4 py-3.5 flex flex-col gap-0.5">
-            <p className="text-xs text-muted-foreground">Bairro com mais demandas</p>
-            <p className="text-xl font-bold text-foreground tracking-tight leading-none mt-1">
+        <div className="grid grid-cols-2 sm:flex gap-2.5 sm:gap-3">
+          <div className="col-span-1 rounded-xl border border-border bg-card px-3.5 py-3 sm:px-4 sm:py-3.5 flex flex-col gap-0.5 flex-1 min-w-0">
+            <p className="text-2xs sm:text-xs text-muted-foreground">Bairro com mais demandas</p>
+            <p className="text-base sm:text-xl font-bold text-foreground tracking-tight leading-tight mt-1 line-clamp-2">
               {insight.topNeighborhood}
             </p>
-            <p className="text-xs text-muted-foreground mt-1">nos últimos 30 dias</p>
+            <p className="text-2xs sm:text-xs text-muted-foreground mt-1">nos últimos 30 dias</p>
           </div>
-          <div className="rounded-xl border border-border bg-card px-4 py-3.5 flex flex-col gap-0.5 sm:min-w-40 sm:text-right">
-            <p className="text-xs text-muted-foreground">Ocorrências no bairro</p>
+          <div className="col-span-1 rounded-xl border border-border bg-card px-3.5 py-3 sm:px-4 sm:py-3.5 flex flex-col gap-0.5 sm:min-w-40 sm:text-right">
+            <p className="text-2xs sm:text-xs text-muted-foreground">Ocorrências no bairro</p>
             <p className="text-3xl font-extrabold text-primary tabular-nums leading-none mt-1">
               {insight.occurrenceCount}
             </p>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-2xs sm:text-xs text-muted-foreground mt-1">
               {insight.occurrenceCount === 1 ? "demanda registrada" : "demandas registradas"}
             </p>
           </div>
@@ -136,7 +136,7 @@ export function Map() {
 
       <div className="relative rounded-xl overflow-hidden border border-border shadow-sm">
         {isLoading ? (
-          <div className="flex items-center justify-center h-[65vh] bg-muted/20">
+          <div className="flex items-center justify-center h-[50vh] sm:h-[65vh] bg-muted/20 min-h-70">
             <div className="flex flex-col items-center gap-3">
               <Loading className="text-primary size-6" />
               <p className="text-sm text-muted-foreground">Carregando mapa...</p>
@@ -144,20 +144,22 @@ export function Map() {
           </div>
         ) : (
           <APIProvider apiKey={API_KEY} language="pt-BR" region="BR">
-            <GoogleMap
-              mapId="DEMO_MAP_ID"
-              defaultCenter={points.length > 0 ? center : BRAZIL_CENTER}
-              defaultZoom={points.length > 0 ? 14 : 5}
-              style={{ height: "65vh", width: "100%" }}
-              streetViewControl={false}
-              mapTypeControl={false}
-              fullscreenControl={false}
-              gestureHandling="cooperative"
-            >
-              {points.map((point, i) => (
-                <PointMarker key={i} point={point} />
-              ))}
-            </GoogleMap>
+            <div className="h-[50vh] sm:h-[65vh]">
+              <GoogleMap
+                mapId="DEMO_MAP_ID"
+                defaultCenter={points.length > 0 ? center : BRAZIL_CENTER}
+                defaultZoom={points.length > 0 ? 14 : 5}
+                style={{ height: "100%", width: "100%" }}
+                streetViewControl={false}
+                mapTypeControl={false}
+                fullscreenControl={false}
+                gestureHandling="cooperative"
+              >
+                {points.map((point, i) => (
+                  <PointMarker key={i} point={point} />
+                ))}
+              </GoogleMap>
+            </div>
           </APIProvider>
         )}
 
