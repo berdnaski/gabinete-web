@@ -5,13 +5,15 @@ import { PersonalInfoCard } from "./components/personal-info-card";
 import { CabinetInfoCard } from "./components/cabinet-info-card";
 import { CabinetBrandingCard } from "./components/cabinet-branding-card";
 import { SecurityCard } from "./components/security-card";
+import { NeighborhoodSettingsCard } from "./components/neighborhood-settings-card";
 import { useAuth } from "@/hooks/use-auth";
-import { User, Building2, Monitor } from "lucide-react";
+import { User, Building2, Monitor, MapPin } from "lucide-react";
 import { UserRole } from "@/api/users/types";
 
 const TAB_ICONS: Record<string, React.ElementType> = {
   profile: User,
   cabinet: Building2,
+  location: MapPin,
   system: Monitor,
 };
 
@@ -21,6 +23,7 @@ export function Settings() {
 
   const tabs = useMemo(() => [
     { value: "profile", label: "Meu Perfil" },
+    { value: "location", label: "Localização" },
     ...(user?.isCabinetMember ? [{ value: "cabinet", label: "Meu Gabinete" }] : []),
   ], [user?.isCabinetMember]);
 
@@ -94,6 +97,10 @@ export function Settings() {
               <TabsContent value="profile" className="space-y-4 outline-none focus-visible:ring-0 mt-0">
                 <PersonalInfoCard />
                 <SecurityCard />
+              </TabsContent>
+
+              <TabsContent value="location" className="space-y-4 outline-none focus-visible:ring-0 mt-0">
+                <NeighborhoodSettingsCard />
               </TabsContent>
 
               <TabsContent value="cabinet" className="space-y-4 outline-none focus-visible:ring-0 mt-0">
