@@ -1,36 +1,35 @@
 import { useState } from "react"
-import { MapPin, Plus, Star, Trash2, Loader2, Navigation } from "lucide-react"
+import { AlertTriangle, MapPin, Plus, Star, Trash2, Loader2, Navigation, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
+  Card, CardContent, CardDescription, CardHeader, CardTitle,
 } from "@/components/ui/card"
 import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+  Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog"
 import {
-  useListUserNeighborhoods,
-  useAddUserNeighborhood,
-  useRemoveUserNeighborhood,
-  useSetPrimaryNeighborhood,
+  useListUserNeighborhoods, useAddUserNeighborhood,
+  useRemoveUserNeighborhood, useSetPrimaryNeighborhood,
 } from "@/api/neighborhood/hooks"
 import { cn } from "@/lib/utils"
 import { NeighborhoodSearchInput } from "@/components/ui/location-picker/neighborhood-search-input"
+import type { NeighborhoodResult } from "@/components/ui/location-picker/neighborhood-search-input"
+import { motion, AnimatePresence } from "framer-motion"
 
 const BRAZIL_STATES = [
   "AC","AL","AP","AM","BA","CE","DF","ES","GO","MA",
   "MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN",
   "RS","RO","RR","SC","SP","SE","TO",
 ]
+
+const QUICK_LABELS = ["Casa", "Trabalho", "Outro"]
+const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1]
+
+function normalizeStr(s: string) {
+  return s.trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "")
+}
 
 async function reverseGeocodeCity(lat: number, lng: number) {
   const key = import.meta.env.VITE_GOOGLE_PLACES_API_KEY
@@ -39,9 +38,7 @@ async function reverseGeocodeCity(lat: number, lng: number) {
   )
   const data = await res.json()
   if (data.status !== "OK" || !data.results?.length) return { city: "", state: "" }
-
-  let city = ""
-  let state = ""
+  let city = ""; let state = ""
   for (const result of data.results) {
     for (const comp of result.address_components as Array<{ long_name: string; short_name: string; types: string[] }>) {
       if (!city && (comp.types.includes("administrative_area_level_2") || comp.types.includes("locality"))) city = comp.long_name
@@ -52,25 +49,45 @@ async function reverseGeocodeCity(lat: number, lng: number) {
   return { city, state }
 }
 
+const EMPTY_FORM = { neighborhood: "", city: "", state: "", label: "", customLabel: "" }
+
 export function NeighborhoodSettingsCard() {
   const [open, setOpen] = useState(false)
   const [detecting, setDetecting] = useState(false)
+  const [gpsDetected, setGpsDetected] = useState(false)
   const [gpsError, setGpsError] = useState<string | null>(null)
   const [locationBias, setLocationBias] = useState<{ lat: number; lng: number } | undefined>()
-  const [form, setForm] = useState({ neighborhood: "", city: "", state: "", label: "" })
+  const [cityConflict, setCityConflict] = useState<{ neighborhoodCity: string; currentCity: string } | null>(null)
+  const [form, setForm] = useState(EMPTY_FORM)
 
   const { data: neighborhoods = [], isLoading } = useListUserNeighborhoods()
   const { mutateAsync: addNeighborhood, isPending: isAdding } = useAddUserNeighborhood()
   const { mutate: removeNeighborhood } = useRemoveUserNeighborhood()
   const { mutate: setPrimary } = useSetPrimaryNeighborhood()
 
-  async function handleDetect() {
-    if (!navigator.geolocation) {
-      setGpsError("Seu navegador não suporta geolocalização.")
+  function closeDialog() {
+    setOpen(false)
+    setGpsError(null); setLocationBias(undefined); setGpsDetected(false)
+    setCityConflict(null); setForm(EMPTY_FORM)
+  }
+
+  function handleNeighborhoodSelect(result: NeighborhoodResult) {
+    setCityConflict(null)
+    if (form.city && result.city && normalizeStr(result.city) !== normalizeStr(form.city)) {
+      setCityConflict({ neighborhoodCity: result.city, currentCity: form.city })
       return
     }
-    setDetecting(true)
-    setGpsError(null)
+    setForm((f) => ({
+      ...f,
+      neighborhood: result.neighborhood,
+      city: result.city || f.city,
+      state: result.state || f.state,
+    }))
+  }
+
+  async function handleDetect() {
+    if (!navigator.geolocation) { setGpsError("Geolocalização não suportada."); return }
+    setDetecting(true); setGpsError(null)
     try {
       await new Promise<void>((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(
@@ -78,42 +95,37 @@ export function NeighborhoodSettingsCard() {
             const { latitude: lat, longitude: lng } = pos.coords
             try {
               const { city, state } = await reverseGeocodeCity(lat, lng)
-              setLocationBias({ lat, lng })
-              setForm((f) => ({ ...f, city, state }))
-              resolve()
-            } catch {
-              setLocationBias({ lat, lng })
-              resolve()
-            }
+              setLocationBias({ lat, lng }); setGpsDetected(true)
+              setForm((f) => ({ ...f, city, state })); resolve()
+            } catch { setLocationBias({ lat, lng }); resolve() }
           },
           (err) => reject(err),
           { timeout: 10000, enableHighAccuracy: false, maximumAge: 60000 },
         )
       })
     } catch (err: unknown) {
-      if (err instanceof GeolocationPositionError && err.code === GeolocationPositionError.PERMISSION_DENIED) {
-        setGpsError("Permissão negada. Preencha o bairro manualmente.")
-      } else if (err instanceof GeolocationPositionError && err.code === GeolocationPositionError.TIMEOUT) {
-        setGpsError("Tempo esgotado. Verifique se a localização está ativada no Windows.")
-      } else {
-        setGpsError("Não foi possível detectar a localização. Preencha manualmente.")
-      }
-    } finally {
-      setDetecting(false)
-    }
+      const msg =
+        err instanceof GeolocationPositionError && err.code === GeolocationPositionError.PERMISSION_DENIED
+          ? "Permissão negada. Preencha manualmente."
+          : err instanceof GeolocationPositionError && err.code === GeolocationPositionError.TIMEOUT
+            ? "Tempo esgotado. Verifique o GPS do dispositivo."
+            : "Não foi possível detectar a localização."
+      setGpsError(msg)
+    } finally { setDetecting(false) }
   }
 
   async function handleAdd() {
-    if (!form.neighborhood.trim() || !form.city.trim() || !form.state.trim()) return
+    const { neighborhood, city, state, label, customLabel } = form
+    if (!neighborhood.trim() || !city.trim() || !state.trim() || cityConflict) return
+    const effectiveLabel = label === "Outro" ? customLabel : label
     await addNeighborhood({
-      neighborhood: form.neighborhood.trim(),
-      city: form.city.trim(),
-      state: form.state.trim(),
-      label: form.label.trim() || undefined,
+      neighborhood: neighborhood.trim(), city: city.trim(), state: state.trim(),
+      label: effectiveLabel.trim() || undefined,
     })
-    setOpen(false)
-    setForm({ neighborhood: "", city: "", state: "", label: "" })
+    closeDialog()
   }
+
+  const showCityFields = !gpsDetected || !form.city || !!cityConflict
 
   return (
     <>
@@ -122,17 +134,10 @@ export function NeighborhoodSettingsCard() {
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <MapPin className="size-4 text-muted-foreground" />
-              <CardTitle className="text-base font-semibold text-foreground">
-                Meus Bairros
-              </CardTitle>
+              <CardTitle className="text-base font-semibold text-foreground">Meus Bairros</CardTitle>
             </div>
             {neighborhoods.length < 3 && (
-              <Button
-                size="sm"
-                variant="outline"
-                className="gap-1.5 h-7 text-xs"
-                onClick={() => setOpen(true)}
-              >
+              <Button size="sm" variant="outline" className="gap-1.5 h-7 text-xs" onClick={() => setOpen(true)}>
                 <Plus className="size-3" />
                 Adicionar
               </Button>
@@ -153,15 +158,8 @@ export function NeighborhoodSettingsCard() {
               <div className="size-10 rounded-full bg-muted flex items-center justify-center">
                 <MapPin className="size-4 text-muted-foreground" />
               </div>
-              <p className="text-sm text-muted-foreground">
-                Nenhum bairro salvo ainda.
-              </p>
-              <Button
-                size="sm"
-                variant="outline"
-                className="gap-1.5"
-                onClick={() => setOpen(true)}
-              >
+              <p className="text-sm text-muted-foreground">Nenhum bairro salvo ainda.</p>
+              <Button size="sm" variant="outline" className="gap-1.5" onClick={() => setOpen(true)}>
                 <Plus className="size-3.5" />
                 Adicionar bairro
               </Button>
@@ -169,54 +167,36 @@ export function NeighborhoodSettingsCard() {
           ) : (
             <div className="flex flex-col divide-y divide-border/40">
               {neighborhoods.map((n) => (
-                <div key={n.id} className="flex items-center gap-3 py-3">
+                <div key={n.id} className="flex items-center gap-3 py-3 group">
                   <div className="size-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                     <MapPin className="size-3.5 text-primary" />
                   </div>
-
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <p className="text-sm font-semibold text-foreground truncate">
-                        {n.neighborhood}
-                      </p>
+                      <p className="text-sm font-semibold text-foreground truncate">{n.neighborhood}</p>
                       {n.label && (
                         <span className="text-2xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded-md shrink-0">
                           {n.label}
                         </span>
                       )}
-                      {n.isPrimary && (
-                        <Star className="size-3 text-amber-400 fill-amber-400 shrink-0" />
-                      )}
+                      {n.isPrimary && <Star className="size-3 text-amber-400 fill-amber-400 shrink-0" />}
                     </div>
-                    <p className="text-xs text-muted-foreground">
-                      {n.city} · {n.state}
-                    </p>
+                    <p className="text-xs text-muted-foreground">{n.city} · {n.state}</p>
                   </div>
-
-                  <div className="flex items-center gap-1 shrink-0">
+                  <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                     {!n.isPrimary && (
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        onClick={() => setPrimary(n.id)}
-                        title="Definir como principal"
-                        className="text-muted-foreground hover:text-amber-500"
-                      >
+                      <Button variant="ghost" size="icon-sm" onClick={() => setPrimary(n.id)}
+                        title="Definir como principal" className="text-muted-foreground hover:text-amber-500">
                         <Star className="size-3.5" />
                       </Button>
                     )}
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      onClick={() => removeNeighborhood(n.id)}
-                      className="text-muted-foreground hover:text-destructive"
-                    >
+                    <Button variant="ghost" size="icon-sm" onClick={() => removeNeighborhood(n.id)}
+                      className="text-muted-foreground hover:text-destructive">
                       <Trash2 className="size-3.5" />
                     </Button>
                   </div>
                 </div>
               ))}
-
               {neighborhoods.length < 3 && (
                 <div className="pt-3">
                   <button
@@ -237,97 +217,197 @@ export function NeighborhoodSettingsCard() {
         </CardContent>
       </Card>
 
-      <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setGpsError(null); setLocationBias(undefined); setForm({ neighborhood: "", city: "", state: "", label: "" }) } }}>
+      <Dialog open={open} onOpenChange={(v) => { if (!v) closeDialog(); else setOpen(true) }}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
-            <DialogTitle className="text-base">Adicionar bairro</DialogTitle>
+            <DialogTitle className="text-base flex items-center gap-2">
+              <MapPin className="size-4 text-primary" />
+              Adicionar bairro
+              {gpsDetected && (
+                <span className="ml-auto inline-flex items-center gap-1 text-2xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-full px-2 py-0.5">
+                  <Navigation className="size-2.5" />
+                  GPS
+                </span>
+              )}
+            </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4 py-1">
+            {/* GPS detect button */}
             <Button
-              variant="outline"
-              size="sm"
-              className="w-full gap-2"
-              onClick={handleDetect}
-              disabled={detecting}
+              variant="outline" size="sm" className="w-full gap-2"
+              onClick={handleDetect} disabled={detecting}
             >
-              {detecting ? (
-                <Loader2 className="size-3.5 animate-spin" />
-              ) : (
-                <Navigation className="size-3.5" />
-              )}
-              {detecting ? "Detectando..." : "Detectar localização"}
+              {detecting ? <Loader2 className="size-3.5 animate-spin" /> : <Navigation className="size-3.5" />}
+              {detecting ? "Detectando..." : gpsDetected ? "Detectar novamente" : "Detectar localização"}
             </Button>
-            {gpsError && (
-              <p className="text-xs text-destructive -mt-1">{gpsError}</p>
+
+            <AnimatePresence>
+              {gpsError && (
+                <motion.p
+                  key="gps-err"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="text-xs text-destructive"
+                >
+                  {gpsError}
+                </motion.p>
+              )}
+            </AnimatePresence>
+
+            {gpsDetected && form.city && !cityConflict && (
+              <motion.div
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2, ease: EASE }}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800"
+              >
+                <Navigation className="size-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <p className="text-xs font-medium text-emerald-700 dark:text-emerald-300">
+                  {form.city} · {form.state}
+                </p>
+              </motion.div>
             )}
 
             <div className="space-y-3">
+              {/* Neighborhood */}
               <div className="space-y-1.5">
                 <Label className="text-xs font-semibold">Bairro</Label>
                 <NeighborhoodSearchInput
                   value={form.neighborhood}
                   locationBias={locationBias}
-                  onSelect={(result) => setForm((f) => ({
-                    ...f,
-                    neighborhood: result.neighborhood,
-                    city: result.city || f.city,
-                    state: result.state || f.state,
-                  }))}
-                  onClear={() => setForm((f) => ({ ...f, neighborhood: "" }))}
+                  onSelect={handleNeighborhoodSelect}
+                  onClear={() => { setForm((f) => ({ ...f, neighborhood: "" })); setCityConflict(null) }}
                   placeholder="Buscar bairro no Maps..."
                 />
               </div>
 
-              <div className="grid grid-cols-3 gap-2">
-                <div className="col-span-2 space-y-1.5">
-                  <Label className="text-xs font-semibold">Cidade</Label>
-                  <Input
-                    placeholder="Cidade"
-                    value={form.city}
-                    onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))}
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold">Estado</Label>
-                  <select
-                    value={form.state}
-                    onChange={(e) => setForm((f) => ({ ...f, state: e.target.value }))}
-                    className={cn(
-                      "flex h-8 w-full rounded-md border border-input bg-background px-2",
-                      "text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                    )}
+              {/* Conflict card */}
+              <AnimatePresence>
+                {cityConflict && (
+                  <motion.div
+                    key="conflict"
+                    initial={{ opacity: 0, y: -6, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.22, ease: EASE }}
+                    className="rounded-xl border border-destructive/20 bg-destructive/5 p-3 space-y-2.5"
                   >
-                    <option value="">UF</option>
-                    {BRAZIL_STATES.map((s) => <option key={s} value={s}>{s}</option>)}
-                  </select>
-                </div>
-              </div>
+                    <div className="flex items-center gap-1.5">
+                      <AlertTriangle className="size-3.5 text-destructive shrink-0" />
+                      <p className="text-xs font-semibold text-destructive">Bairro de outra cidade</p>
+                    </div>
+                    <div className="grid grid-cols-[1fr_16px_1fr] gap-1.5 items-center">
+                      <div className="rounded-lg bg-destructive/10 border border-destructive/15 px-2 py-1.5">
+                        <p className="text-2xs font-semibold uppercase tracking-widest text-destructive/50 mb-0.5">Bairro em</p>
+                        <p className="text-xs font-bold text-destructive truncate">{cityConflict.neighborhoodCity}</p>
+                      </div>
+                      <p className="text-center text-xs text-muted-foreground/40 select-none">≠</p>
+                      <div className="rounded-lg bg-muted border border-border px-2 py-1.5">
+                        <p className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground/50 mb-0.5">Sua cidade</p>
+                        <p className="text-xs font-bold text-foreground truncate">{cityConflict.currentCity}</p>
+                      </div>
+                    </div>
+                    <p className="text-2xs text-muted-foreground">
+                      Corrija a cidade abaixo ou busque outro bairro.
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
-              <div className="space-y-1.5">
+              {/* City + State */}
+              <AnimatePresence>
+                {showCityFields && (
+                  <motion.div
+                    key="city-fields"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="grid grid-cols-3 gap-2"
+                  >
+                    <div className="col-span-2 space-y-1.5">
+                      <Label className="text-xs font-semibold">Cidade</Label>
+                      <Input
+                        placeholder="Cidade"
+                        value={form.city}
+                        onChange={(e) => { setForm((f) => ({ ...f, city: e.target.value })); setCityConflict(null) }}
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-semibold">Estado</Label>
+                      <select
+                        value={form.state}
+                        onChange={(e) => setForm((f) => ({ ...f, state: e.target.value }))}
+                        className={cn(
+                          "flex h-8 w-full rounded-md border border-input bg-background px-2",
+                          "text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                        )}
+                      >
+                        <option value="">UF</option>
+                        {BRAZIL_STATES.map((s) => <option key={s} value={s}>{s}</option>)}
+                      </select>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Label chips */}
+              <div className="space-y-2">
                 <Label className="text-xs font-semibold">
                   Apelido <span className="font-normal text-muted-foreground">(opcional)</span>
                 </Label>
-                <Input
-                  placeholder="Ex: Casa, Trabalho"
-                  value={form.label}
-                  onChange={(e) => setForm((f) => ({ ...f, label: e.target.value }))}
-                  maxLength={30}
-                />
+                <div className="flex gap-1.5 flex-wrap">
+                  {QUICK_LABELS.map((opt) => (
+                    <button
+                      key={opt} type="button"
+                      onClick={() => {
+                        setForm((f) => ({ ...f, label: f.label === opt ? "" : opt, customLabel: "" }))
+                      }}
+                      className={cn(
+                        "px-3 py-1 rounded-full text-xs font-medium border transition-all duration-150",
+                        form.label === opt
+                          ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                          : "bg-transparent text-muted-foreground border-border hover:border-primary/40 hover:text-foreground",
+                      )}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+                <AnimatePresence>
+                  {form.label === "Outro" && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.18 }}
+                    >
+                      <Input
+                        placeholder="Ex: Faculdade, Academia..."
+                        value={form.customLabel}
+                        onChange={(e) => setForm((f) => ({ ...f, customLabel: e.target.value }))}
+                        maxLength={30}
+                        className="mt-1.5"
+                        autoFocus
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
           </div>
 
           <DialogFooter>
-            <Button variant="outline" size="sm" onClick={() => setOpen(false)}>
+            <Button variant="outline" size="sm" className="gap-1.5" onClick={closeDialog}>
+              <X className="size-3.5" />
               Cancelar
             </Button>
             <Button
-              size="sm"
-              onClick={handleAdd}
-              disabled={isAdding || !form.neighborhood.trim() || !form.city.trim() || !form.state.trim()}
+              size="sm" onClick={handleAdd}
+              disabled={isAdding || !form.neighborhood.trim() || !form.city.trim() || !form.state.trim() || !!cityConflict}
             >
-              {isAdding && <Loader2 className="size-3.5 animate-spin" />}
+              {isAdding && <Loader2 className="size-3.5 animate-spin mr-1" />}
               Salvar
             </Button>
           </DialogFooter>
