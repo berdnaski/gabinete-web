@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button"
 import { NotificationPopover } from "@/components/layout/components/notification-popover"
 import { UserDropdown } from "@/components/user-dropdown"
 import { useAuth } from "@/hooks/use-auth"
-import { Building2, LayoutDashboard, LogIn, MapPin } from "lucide-react"
+import { Building2, LayoutDashboard, LogIn, MapPin, MapPinHouse } from "lucide-react"
 import { Link, NavLink } from "react-router-dom"
 import GIcon from '@/assets/icon.svg'
 import { cn } from "@/lib/utils"
@@ -13,6 +13,7 @@ const PUBLIC_NAV_LINKS = [
 ]
 
 const CITIZEN_NAV_LINKS = [
+  { to: "/meu-bairro", label: "Meu Bairro", icon: MapPinHouse },
   { to: "/my-demands", label: "Minhas Demandas", icon: LayoutDashboard },
 ]
 
