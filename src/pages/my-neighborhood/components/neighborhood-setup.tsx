@@ -126,7 +126,7 @@ export function NeighborhoodSetup({ onSuccess }: NeighborhoodSetupProps) {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
             className="w-full max-w-sm flex flex-col items-center text-center gap-6"
           >
             <div className="size-16 rounded-2xl bg-primary/10 flex items-center justify-center">
@@ -178,7 +178,7 @@ export function NeighborhoodSetup({ onSuccess }: NeighborhoodSetupProps) {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
             className="w-full max-w-sm"
           >
             <div className="rounded-2xl border border-border bg-card p-6 space-y-5 shadow-sm">
