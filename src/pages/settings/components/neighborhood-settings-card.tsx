@@ -24,6 +24,7 @@ import {
   useSetPrimaryNeighborhood,
 } from "@/api/neighborhood/hooks"
 import { cn } from "@/lib/utils"
+import { NeighborhoodSearchInput } from "@/components/ui/location-picker/neighborhood-search-input"
 
 const BRAZIL_STATES = [
   "AC","AL","AP","AM","BA","CE","DF","ES","GO","MA",
@@ -31,33 +32,31 @@ const BRAZIL_STATES = [
   "RS","RO","RR","SC","SP","SE","TO",
 ]
 
-async function reverseGeocode(lat: number, lng: number) {
+async function reverseGeocodeCity(lat: number, lng: number) {
   const key = import.meta.env.VITE_GOOGLE_PLACES_API_KEY
   const res = await fetch(
     `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${key}&language=pt-BR`,
   )
   const data = await res.json()
-  if (data.status !== "OK" || !data.results?.length) throw new Error()
+  if (data.status !== "OK" || !data.results?.length) return { city: "", state: "" }
 
-  let neighborhood = ""
   let city = ""
   let state = ""
-
   for (const result of data.results) {
     for (const comp of result.address_components as Array<{ long_name: string; short_name: string; types: string[] }>) {
-      if (!neighborhood && (comp.types.includes("sublocality_level_1") || comp.types.includes("neighborhood"))) neighborhood = comp.long_name
-      if (!city && comp.types.includes("locality")) city = comp.long_name
+      if (!city && (comp.types.includes("administrative_area_level_2") || comp.types.includes("locality"))) city = comp.long_name
       if (!state && comp.types.includes("administrative_area_level_1")) state = comp.short_name
     }
     if (city && state) break
   }
-  return { neighborhood, city, state }
+  return { city, state }
 }
 
 export function NeighborhoodSettingsCard() {
   const [open, setOpen] = useState(false)
   const [detecting, setDetecting] = useState(false)
   const [gpsError, setGpsError] = useState<string | null>(null)
+  const [locationBias, setLocationBias] = useState<{ lat: number; lng: number } | undefined>()
   const [form, setForm] = useState({ neighborhood: "", city: "", state: "", label: "" })
 
   const { data: neighborhoods = [], isLoading } = useListUserNeighborhoods()
@@ -76,12 +75,15 @@ export function NeighborhoodSettingsCard() {
       await new Promise<void>((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(
           async (pos) => {
+            const { latitude: lat, longitude: lng } = pos.coords
             try {
-              const loc = await reverseGeocode(pos.coords.latitude, pos.coords.longitude)
-              setForm((f) => ({ ...f, ...loc }))
+              const { city, state } = await reverseGeocodeCity(lat, lng)
+              setLocationBias({ lat, lng })
+              setForm((f) => ({ ...f, city, state }))
               resolve()
             } catch {
-              reject(new Error("geocoding"))
+              setLocationBias({ lat, lng })
+              resolve()
             }
           },
           (err) => reject(err),
@@ -235,7 +237,7 @@ export function NeighborhoodSettingsCard() {
         </CardContent>
       </Card>
 
-      <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) setGpsError(null) }}>
+      <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setGpsError(null); setLocationBias(undefined); setForm({ neighborhood: "", city: "", state: "", label: "" }) } }}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle className="text-base">Adicionar bairro</DialogTitle>
@@ -263,10 +265,17 @@ export function NeighborhoodSettingsCard() {
             <div className="space-y-3">
               <div className="space-y-1.5">
                 <Label className="text-xs font-semibold">Bairro</Label>
-                <Input
-                  placeholder="Ex: Centro"
+                <NeighborhoodSearchInput
                   value={form.neighborhood}
-                  onChange={(e) => setForm((f) => ({ ...f, neighborhood: e.target.value }))}
+                  locationBias={locationBias}
+                  onSelect={(result) => setForm((f) => ({
+                    ...f,
+                    neighborhood: result.neighborhood,
+                    city: result.city || f.city,
+                    state: result.state || f.state,
+                  }))}
+                  onClear={() => setForm((f) => ({ ...f, neighborhood: "" }))}
+                  placeholder="Buscar bairro no Maps..."
                 />
               </div>
 
