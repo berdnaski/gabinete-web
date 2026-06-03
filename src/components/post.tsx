@@ -350,7 +350,7 @@ interface PostHeaderProps {
   onReport: () => void
 }
 
-function PostHeader({ demand, authorName, profilePath, showStatus, userOwnsDemand, isAuthenticated, onAssign, onUnlink, onReport }: PostHeaderProps) {
+function PostHeader({ demand, authorName, profilePath, showStatus, userOwnsDemand , onAssign, onUnlink, onReport }: PostHeaderProps) {
   const avatarEl = profilePath ? (
     <Link to={profilePath} className="shrink-0" onClick={(e) => e.stopPropagation()}>
       <UserAvatar size="lg" name={authorName} avatarUrl={demand?.reporter?.avatarUrl} />

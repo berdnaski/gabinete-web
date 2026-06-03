@@ -30,7 +30,7 @@ import { formatDateToNow } from "@/utils/format-date-to-now"
 import { getFirstLettersFromNames } from "@/utils/get-first-letters-from-names"
 import { formatDistanceToNow } from "date-fns"
 import { ptBR } from "date-fns/locale"
-import { AlertTriangle, CheckCircle, FlagIcon, ImageIcon, Loader2, MapPinIcon, Trash2, UserX } from "lucide-react"
+import { AlertTriangle, CheckCircle, ImageIcon, Loader2, MapPinIcon, Trash2, UserX } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 

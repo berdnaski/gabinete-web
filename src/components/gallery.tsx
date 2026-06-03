@@ -2,7 +2,7 @@ import { type Evidence } from "@/api/demands/types";
 import { cn } from "@/lib/utils";
 import { Dialog as DialogPrimitive } from "radix-ui";
 import { ChevronLeftIcon, ChevronRightIcon, XIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 interface GalleryProps {
   images: Evidence[];
@@ -13,17 +13,8 @@ export function Gallery({ images, className }: GalleryProps) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const isOpen = lightboxIndex !== null;
 
-  // useEffect(() => {
-  //   if (isOpen) {
-  //     const prev = document.body.style.overflow;
-  //     document.body.style.overflow = "hidden";
-  //     return () => { document.body.style.overflow = prev; };
-  //   }
-  // }, [isOpen]);
-
   if (!images || images.length === 0) return null;
 
-  const open = (index: number) => setLightboxIndex(index);
   const close = () => setLightboxIndex(null);
   const prev = () =>
     setLightboxIndex((i) => (i === null ? null : (i - 1 + images.length) % images.length));
