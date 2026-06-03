@@ -102,6 +102,7 @@ src/
 | `/map` | Map | Geographic map + heatmap of demands |
 | `/demand-comments/:id` | DemandComments | Demand detail with comment thread |
 | `/my-demands` | MyDemands | Citizen's own demands with statistics |
+| `/my-neighborhood` | MyNeighborhood | Neighborhood dashboard — demands, categories, cabinets (CITIZEN only) |
 | `/cabinets` | Cabinets | Browse all cabinets |
 | `/profile` | Profile | User profile management |
 | `/settings` | Settings | Cabinet branding, personal info, security |
@@ -127,8 +128,10 @@ src/
 
 **Feature components** (in `src/components/`):
 - `DemandDetailSheet` — Slide-over panel showing full demand details
-- `CreateResultDialog` — Modal for creating a resolution result linked to a demand
-- `UpdateProgressDialog` — Modal for updating demand status
+- `CreateResultDialog` — Modal for creating a resolution result; `type` is always `OTHER` internally (removed from UI)
+- `UpdateProgressDialog` — Modal for updating demand status; requires ≥1 result before RESOLVED; `onNeedsResults` callback opens `CreateResultDialog`
+- `NeighborhoodOnboardingModal` — Auto-shows for authenticated citizens with 0 saved neighborhoods; dismissible per session via `sessionStorage`
+- `DemandStaleBadge` — Badge showing days without update (amber ≥15 days, red ≥30 days); hidden for terminal statuses
 - `ClaimDemandFlow` — Multi-step flow for cabinet staff to claim an open demand
 - `InviteMemberDialog` — Invite team member by email
 - `ReportDemandDialog` — Citizen reporting/flagging a demand
@@ -138,6 +141,10 @@ src/
 - `UserDropdown` — User menu with logout and profile navigation
 - `DemandStatusBadge` — Status chip with color coding
 - `TeamSwitcher` — Switch between cabinets in cabinet staff context
+
+**UI primitives** (in `src/components/ui/`):
+- `NeighborhoodSearchInput` — Google Places autocomplete filtered to `neighborhood/sublocality` types; accepts optional `locationBias` (GPS coords)
+- `CitySelect` — City combobox fetched from IBGE API (`/localidades/estados/:uf/municipios`); disabled until state is selected; clears city on state change
 
 **Layouts:**
 - `Layout` — Main authenticated layout with sidebar navigation
@@ -171,11 +178,11 @@ src/
 - `demands/` — CRUD, claim, assign, comments, likes, report, evidence upload (presigned), progress update, surveys, analytics
 - `cabinets/` — CRUD, member management, invitations
 - `users/` — profile, avatar upload
+- `neighborhood/` — user neighborhood CRUD (`list`, `add`, `remove`, `setPrimary`) + `getDashboard` for the neighborhood feed
 - `categories/` — list and manage demand categories
 - `results/` — CRUD, image and protocol upload
 - `notifications/` — list, mark read
 - `admin/` — admin-only operations
-- `ibge/` — Brazilian municipality/state geographic data (external IBGE API)
 
 ## Validation Schemas (`src/schemas/`)
 
@@ -216,5 +223,11 @@ src/
 **Real-time:** Socket.io connection is established after login. Listens for demand status changes and new notifications.
 
 **Dark Mode:** Managed by `ThemeProvider`. Components use Tailwind `dark:` variants. Toggle via `ThemeToggle` component.
+
+**Neighborhood flow:** `/my-neighborhood` is citizen-only (`ProtectedRoute allowedRoles={[CITIZEN]}`). `NeighborhoodOnboardingModal` in `Layout` auto-opens for authenticated citizens without any saved neighborhood. Manual input requires selecting state first, then city via `CitySelect` (IBGE API). Neighborhood name always comes from Google Places autocomplete (`NeighborhoodSearchInput`) — never free text. City mismatch between selected neighborhood and registered city shows an inline conflict card and blocks saving.
+
+**Result → demand status:** Deleting the last result of a RESOLVED demand automatically reverts it to IN_PROGRESS (handled server-side via EventEmitter; no client-side action needed).
+
+**Password validation:** Registration requires min 8 characters (schema `src/validation-schemas/register.ts`). Do not lower this — backend DTO enforces the same minimum.
 
 **Cabinet Context:** Cabinet staff pages (`/private/*`) require the user to have an active cabinet selected in `AuthContext`. `useCurrentMember()` returns the user's role in that cabinet.

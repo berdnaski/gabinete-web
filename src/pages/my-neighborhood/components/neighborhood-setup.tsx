@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { AlertTriangle, Loader2, MapPin, Navigation, Search, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { CitySelect } from "@/components/ui/city-select"
 import { useAddUserNeighborhood } from "@/api/neighborhood/hooks"
