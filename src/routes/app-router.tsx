@@ -120,8 +120,12 @@ export function AppRouter() {
           element={<Suspense fallback={<PageLoader />}><Profile /></Suspense>}
         />
         <Route
-          path="meu-bairro"
-          element={<Suspense fallback={<PageLoader />}><MyNeighborhood /></Suspense>}
+          path="my-neighborhood"
+          element={
+            <ProtectedRoute allowedRoles={onlyCitizen}>
+              <Suspense fallback={<PageLoader />}><MyNeighborhood /></Suspense>
+            </ProtectedRoute>
+          }
         />
         <Route
           path="gabinetes"

@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { AlertTriangle, MapPin, Plus, Star, Trash2, Loader2, Navigation, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { CitySelect } from "@/components/ui/city-select"
 import { Label } from "@/components/ui/label"
 import {
   Card, CardContent, CardDescription, CardHeader, CardTitle,
@@ -316,7 +316,7 @@ export function NeighborhoodSettingsCard() {
                 )}
               </AnimatePresence>
 
-              {/* City + State */}
+              {/* State + City */}
               <AnimatePresence>
                 {showCityFields && (
                   <motion.div
@@ -326,19 +326,11 @@ export function NeighborhoodSettingsCard() {
                     exit={{ opacity: 0 }}
                     className="grid grid-cols-3 gap-2"
                   >
-                    <div className="col-span-2 space-y-1.5">
-                      <Label className="text-xs font-semibold">Cidade</Label>
-                      <Input
-                        placeholder="Cidade"
-                        value={form.city}
-                        onChange={(e) => { setForm((f) => ({ ...f, city: e.target.value })); setCityConflict(null) }}
-                      />
-                    </div>
                     <div className="space-y-1.5">
                       <Label className="text-xs font-semibold">Estado</Label>
                       <select
                         value={form.state}
-                        onChange={(e) => setForm((f) => ({ ...f, state: e.target.value }))}
+                        onChange={(e) => { setForm((f) => ({ ...f, state: e.target.value })); setCityConflict(null) }}
                         className={cn(
                           "flex h-8 w-full rounded-md border border-input bg-background px-2",
                           "text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
@@ -347,6 +339,14 @@ export function NeighborhoodSettingsCard() {
                         <option value="">UF</option>
                         {BRAZIL_STATES.map((s) => <option key={s} value={s}>{s}</option>)}
                       </select>
+                    </div>
+                    <div className="col-span-2 space-y-1.5">
+                      <Label className="text-xs font-semibold">Cidade</Label>
+                      <CitySelect
+                        state={form.state}
+                        value={form.city}
+                        onChange={(c) => { setForm((f) => ({ ...f, city: c })); setCityConflict(null) }}
+                      />
                     </div>
                   </motion.div>
                 )}

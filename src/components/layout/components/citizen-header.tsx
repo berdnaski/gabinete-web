@@ -13,7 +13,7 @@ const PUBLIC_NAV_LINKS = [
 ]
 
 const CITIZEN_NAV_LINKS = [
-  { to: "/meu-bairro", label: "Meu Bairro", icon: MapPinHouse },
+  { to: "/my-neighborhood", label: "Meu Bairro", icon: MapPinHouse },
   { to: "/my-demands", label: "Minhas Demandas", icon: LayoutDashboard },
 ]
 

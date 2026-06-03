@@ -1,8 +1,8 @@
 import { useState } from "react"
 import { AlertTriangle, Loader2, MapPin, Navigation, Search, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { CitySelect } from "@/components/ui/city-select"
 import { useAddUserNeighborhood } from "@/api/neighborhood/hooks"
 import { cn } from "@/lib/utils"
 import { motion, AnimatePresence } from "framer-motion"
@@ -300,7 +300,7 @@ export function NeighborhoodSetup({ onSuccess }: NeighborhoodSetupProps) {
                   )}
                 </AnimatePresence>
 
-                {/* City + State — hidden when GPS has city and no conflict */}
+                {/* State + City — hidden when GPS has city and no conflict */}
                 <AnimatePresence>
                   {showCityFields && (
                     <motion.div
@@ -311,19 +311,11 @@ export function NeighborhoodSetup({ onSuccess }: NeighborhoodSetupProps) {
                       transition={{ duration: 0.2 }}
                       className="grid grid-cols-3 gap-2.5"
                     >
-                      <div className="col-span-2 space-y-1.5">
-                        <Label className="text-xs font-semibold">Cidade</Label>
-                        <Input
-                          placeholder="Ex: Belo Horizonte"
-                          value={city}
-                          onChange={(e) => { setCity(e.target.value); setCityConflict(null) }}
-                        />
-                      </div>
                       <div className="space-y-1.5">
                         <Label className="text-xs font-semibold">Estado</Label>
                         <select
                           value={state}
-                          onChange={(e) => setState(e.target.value)}
+                          onChange={(e) => { setState(e.target.value); setCityConflict(null) }}
                           className={cn(
                             "flex h-8 w-full rounded-md border border-input bg-background px-2",
                             "text-sm ring-offset-background focus-visible:outline-none",
@@ -333,6 +325,14 @@ export function NeighborhoodSetup({ onSuccess }: NeighborhoodSetupProps) {
                           <option value="">UF</option>
                           {BRAZIL_STATES.map((s) => <option key={s} value={s}>{s}</option>)}
                         </select>
+                      </div>
+                      <div className="col-span-2 space-y-1.5">
+                        <Label className="text-xs font-semibold">Cidade</Label>
+                        <CitySelect
+                          state={state}
+                          value={city}
+                          onChange={(c) => { setCity(c); setCityConflict(null) }}
+                        />
                       </div>
                     </motion.div>
                   )}
