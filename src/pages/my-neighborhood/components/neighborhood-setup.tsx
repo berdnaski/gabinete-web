@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { AlertTriangle, Loader2, MapPin, Navigation, Search, X } from "lucide-react"
+import { Info, Loader2, MapPin, Navigation, Search, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -54,7 +54,7 @@ export function NeighborhoodSetup({ onSuccess }: NeighborhoodSetupProps) {
   const [locationBias, setLocationBias] = useState<{ lat: number; lng: number } | undefined>()
   const [gpsDetected, setGpsDetected] = useState(false)
   const [gpsError, setGpsError] = useState<string | null>(null)
-  const [cityConflict, setCityConflict] = useState<{ neighborhoodCity: string; currentCity: string } | null>(null)
+  const [cityAdjusted, setCityAdjusted] = useState<string | null>(null)
 
   const [neighborhood, setNeighborhood] = useState("")
   const [city, setCity] = useState("")
@@ -68,17 +68,16 @@ export function NeighborhoodSetup({ onSuccess }: NeighborhoodSetupProps) {
 
   function resetForm() {
     setNeighborhood(""); setCity(""); setState(""); setLabel(""); setCustomLabel("")
-    setLocationBias(undefined); setGpsDetected(false); setGpsError(null); setCityConflict(null)
+    setLocationBias(undefined); setGpsDetected(false); setGpsError(null); setCityAdjusted(null)
   }
 
   function handleNeighborhoodSelect(result: NeighborhoodResult) {
-    setCityConflict(null)
-    if (city && result.city && normalizeStr(result.city) !== normalizeStr(city)) {
-      setCityConflict({ neighborhoodCity: result.city, currentCity: city })
-      return
-    }
     setNeighborhood(result.neighborhood)
-    if (result.city) setCity(result.city)
+    if (result.city) {
+      const wasAdjusted = !!city && normalizeStr(result.city) !== normalizeStr(city)
+      setCity(result.city)
+      setCityAdjusted(wasAdjusted ? result.city : null)
+    }
     if (result.state) setState(result.state)
   }
 
@@ -107,7 +106,7 @@ export function NeighborhoodSetup({ onSuccess }: NeighborhoodSetupProps) {
   }
 
   async function handleConfirm() {
-    if (!neighborhood.trim() || !city.trim() || !state.trim() || cityConflict) return
+    if (!neighborhood.trim() || !city.trim() || !state.trim()) return
     await addNeighborhood({
       neighborhood: neighborhood.trim(), city: city.trim(), state: state.trim(),
       label: effectiveLabel.trim() || undefined, isPrimary: true,
@@ -115,7 +114,7 @@ export function NeighborhoodSetup({ onSuccess }: NeighborhoodSetupProps) {
     onSuccess?.()
   }
 
-  const showCityFields = !gpsDetected || !city || !!cityConflict
+  const showCityFields = !gpsDetected || !city
 
   return (
     <div className="flex items-center justify-center min-h-[60vh] px-4">
@@ -206,8 +205,6 @@ export function NeighborhoodSetup({ onSuccess }: NeighborhoodSetupProps) {
             className="w-full max-w-sm"
           >
             <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
-
-              {/* Header */}
               <div className="px-5 pt-5 pb-4 border-b border-border/60">
                 <div className="flex items-center gap-2.5">
                   <div className="size-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
@@ -223,14 +220,13 @@ export function NeighborhoodSetup({ onSuccess }: NeighborhoodSetupProps) {
                     </span>
                   )}
                 </div>
-                {gpsDetected && city && !cityConflict && (
+                {gpsDetected && city && (
                   <p className="text-xs text-muted-foreground mt-1.5 pl-9.5">
                     {city} · {state}
                   </p>
                 )}
               </div>
 
-              {/* Body */}
               <div className="p-5 space-y-4">
                 <AnimatePresence>
                   {gpsError && (
@@ -246,62 +242,36 @@ export function NeighborhoodSetup({ onSuccess }: NeighborhoodSetupProps) {
                   )}
                 </AnimatePresence>
 
-                {/* Neighborhood search */}
                 <div className="space-y-1.5">
                   <Label className="text-xs font-semibold">Bairro</Label>
                   <NeighborhoodSearchInput
                     value={neighborhood}
                     locationBias={locationBias}
                     onSelect={handleNeighborhoodSelect}
-                    onClear={() => { setNeighborhood(""); setCityConflict(null) }}
+                    onClear={() => { setNeighborhood(""); setCityAdjusted(null) }}
                     placeholder="Buscar bairro no Maps..."
                   />
                 </div>
 
-                {/* City conflict card */}
                 <AnimatePresence>
-                  {cityConflict && (
+                  {cityAdjusted && (
                     <motion.div
-                      key="conflict"
+                      key="adjusted"
                       initial={{ opacity: 0, y: -6, scale: 0.98 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -6, scale: 0.98 }}
                       transition={{ duration: 0.25, ease: EASE }}
-                      className="rounded-xl border border-destructive/20 bg-destructive/5 p-3.5 space-y-3"
+                      className="flex items-start gap-2 rounded-xl border border-primary/20 bg-primary/5 px-3 py-2.5"
                     >
-                      <div className="flex items-center gap-1.5">
-                        <AlertTriangle className="size-3.5 text-destructive shrink-0" />
-                        <p className="text-xs font-semibold text-destructive">Bairro de outra cidade</p>
-                      </div>
-
-                      <div className="grid grid-cols-[1fr_20px_1fr] gap-2 items-center">
-                        <div className="rounded-lg bg-destructive/10 border border-destructive/15 px-2.5 py-2">
-                          <p className="text-2xs font-semibold uppercase tracking-widest text-destructive/50 mb-0.5">
-                            Bairro em
-                          </p>
-                          <p className="text-xs font-bold text-destructive leading-tight truncate">
-                            {cityConflict.neighborhoodCity}
-                          </p>
-                        </div>
-                        <p className="text-center text-sm text-muted-foreground/40 font-light select-none">≠</p>
-                        <div className="rounded-lg bg-muted border border-border px-2.5 py-2">
-                          <p className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground/50 mb-0.5">
-                            Sua cidade
-                          </p>
-                          <p className="text-xs font-bold text-foreground leading-tight truncate">
-                            {cityConflict.currentCity}
-                          </p>
-                        </div>
-                      </div>
-
+                      <Info className="size-3.5 text-primary shrink-0 mt-0.5" />
                       <p className="text-2xs text-muted-foreground leading-relaxed">
-                        Busque um bairro de <span className="font-medium text-foreground">{cityConflict.currentCity}</span>, ou corrija a cidade abaixo.
+                        Cidade ajustada para{" "}
+                        <span className="font-semibold text-foreground">{cityAdjusted}</span>, de acordo com o bairro selecionado.
                       </p>
                     </motion.div>
                   )}
                 </AnimatePresence>
 
-                {/* State + City — hidden when GPS has city and no conflict */}
                 <AnimatePresence>
                   {showCityFields && (
                     <motion.div
@@ -316,7 +286,7 @@ export function NeighborhoodSetup({ onSuccess }: NeighborhoodSetupProps) {
                         <Label className="text-xs font-semibold">Estado</Label>
                         <select
                           value={state}
-                          onChange={(e) => { setState(e.target.value); setCityConflict(null) }}
+                          onChange={(e) => { setState(e.target.value); setCityAdjusted(null) }}
                           className={cn(
                             "flex h-8 w-full rounded-md border border-input bg-background px-2",
                             "text-sm ring-offset-background focus-visible:outline-none",
@@ -332,14 +302,13 @@ export function NeighborhoodSetup({ onSuccess }: NeighborhoodSetupProps) {
                         <CitySelect
                           state={state}
                           value={city}
-                          onChange={(c) => { setCity(c); setCityConflict(null) }}
+                          onChange={(c) => { setCity(c); setCityAdjusted(null) }}
                         />
                       </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
 
-                {/* Label chips */}
                 <div className="space-y-2">
                   <Label className="text-xs font-semibold">
                     Apelido <span className="font-normal text-muted-foreground">(opcional)</span>
@@ -383,7 +352,6 @@ export function NeighborhoodSetup({ onSuccess }: NeighborhoodSetupProps) {
                 </div>
               </div>
 
-              {/* Footer */}
               <div className="px-5 pb-5 pt-1 flex gap-2">
                 <Button
                   variant="ghost"
@@ -397,7 +365,7 @@ export function NeighborhoodSetup({ onSuccess }: NeighborhoodSetupProps) {
                 <Button
                   className="flex-1"
                   onClick={handleConfirm}
-                  disabled={isPending || !neighborhood.trim() || !city.trim() || !state.trim() || !!cityConflict}
+                  disabled={isPending || !neighborhood.trim() || !city.trim() || !state.trim()}
                 >
                   {isPending && <Loader2 className="size-3.5 animate-spin mr-1" />}
                   Salvar bairro

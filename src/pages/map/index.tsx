@@ -2,14 +2,16 @@ import { useGetHeatmap } from "@/api/demands/hooks";
 import type { HeatmapPoint } from "@/api/demands/types";
 import { DemandStatusBadge } from "@/components/demand-status-badge";
 import { Loading } from "@/components/loading";
+import { useNavigationCity } from "@/contexts/navigation-city-context";
 import { cn } from "@/lib/utils";
 import {
   AdvancedMarker,
   APIProvider,
   Map as GoogleMap,
+  useMap,
 } from "@vis.gl/react-google-maps";
 import { Layers, MapPin } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const API_KEY = import.meta.env.VITE_GOOGLE_PLACES_API_KEY as string;
@@ -82,13 +84,40 @@ function PointMarker({ point }: { point: HeatmapPoint }) {
   );
 }
 
-export function Map() {
-  const { data, isLoading } = useGetHeatmap();
+function CityBoundsFitter({ city, state }: { city: string; state: string }) {
+  const map = useMap();
 
-  const points = data?.points ?? [];
-  const insight = data?.insight ?? null;
+  useEffect(() => {
+    if (!map || !city) return;
 
-  const center = useMemo(() => {
+    const geocoder = new google.maps.Geocoder();
+    geocoder.geocode(
+      { address: `${city}, ${state}, Brasil`, language: "pt-BR" },
+      (results, status) => {
+        if (status === "OK" && results?.[0]?.geometry?.viewport) {
+          const vp = results[0].geometry.viewport;
+          map.fitBounds({
+            north: vp.getNorthEast().lat(),
+            east: vp.getNorthEast().lng(),
+            south: vp.getSouthWest().lat(),
+            west: vp.getSouthWest().lng(),
+          });
+        }
+      },
+    );
+  }, [map, city, state]);
+
+  return null;
+}
+
+function MapInner({ points, insight, isLoading }: {
+  points: HeatmapPoint[];
+  insight: { topNeighborhood: string; occurrenceCount: number; text: string } | null;
+  isLoading: boolean;
+}) {
+  const { navigationCity } = useNavigationCity();
+
+  const fallbackCenter = useMemo(() => {
     if (points.length === 0) return BRAZIL_CENTER;
     return {
       lat: points.reduce((s, p) => s + p.lat, 0) / points.length,
@@ -97,12 +126,91 @@ export function Map() {
   }, [points]);
 
   return (
+    <div className="relative rounded-xl overflow-hidden border border-border shadow-sm">
+      {isLoading ? (
+        <div className="flex items-center justify-center h-[50vh] sm:h-[65vh] bg-muted/20 min-h-70">
+          <div className="flex flex-col items-center gap-3">
+            <Loading className="text-primary size-6" />
+            <p className="text-sm text-muted-foreground">Carregando mapa...</p>
+          </div>
+        </div>
+      ) : (
+        <APIProvider apiKey={API_KEY} language="pt-BR" region="BR">
+          <div className="h-[50vh] sm:h-[65vh]">
+            <GoogleMap
+              mapId="DEMO_MAP_ID"
+              defaultCenter={points.length > 0 ? fallbackCenter : BRAZIL_CENTER}
+              defaultZoom={points.length > 0 ? 14 : 5}
+              style={{ height: "100%", width: "100%" }}
+              streetViewControl={false}
+              mapTypeControl={false}
+              fullscreenControl={false}
+              gestureHandling="cooperative"
+            >
+              {navigationCity && (
+                <CityBoundsFitter city={navigationCity.city} state={navigationCity.state} />
+              )}
+              {points.map((point, i) => (
+                <PointMarker key={i} point={point} />
+              ))}
+            </GoogleMap>
+          </div>
+        </APIProvider>
+      )}
+
+      {!isLoading && (
+        <div className="absolute bottom-4 right-3 z-10 bg-background/95 backdrop-blur-sm border border-border rounded-lg shadow-md px-3 py-2.5">
+          <p className="text-xs font-medium text-muted-foreground mb-2">Legenda</p>
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center gap-2">
+              <span className="size-3 rounded-full bg-blue-500/75 border border-blue-600 shrink-0" />
+              <span className="text-xs text-foreground">Demanda</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="size-4 rounded-full bg-red-600/80 border border-red-600 shrink-0" />
+              <span className="text-xs text-foreground">Urgente</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {!isLoading && points.length === 0 && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
+          <div className="bg-background/95 backdrop-blur-sm border border-border rounded-xl px-6 py-5 text-center shadow-lg pointer-events-auto max-w-xs">
+            <div className="size-10 rounded-lg bg-muted flex items-center justify-center mx-auto mb-3">
+              <MapPin className="size-4 text-muted-foreground" />
+            </div>
+            <p className="text-sm font-semibold text-foreground">Nenhuma demanda mapeada</p>
+            <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+              {navigationCity
+                ? `Não há demandas com localização em ${navigationCity.label} nos últimos 30 dias.`
+                : "Demandas precisam ter localização para aparecer no mapa."}
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function Map() {
+  const { navigationCity } = useNavigationCity();
+  const { data, isLoading } = useGetHeatmap(
+    navigationCity ? { city: navigationCity.city, state: navigationCity.state } : undefined,
+  );
+
+  const points = data?.points ?? [];
+  const insight = data?.insight ?? null;
+
+  return (
     <div className="max-w-6xl mx-auto flex flex-col gap-3 sm:gap-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h1 className="text-base sm:text-xl font-bold text-foreground tracking-tight">Mapa de demandas</h1>
           <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
-            Visualize onde as demandas estão concentradas na sua cidade.
+            {navigationCity
+              ? `Demandas em ${navigationCity.label}`
+              : "Visualize onde as demandas estão concentradas."}
           </p>
         </div>
         {!isLoading && (
@@ -134,65 +242,7 @@ export function Map() {
         </div>
       )}
 
-      <div className="relative rounded-xl overflow-hidden border border-border shadow-sm">
-        {isLoading ? (
-          <div className="flex items-center justify-center h-[50vh] sm:h-[65vh] bg-muted/20 min-h-70">
-            <div className="flex flex-col items-center gap-3">
-              <Loading className="text-primary size-6" />
-              <p className="text-sm text-muted-foreground">Carregando mapa...</p>
-            </div>
-          </div>
-        ) : (
-          <APIProvider apiKey={API_KEY} language="pt-BR" region="BR">
-            <div className="h-[50vh] sm:h-[65vh]">
-              <GoogleMap
-                mapId="DEMO_MAP_ID"
-                defaultCenter={points.length > 0 ? center : BRAZIL_CENTER}
-                defaultZoom={points.length > 0 ? 14 : 5}
-                style={{ height: "100%", width: "100%" }}
-                streetViewControl={false}
-                mapTypeControl={false}
-                fullscreenControl={false}
-                gestureHandling="cooperative"
-              >
-                {points.map((point, i) => (
-                  <PointMarker key={i} point={point} />
-                ))}
-              </GoogleMap>
-            </div>
-          </APIProvider>
-        )}
-
-        {!isLoading && (
-          <div className="absolute bottom-4 right-3 z-10 bg-background/95 backdrop-blur-sm border border-border rounded-lg shadow-md px-3 py-2.5">
-            <p className="text-xs font-medium text-muted-foreground mb-2">Legenda</p>
-            <div className="flex flex-col gap-1.5">
-              <div className="flex items-center gap-2">
-                <span className="size-3 rounded-full bg-blue-500/75 border border-blue-600 shrink-0" />
-                <span className="text-xs text-foreground">Demanda</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="size-4 rounded-full bg-red-600/80 border border-red-600 shrink-0" />
-                <span className="text-xs text-foreground">Urgente</span>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {!isLoading && points.length === 0 && (
-          <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
-            <div className="bg-background/95 backdrop-blur-sm border border-border rounded-xl px-6 py-5 text-center shadow-lg pointer-events-auto max-w-xs">
-              <div className="size-10 rounded-lg bg-muted flex items-center justify-center mx-auto mb-3">
-                <MapPin className="size-4 text-muted-foreground" />
-              </div>
-              <p className="text-sm font-semibold text-foreground">Nenhuma demanda mapeada</p>
-              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                Demandas precisam ter localização para aparecer no mapa.
-              </p>
-            </div>
-          </div>
-        )}
-      </div>
+      <MapInner points={points} insight={insight} isLoading={isLoading} />
     </div>
   );
 }

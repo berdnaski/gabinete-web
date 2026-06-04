@@ -2,6 +2,7 @@ import { apiClient, ApiError } from "@/api";
 import { AuthApi } from "@/api/auth";
 import type { GetUserProfileResponse, LoginRequest, RegisterRequest } from "@/api/auth/types";
 import { CabinetsApi } from "@/api/cabinets";
+import { queryClient } from "@/api/queryClient";
 import { useState, useEffect, useRef, type ReactNode, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -151,6 +152,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       localStorage.removeItem(USER_KEY);
       localStorage.removeItem(ACCESS_TOKEN_KEY);
       localStorage.removeItem(CABINET_KEY);
+      queryClient.clear();
       setUser(null);
       setCabinet(null);
       navigate("/login");

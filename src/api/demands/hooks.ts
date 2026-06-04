@@ -12,10 +12,10 @@ export function useGetCabinetDashboardSummary(slug?: string) {
   });
 }
 
-export function useGetHeatmap() {
+export function useGetHeatmap(params?: { city?: string; state?: string }) {
   return useQuery({
-    queryKey: ["demands-heatmap"],
-    queryFn: DemandsApi.getHeatmap,
+    queryKey: ["demands-heatmap", params],
+    queryFn: () => DemandsApi.getHeatmap(params),
     staleTime: 1000 * 60 * 5,
     select: (data) => ({
       points: Array.isArray(data?.points) ? data.points : [],

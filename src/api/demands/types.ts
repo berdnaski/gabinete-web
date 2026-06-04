@@ -118,6 +118,8 @@ export interface ListDemandsParams {
 	startDate?: string;
 	endDate?: string;
 	neighborhood?: string;
+	city?: string;
+	state?: string;
 }
 
 export interface HeatmapPoint {

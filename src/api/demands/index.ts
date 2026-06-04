@@ -25,6 +25,8 @@ export const DemandsApi = {
 				priority: params.priority,
 				startDate: params.startDate,
 				neighborhood: params.neighborhood,
+				city: params.city,
+				state: params.state,
 			}
 		});
 		return response.data;
@@ -134,8 +136,8 @@ export const DemandsApi = {
 		return data;
 	},
 
-	getHeatmap: async (): Promise<HeatmapResponse> => {
-		const response = await apiClient.get<HeatmapResponse>(`${baseURL}/heatmap`);
+	getHeatmap: async (params?: { city?: string; state?: string }): Promise<HeatmapResponse> => {
+		const response = await apiClient.get<HeatmapResponse>(`${baseURL}/heatmap`, { params });
 		return response.data;
 	},
 

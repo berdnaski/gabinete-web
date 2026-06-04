@@ -1,20 +1,26 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { useListUserNeighborhoods } from "@/api/neighborhood/hooks"
 import { useAuth } from "@/hooks/use-auth"
 import { UserRole } from "@/api/users/types"
 import { NeighborhoodSetup } from "@/pages/my-neighborhood/components/neighborhood-setup"
 
-const SESSION_KEY = "neighborhood_onboarding_dismissed"
-
 function NeighborhoodOnboardingModalInner() {
+  const { user } = useAuth()
   const { data: neighborhoods, isLoading } = useListUserNeighborhoods()
-  const [dismissed, setDismissed] = useState(() => sessionStorage.getItem(SESSION_KEY) === "1")
+  const [dismissed, setDismissed] = useState(false)
+
+  const sessionKey = user ? `neighborhood_onboarding_dismissed:${user.id}` : null
+
+  useEffect(() => {
+    if (!sessionKey) return
+    setDismissed(sessionStorage.getItem(sessionKey) === "1")
+  }, [sessionKey])
 
   const open = !isLoading && !dismissed && neighborhoods !== undefined && neighborhoods.length === 0
 
   function handleDismiss() {
-    sessionStorage.setItem(SESSION_KEY, "1")
+    if (sessionKey) sessionStorage.setItem(sessionKey, "1")
     setDismissed(true)
   }
 

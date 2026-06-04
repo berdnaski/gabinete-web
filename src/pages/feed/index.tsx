@@ -6,8 +6,11 @@ import { DialogDemandForm } from "../private/demands/components/dialog-demand-fo
 import { FeedEmptyState } from "./components/feed-empty-state"
 import { Post } from "@/components/post"
 import { Loading } from "@/components/loading"
+import { useNavigationCity } from "@/contexts/navigation-city-context"
 
 export function Feed() {
+  const { navigationCity } = useNavigationCity()
+
   const [filters, setFilters] = useState<DemandsFilterValue>({
     search: "",
     status: [],
@@ -27,6 +30,8 @@ export function Feed() {
     startDate: filters.dateRange?.from?.toISOString(),
     endDate: filters.dateRange?.to?.toISOString(),
     neighborhood: filters.neighborhood ?? undefined,
+    city: navigationCity?.city,
+    state: navigationCity?.state,
     limit: 20,
   })
 

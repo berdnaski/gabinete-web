@@ -10,6 +10,7 @@ import { PageTitleProvider } from "./contexts/page-title-context";
 import { AppRouter } from "./routes/app-router";
 import { AuthProvider } from "./contexts/auth-context";
 import { SocketProvider } from "./contexts/socket-context";
+import { NavigationCityProvider } from "./contexts/navigation-city-context";
 
 function AppContent() {
   const { isInitializing } = useAuth();
@@ -38,11 +39,13 @@ export function App() {
       <BrowserRouter>
         <AuthProvider>
           <SocketProvider>
-            <TooltipProvider>
-              <PageTitleProvider>
-                <AppContent />
-              </PageTitleProvider>
-            </TooltipProvider>
+            <NavigationCityProvider>
+              <TooltipProvider>
+                <PageTitleProvider>
+                  <AppContent />
+                </PageTitleProvider>
+              </TooltipProvider>
+            </NavigationCityProvider>
           </SocketProvider>
         </AuthProvider>
       </BrowserRouter>
