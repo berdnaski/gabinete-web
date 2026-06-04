@@ -248,6 +248,7 @@ export function NeighborhoodSetup({ onSuccess }: NeighborhoodSetupProps) {
                     value={neighborhood}
                     locationBias={locationBias}
                     onSelect={handleNeighborhoodSelect}
+                    onValueChange={setNeighborhood}
                     onClear={() => { setNeighborhood(""); setCityAdjusted(null) }}
                     placeholder="Buscar bairro no Maps..."
                   />

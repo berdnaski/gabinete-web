@@ -15,11 +15,12 @@ interface Props {
   value: string
   onSelect: (result: NeighborhoodResult) => void
   onClear: () => void
+  onValueChange?: (value: string) => void
   locationBias?: { lat: number; lng: number }
   placeholder?: string
 }
 
-function NeighborhoodSearchInner({ value, onSelect, onClear, locationBias, placeholder }: Props) {
+function NeighborhoodSearchInner({ value, onSelect, onClear, onValueChange, locationBias, placeholder }: Props) {
   const [query, setQuery] = useState(value)
   const [suggestions, setSuggestions] = useState<google.maps.places.PlacePrediction[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -125,6 +126,7 @@ function NeighborhoodSearchInner({ value, onSelect, onClear, locationBias, place
           onChange={(e) => {
             setQuery(e.target.value)
             if (isSelected) setIsSelected(false)
+            onValueChange?.(e.target.value)
           }}
           placeholder={placeholder ?? 'Buscar bairro no Maps...'}
           autoComplete="off"

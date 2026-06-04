@@ -274,6 +274,7 @@ export function NeighborhoodSettingsCard() {
                   value={form.neighborhood}
                   locationBias={locationBias}
                   onSelect={handleNeighborhoodSelect}
+                  onValueChange={(v) => setForm((f) => ({ ...f, neighborhood: v }))}
                   onClear={() => { setForm((f) => ({ ...f, neighborhood: "" })); setCityAdjusted(null) }}
                   placeholder="Buscar bairro no Maps..."
                 />
