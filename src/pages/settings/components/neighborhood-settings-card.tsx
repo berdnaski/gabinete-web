@@ -312,7 +312,7 @@ export function NeighborhoodSettingsCard() {
                       <Label className="text-xs font-semibold">Estado</Label>
                       <select
                         value={form.state}
-                        onChange={(e) => { setForm((f) => ({ ...f, state: e.target.value })); setCityAdjusted(null) }}
+                        onChange={(e) => { setForm((f) => ({ ...f, state: e.target.value, city: "" })); setCityAdjusted(null) }}
                         className={cn(
                           "flex h-8 w-full rounded-md border border-input bg-background px-2",
                           "text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",

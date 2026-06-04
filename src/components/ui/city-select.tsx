@@ -23,20 +23,12 @@ export function CitySelect({ state, value, onChange, disabled }: CitySelectProps
   const [isSelected, setIsSelected] = useState(!!value)
   const containerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
-  const isMounted = useRef(false)
 
   useEffect(() => {
-    const isChange = isMounted.current
-    isMounted.current = true
-
-    if (isChange) {
-      setQuery("")
-      setIsSelected(false)
-      onChange("")
+    if (!state) {
       setCities([])
+      return
     }
-
-    if (!state) return
     setLoading(true)
     fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${state}/municipios?orderBy=nome`)
       .then((r) => r.json())
@@ -46,9 +38,9 @@ export function CitySelect({ state, value, onChange, disabled }: CitySelectProps
   }, [state])
 
   useEffect(() => {
-    if (value && value !== query) {
+    if (value !== query) {
       setQuery(value)
-      setIsSelected(true)
+      setIsSelected(!!value)
     }
   }, [value])
 

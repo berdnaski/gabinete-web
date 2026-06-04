@@ -287,7 +287,7 @@ export function NeighborhoodSetup({ onSuccess }: NeighborhoodSetupProps) {
                         <Label className="text-xs font-semibold">Estado</Label>
                         <select
                           value={state}
-                          onChange={(e) => { setState(e.target.value); setCityAdjusted(null) }}
+                          onChange={(e) => { setState(e.target.value); setCity(""); setCityAdjusted(null) }}
                           className={cn(
                             "flex h-8 w-full rounded-md border border-input bg-background px-2",
                             "text-sm ring-offset-background focus-visible:outline-none",

@@ -1,9 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
+import { ApiError } from "@/api"
 import { NeighborhoodApi } from "./index"
 import type { CreateNeighborhoodPayload } from "./types"
 
 const NEIGHBORHOODS_KEY = ["user-neighborhoods"]
+
+function addNeighborhoodErrorMessage(error: unknown): string {
+  const message = error instanceof ApiError ? error.message : ""
+  if (message.includes("Maximum")) return "Você atingiu o limite de 3 bairros."
+  if (message.includes("already saved")) return "Esse bairro já está salvo."
+  return "Erro ao salvar bairro."
+}
 
 export function useListUserNeighborhoods() {
   return useQuery({
@@ -21,7 +29,7 @@ export function useAddUserNeighborhood() {
       queryClient.invalidateQueries({ queryKey: NEIGHBORHOODS_KEY })
       toast.success("Bairro salvo!")
     },
-    onError: () => toast.error("Erro ao salvar bairro."),
+    onError: (error) => toast.error(addNeighborhoodErrorMessage(error)),
   })
 }
 
