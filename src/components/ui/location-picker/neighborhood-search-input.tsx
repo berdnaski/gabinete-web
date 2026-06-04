@@ -84,6 +84,9 @@ function NeighborhoodSearchInner({ value, onSelect, onClear, onValueChange, loca
     setIsSelected(true)
     setIsOpen(false)
     setSuggestions([])
+
+    const fallbackName = prediction.text.text.split(',')[0].trim()
+
     try {
       const place = prediction.toPlace()
       await place.fetchFields({ fields: ['displayName', 'addressComponents'] })
@@ -95,7 +98,7 @@ function NeighborhoodSearchInner({ value, onSelect, onClear, onValueChange, loca
         get('neighborhood') ||
         get('sublocality_level_1') ||
         get('sublocality') ||
-        prediction.text.text
+        fallbackName
 
       const city = get('administrative_area_level_2') || get('locality')
       const state = get('administrative_area_level_1', true)
@@ -103,7 +106,8 @@ function NeighborhoodSearchInner({ value, onSelect, onClear, onValueChange, loca
       setQuery(neighborhood)
       onSelect({ neighborhood, city, state })
     } catch {
-      setQuery(prediction.text.text)
+      setQuery(fallbackName)
+      onSelect({ neighborhood: fallbackName, city: '', state: '' })
     }
   }
 
