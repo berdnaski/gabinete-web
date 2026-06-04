@@ -110,9 +110,8 @@ function CityBoundsFitter({ city, state }: { city: string; state: string }) {
   return null;
 }
 
-function MapInner({ points, insight, isLoading }: {
+function MapInner({ points, isLoading }: {
   points: HeatmapPoint[];
-  insight: { topNeighborhood: string; occurrenceCount: number; text: string } | null;
   isLoading: boolean;
 }) {
   const { navigationCity } = useNavigationCity();
@@ -242,7 +241,7 @@ export function Map() {
         </div>
       )}
 
-      <MapInner points={points} insight={insight} isLoading={isLoading} />
+      <MapInner points={points} isLoading={isLoading} />
     </div>
   );
 }
