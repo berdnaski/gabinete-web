@@ -49,6 +49,7 @@ Use `pnpm` as the package manager (not npm). The `@` alias resolves to `/src`.
 - Use `toast` (sonner) for mutation feedback
 - Use generic dialogs for complex interactions
 - Use early returns to keep code flat and readable
+- **Confirmation dialogs are mandatory for any irreversible or high-impact action** — this includes deleting any record, deactivating/activating entities, and any mutation that is hard or impossible to undo. Never fire these mutations directly from a button click. Always show a `Dialog` with a clear description of the consequence and a destructive confirm button first.
 
 **General:**
 - Do not introduce new libraries without explicit instruction

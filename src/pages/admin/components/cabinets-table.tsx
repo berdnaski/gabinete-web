@@ -1,9 +1,10 @@
 import { useGetCabinetsPaginated } from "@/api/cabinets/hooks"
+import { useAdminCabinetSubscriptionsSummary } from "@/api/plans/hooks"
 import { DataTable, type DataTableFilterField } from "@/components/data-table"
 import { useDataTable, TABLE_PARAM_KEYS } from "@/hooks/use-data-table"
 import { useMemo } from "react"
 import { useSearchParams } from "react-router-dom"
-import { cabinetsColumns } from "./cabinets-columns"
+import { createCabinetsColumns } from "./cabinets-columns"
 
 const filterFields: DataTableFilterField[] = [
   {
@@ -18,7 +19,14 @@ const filterFields: DataTableFilterField[] = [
 ]
 
 export function CabinetsTable() {
-  const columns = useMemo(() => cabinetsColumns, [])
+  const { data: subscriptionsSummary = [] } = useAdminCabinetSubscriptionsSummary()
+
+  const subscriptionMap = useMemo(
+    () => new Map(subscriptionsSummary.map((s) => [s.cabinetId, s.planName])),
+    [subscriptionsSummary],
+  )
+
+  const columns = useMemo(() => createCabinetsColumns(subscriptionMap), [subscriptionMap])
   const [searchParams] = useSearchParams()
 
   const page = Math.max(1, Number(searchParams.get(TABLE_PARAM_KEYS.PAGE) ?? 1))

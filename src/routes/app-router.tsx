@@ -16,6 +16,7 @@ import { ConfirmPasswordPage } from "@/pages/public/confirm-password";
 import { Admin } from "@/pages/admin";
 import { AdminUsers } from "@/pages/admin/users";
 import { AdminReports } from "@/pages/admin/reports";
+import { AdminPlans } from "@/pages/admin/plans";
 import { AcceptInvite } from "@/pages/public/accept-invite";
 
 const Sandbox = lazy(() => import("@/pages/public/sandbox").then((m) => ({ default: m.Sandbox })));
@@ -160,6 +161,14 @@ export function AppRouter() {
           element={
             <ProtectedRoute allowedRoles={onlyAdmin}>
               <AdminUsers />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="admin/plans"
+          element={
+            <ProtectedRoute allowedRoles={onlyAdmin}>
+              <AdminPlans />
             </ProtectedRoute>
           }
         />
