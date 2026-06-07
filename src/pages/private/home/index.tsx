@@ -34,6 +34,8 @@ import { useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
 import { DemandPriority } from "../demands/components/demand-priority"
+import { FeatureGate } from "@/components/feature-gate"
+import { FEATURES } from "@/api/plans/features"
 
 const trendConfig: ChartConfig = {
   created: { label: "Recebidas", color: BRAND.primary },
@@ -132,15 +134,17 @@ export function Home() {
           <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border bg-card text-xs font-medium text-muted-foreground capitalize">
             {getMonthYear()}
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-1.5 h-7 text-xs text-muted-foreground"
-            onClick={() => navigate("/relatorios")}
-          >
-            <Download className="size-3" />
-            <span className="hidden sm:inline">Exportar</span>
-          </Button>
+          <FeatureGate feature={FEATURES.CSV_EXPORT}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5 h-7 text-xs text-muted-foreground"
+              onClick={() => navigate("/relatorios")}
+            >
+              <Download className="size-3" />
+              <span className="hidden sm:inline">Exportar</span>
+            </Button>
+          </FeatureGate>
         </div>
       </motion.div>
 

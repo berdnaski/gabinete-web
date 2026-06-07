@@ -1,5 +1,6 @@
 import { apiClient } from "..";
 import type { Cabinet, CabinetInvitation, CabinetInvitationDetails, CabinetMember, CabinetMetrics, CabinetTrendDetailedPoint, CabinetTrendPoint } from "./types";
+import type { CabinetUsage } from "@/api/plans/types";
 
 const baseURL = "/cabinets";
 
@@ -134,6 +135,11 @@ export const CabinetsApi = {
     const response = await apiClient.patch<Cabinet>(`${baseURL}/${slug}`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
+    return response.data;
+  },
+
+  getUsage: async (slug: string): Promise<CabinetUsage> => {
+    const response = await apiClient.get<CabinetUsage>(`/cabinets/${slug}/usage`);
     return response.data;
   },
 };

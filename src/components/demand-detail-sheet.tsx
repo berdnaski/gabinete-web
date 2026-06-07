@@ -340,7 +340,13 @@ function ResultCard({ result, canDelete }: { result: Result; canDelete?: boolean
       { id: result.id, file },
       {
         onSuccess: () => toast.success("Protocolo anexado com sucesso"),
-        onError: () => toast.error("Erro ao anexar protocolo"),
+        onError: (err: any) => {
+          if (err?.status === 403) {
+            toast.error(err.message ?? "Limite de armazenamento atingido. Entre em contato com um Consultor para fazer upgrade.")
+          } else {
+            toast.error("Erro ao anexar protocolo")
+          }
+        },
       },
     )
     e.target.value = ""

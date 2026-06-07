@@ -42,8 +42,7 @@ export function InviteMemberDialog({ open, onOpenChange }: InviteMemberDialogPro
           onOpenChange(false)
         },
         onError: (err: any) => {
-          const msg =
-            err?.response?.data?.message ?? "Erro ao enviar convite. Tente novamente."
+          const msg = err?.message ?? "Erro ao enviar convite. Tente novamente."
           toast.error(msg)
         },
       },

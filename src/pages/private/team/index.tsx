@@ -21,6 +21,9 @@ import { Input } from "@/components/ui/input"
 import { useAuth } from "@/hooks/use-auth"
 import { useCurrentMember } from "@/hooks/use-current-member"
 import { usePageTitle } from "@/hooks/use-page-title"
+import { useCabinetFeatures } from "@/hooks/use-cabinet-features"
+import { PlanLimitBanner } from "@/components/plan-limit-banner"
+
 import { cn } from "@/lib/utils"
 import { getFirstLettersFromNames } from "@/utils/get-first-letters-from-names"
 import {
@@ -258,7 +261,7 @@ export function Team() {
   const { data: invitations = [] } = useListCabinetInvitations(
     isOwner ? cabinet?.slug : undefined,
   )
-
+  const { plans } = useCabinetFeatures()
   const { user } = useAuth()
 
   const filtered = useMemo(() => {
@@ -284,6 +287,16 @@ export function Team() {
           )}
         </p>
       </div>
+
+      {plans?.limits.maxMembers !== null && plans?.limits.maxMembers !== undefined && (
+        <div className="rounded-lg border border-border bg-card px-4 py-3">
+          <PlanLimitBanner
+            current={members.length}
+            max={plans.limits.maxMembers}
+            label="Membros da equipe"
+          />
+        </div>
+      )}
 
       <div className="rounded-lg border border-border bg-card overflow-hidden">
         <div className="flex items-center gap-3 px-4 py-3 border-b border-border/60">

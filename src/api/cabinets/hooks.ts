@@ -157,3 +157,12 @@ export function useUpdateMemberRole(slug: string | undefined) {
     },
   });
 }
+
+export function useCabinetUsage(slug: string | undefined) {
+  return useQuery({
+    queryKey: ["cabinet-usage", slug],
+    queryFn: () => CabinetsApi.getUsage(slug!),
+    enabled: !!slug,
+    staleTime: 30 * 1000,
+  })
+}

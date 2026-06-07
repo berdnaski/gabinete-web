@@ -95,8 +95,12 @@ export function ClaimDemandFlow({ demand, open, onOpenChange }: ClaimDemandFlowP
         setClaimedId(demand.id)
         setStep("assign")
       },
-      onError: () => {
-        toast.error("Erro ao vincular demanda ao gabinete")
+      onError: (err: any) => {
+        if (err?.status === 403) {
+          toast.error(err.message ?? "Limite de demandas atingido. Entre em contato com um Consultor para fazer upgrade.")
+        } else {
+          toast.error("Erro ao vincular demanda ao gabinete")
+        }
       },
     })
   }

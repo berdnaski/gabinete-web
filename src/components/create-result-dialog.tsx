@@ -104,7 +104,13 @@ export function CreateResultDialog({ demand, open, onOpenChange }: CreateResultD
           toast.success("Resultado registrado com sucesso")
           onOpenChange(false)
         },
-        onError: () => toast.error("Erro ao registrar resultado"),
+        onError: (err: any) => {
+          if (err?.status === 403) {
+            toast.error(err.message ?? "Limite de armazenamento atingido. Entre em contato com um Consultor para fazer upgrade.")
+          } else {
+            toast.error("Erro ao registrar resultado")
+          }
+        },
       },
     )
   }

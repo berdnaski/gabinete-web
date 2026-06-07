@@ -9,7 +9,7 @@ import type {
 } from "./types"
 
 export const PlansApi = {
-  getCabinetEntitlements: async (slug: string): Promise<CabinetEntitlements> => {
+  getCabinetPlans: async (slug: string): Promise<CabinetEntitlements> => {
     const res = await apiClient.get<CabinetEntitlements>(`/cabinets/${slug}/plans`)
     return res.data
   },
@@ -50,6 +50,11 @@ export const PlansApi = {
 
   getCabinetSubscription: async (cabinetId: string): Promise<CabinetSubscription | null> => {
     const res = await apiClient.get<CabinetSubscription | null>(`/admin/cabinets/${cabinetId}/subscription`)
+    return res.data
+  },
+
+  getCabinetSubscriptionHistory: async (cabinetId: string): Promise<CabinetSubscription[]> => {
+    const res = await apiClient.get<CabinetSubscription[]>(`/admin/cabinets/${cabinetId}/subscriptions`)
     return res.data
   },
 

@@ -28,6 +28,7 @@ export function useCreateResult() {
       queryClient.invalidateQueries({
         queryKey: ["results", { demandId: variables.demandId }],
       })
+      queryClient.invalidateQueries({ queryKey: ["cabinet-usage"] })
     },
   })
 }
@@ -39,6 +40,7 @@ export function useUploadResultProtocol(demandId?: string | null) {
       ResultsApi.uploadProtocol(id, file),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["results", { demandId }] })
+      queryClient.invalidateQueries({ queryKey: ["cabinet-usage"] })
     },
   })
 }

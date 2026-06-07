@@ -1,3 +1,5 @@
+import { FEATURES } from "@/api/plans/features";
+import { FeatureGate } from "@/components/feature-gate";
 import { useGetHeatmap } from "@/api/demands/hooks";
 import type { HeatmapPoint } from "@/api/demands/types";
 import { DemandStatusBadge } from "@/components/demand-status-badge";
@@ -241,7 +243,13 @@ export function Map() {
         </div>
       )}
 
-      <MapInner points={points} isLoading={isLoading} />
+      <FeatureGate
+        feature={FEATURES.HEATMAP}
+        upgradePrompt
+        upgradeClassName="min-h-[400px]"
+      >
+        <MapInner points={points} isLoading={isLoading} />
+      </FeatureGate>
     </div>
   );
 }

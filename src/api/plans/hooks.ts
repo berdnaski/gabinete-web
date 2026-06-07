@@ -93,12 +93,22 @@ export function useAdminCabinetSubscription(cabinetId: string | null) {
   })
 }
 
+export function useAdminCabinetSubscriptionHistory(cabinetId: string | null) {
+  return useQuery({
+    queryKey: ["admin-cabinet-subscription-history", cabinetId],
+    queryFn: () => PlansApi.getCabinetSubscriptionHistory(cabinetId!),
+    enabled: !!cabinetId,
+  })
+}
+
 export function useAdminUpsertCabinetSubscription() {
   return useMutation({
     mutationFn: ({ cabinetId, planId }: { cabinetId: string; planId: string }) =>
       PlansApi.upsertCabinetSubscription(cabinetId, planId),
     onSuccess: (_, { cabinetId }) => {
       queryClient.invalidateQueries({ queryKey: ["admin-cabinet-subscription", cabinetId] })
+      queryClient.invalidateQueries({ queryKey: ["admin-cabinet-subscription-history", cabinetId] })
+      queryClient.invalidateQueries({ queryKey: ["admin-cabinet-subscriptions-summary"] })
       toast.success("Plano atualizado com sucesso")
     },
     onError: () => toast.error("Erro ao atualizar plano"),

@@ -115,8 +115,12 @@ export function DemandsForm({ sizeTrigger }: DemandFormProps) {
             });
 
             setUploadProgress({ current: i + 1, total: data.files.length });
-          } catch (fileError) {
+          } catch (fileError: any) {
             console.error(`Erro ao fazer upload do arquivo ${file.name}:`, fileError);
+            if (fileError?.status === 403) {
+              toast.error(fileError.message ?? "Limite de armazenamento atingido. Entre em contato com um Consultor para fazer upgrade.");
+              break;
+            }
             toast.error(`Falha ao enviar ${file.name}`);
           }
         }
@@ -127,8 +131,13 @@ export function DemandsForm({ sizeTrigger }: DemandFormProps) {
       toast.success("Demanda criada com sucesso!");
       setOpenSheet(false);
       form.reset();
-    } catch (error) {
-      toast.error("Erro ao criar demanda. Tente novamente.");
+    } catch (error: any) {
+      console.error(error)
+      if (error?.status === 403) {
+        toast.error(error.message ?? "Limite do plano atingido. Entre em contato com um Consultor para fazer upgrade.")
+      } else {
+        toast.error("Erro ao criar demanda. Tente novamente.")
+      }
     } finally {
       setIsUploading(false);
       setUploadProgress({ current: 0, total: 0 });

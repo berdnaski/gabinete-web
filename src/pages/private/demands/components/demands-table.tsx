@@ -1,3 +1,5 @@
+import { FEATURES } from "@/api/plans/features"
+import { FeatureGate } from "@/components/feature-gate"
 import { useGetCabinetMembers } from "@/api/cabinets/hooks"
 import { DemandsApi } from "@/api/demands"
 import { useGetDemandsByCabinetSlug } from "@/api/demands/hooks"
@@ -186,17 +188,19 @@ export function DemandsTable() {
           </Button>
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            size="sm"
-            variant="outline"
-            className="h-8 gap-1.5 text-xs text-muted-foreground"
-            onClick={handleExport}
-            disabled={isExporting || !demands?.meta.total}
-          >
-            {isExporting ? <Loader2 className="size-3.5 animate-spin" /> : <Download className="size-3.5" />}
-            <span className="hidden sm:inline">Exportar CSV</span>
-            {demands?.meta.total ? <span className="tabular-nums">({demands.meta.total})</span> : null}
-          </Button>
+          <FeatureGate feature={FEATURES.CSV_EXPORT}>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-8 gap-1.5 text-xs text-muted-foreground"
+              onClick={handleExport}
+              disabled={isExporting || !demands?.meta.total}
+            >
+              {isExporting ? <Loader2 className="size-3.5 animate-spin" /> : <Download className="size-3.5" />}
+              <span className="hidden sm:inline">Exportar CSV</span>
+              {demands?.meta.total ? <span className="tabular-nums">({demands.meta.total})</span> : null}
+            </Button>
+          </FeatureGate>
           <DemandsForm sizeTrigger="default" />
         </div>
       </div>

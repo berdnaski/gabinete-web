@@ -1,3 +1,5 @@
+import { FEATURES } from "@/api/plans/features"
+import { FeatureGate } from "@/components/feature-gate"
 import { useRef, useState, useEffect } from "react"
 import { toast } from "sonner"
 import { QRCodeSVG } from "qrcode.react"
@@ -362,38 +364,40 @@ export function CabinetBrandingCard() {
         </FieldGroup>
 
         {/* ── Widget embed ── */}
-        <FieldGroup>
-          <div className="flex items-center gap-2 mb-3">
-            <Code2 className="size-4 text-muted-foreground" />
-            <span className="text-sm font-semibold text-foreground">Widget para seu site</span>
-          </div>
-          <p className="text-sm text-muted-foreground mb-3 leading-relaxed">
-            Cole este código no site oficial. Um botão flutuante aparecerá para que os cidadãos
-            enviem demandas diretamente.
-          </p>
-          <div className="relative">
-            <pre className="bg-muted/50 border border-border rounded-lg px-4 py-3 text-xs font-mono text-foreground/80 overflow-x-auto whitespace-pre-wrap break-all">
-              {widgetCode}
-            </pre>
-            <button
-              type="button"
-              onClick={copyWidget}
-              className="absolute top-2 right-2 flex items-center gap-1.5 text-xs font-medium bg-background border border-border rounded-md px-2.5 py-1 hover:bg-muted transition-colors"
-            >
-              {copied ? (
-                <>
-                  <Check className="size-3 text-emerald-500" />
-                  <span className="text-emerald-600">Copiado</span>
-                </>
-              ) : (
-                <>
-                  <Copy className="size-3" />
-                  Copiar
-                </>
-              )}
-            </button>
-          </div>
-        </FieldGroup>
+        <FeatureGate feature={FEATURES.WIDGET} upgradePrompt upgradeClassName="mt-2">
+          <FieldGroup>
+            <div className="flex items-center gap-2 mb-3">
+              <Code2 className="size-4 text-muted-foreground" />
+              <span className="text-sm font-semibold text-foreground">Widget para seu site</span>
+            </div>
+            <p className="text-sm text-muted-foreground mb-3 leading-relaxed">
+              Cole este código no site oficial. Um botão flutuante aparecerá para que os cidadãos
+              enviem demandas diretamente.
+            </p>
+            <div className="relative">
+              <pre className="bg-muted/50 border border-border rounded-lg px-4 py-3 text-xs font-mono text-foreground/80 overflow-x-auto whitespace-pre-wrap break-all">
+                {widgetCode}
+              </pre>
+              <button
+                type="button"
+                onClick={copyWidget}
+                className="absolute top-2 right-2 flex items-center gap-1.5 text-xs font-medium bg-background border border-border rounded-md px-2.5 py-1 hover:bg-muted transition-colors"
+              >
+                {copied ? (
+                  <>
+                    <Check className="size-3 text-emerald-500" />
+                    <span className="text-emerald-600">Copiado</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="size-3" />
+                    Copiar
+                  </>
+                )}
+              </button>
+            </div>
+          </FieldGroup>
+        </FeatureGate>
       </CardContent>
 
       <CardFooter className="px-6 py-4 border-t border-border flex items-center justify-between">

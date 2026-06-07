@@ -2,6 +2,7 @@ import {
   useAdminAddCabinetOverride,
   useAdminCabinetOverrides,
   useAdminCabinetSubscription,
+  useAdminCabinetSubscriptionHistory,
   useAdminListFeatures,
   useAdminListPlans,
   useAdminRemoveCabinetOverride,
@@ -206,6 +207,7 @@ export function CabinetPlansSheet({ cabinetId, cabinetName }: Props) {
 
   const { data: subscription, isLoading: loadingSub } = useAdminCabinetSubscription(open ? cabinetId : null)
   const { data: overrides = [], isLoading: loadingOverrides } = useAdminCabinetOverrides(open ? cabinetId : null)
+  const { data: history = [] } = useAdminCabinetSubscriptionHistory(open ? cabinetId : null)
   const { data: plans = [] } = useAdminListPlans()
   const { mutate: upsertSub, isPending: savingSub } = useAdminUpsertCabinetSubscription()
   const { mutate: removeOverride, isPending: removingOverride } = useAdminRemoveCabinetOverride()
@@ -306,6 +308,34 @@ export function CabinetPlansSheet({ cabinetId, cabinetName }: Props) {
                   </Button>
                 </div>
               </section>
+
+              {/* Subscription history */}
+              {history.length > 1 && (
+                <section className="flex flex-col gap-3">
+                  <p className="text-xs font-medium text-muted-foreground">Histórico de assinaturas</p>
+                  <div className="rounded-lg border border-border overflow-hidden divide-y divide-border/60">
+                    {history.map((s) => (
+                      <div key={s.id} className="flex items-center gap-3 px-4 py-2.5">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-foreground">{s.plan.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(s.currentPeriodStart).toLocaleDateString("pt-BR")}
+                            {s.canceledAt && (
+                              <> → {new Date(s.canceledAt).toLocaleDateString("pt-BR")}</>
+                            )}
+                          </p>
+                        </div>
+                        <Badge
+                          variant="outline"
+                          className={cn("text-2xs shrink-0", STATUS_CONFIG[s.status]?.className)}
+                        >
+                          {STATUS_CONFIG[s.status]?.label ?? s.status}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
 
               {/* Overrides */}
               <section className="flex flex-col gap-3">

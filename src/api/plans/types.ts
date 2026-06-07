@@ -68,6 +68,12 @@ export interface CabinetEntitlements {
   }
 }
 
+export interface CabinetUsage {
+  memberCount: number
+  demandCount: number
+  storageUsedBytes: number
+}
+
 export interface AddOverrideRequest {
   featureSlug: string
   type: OverrideType

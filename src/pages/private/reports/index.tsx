@@ -1,3 +1,5 @@
+import { FEATURES } from "@/api/plans/features"
+import { FeatureGate } from "@/components/feature-gate"
 import { useGetCabinetReport } from "@/api/demands/hooks"
 import type { CabinetReport, DemandStatus as DemandStatusType } from "@/api/demands/types"
 import { DemandStatus } from "@/api/demands/types"
@@ -176,13 +178,15 @@ export function Reports() {
         </div>
         {report && (
           <div className="report-controls flex items-center gap-2">
-            <button
-              onClick={() => exportCSV(report, cabinet?.name ?? "gabinete")}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted/60 transition-colors shrink-0"
-            >
-              <Download className="size-3.5" />
-              CSV
-            </button>
+            <FeatureGate feature={FEATURES.CSV_EXPORT}>
+              <button
+                onClick={() => exportCSV(report, cabinet?.name ?? "gabinete")}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted/60 transition-colors shrink-0"
+              >
+                <Download className="size-3.5" />
+                CSV
+              </button>
+            </FeatureGate>
             <button
               onClick={() => window.print()}
               className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted/60 transition-colors shrink-0"

@@ -9,6 +9,10 @@ import { NeighborhoodSettingsCard } from "./components/neighborhood-settings-car
 import { useAuth } from "@/hooks/use-auth";
 import { User, Building2, Monitor, MapPin } from "lucide-react";
 import { UserRole } from "@/api/users/types";
+import { PlanLimitBanner } from "@/components/plan-limit-banner";
+import { useCabinetFeatures } from "@/hooks/use-cabinet-features";
+import { useCabinetUsage } from "@/api/cabinets/hooks";
+import { formatBytes } from "@/lib/format-bytes";
 
 const TAB_ICONS: Record<string, React.ElementType> = {
   profile: User,
@@ -18,8 +22,15 @@ const TAB_ICONS: Record<string, React.ElementType> = {
 };
 
 export function Settings() {
-  const { user } = useAuth();
+  const { user, cabinet } = useAuth();
   const [active, setActive] = useState("profile");
+  const { plans } = useCabinetFeatures();
+
+  const hasStorageLimit =
+    plans?.limits.maxStorageGb !== null && plans?.limits.maxStorageGb !== undefined
+  const { data: usage } = useCabinetUsage(
+    user?.isCabinetMember && hasStorageLimit ? cabinet?.slug : undefined,
+  );
 
   const tabs = useMemo(() => [
     { value: "profile", label: "Meu Perfil" },
@@ -104,6 +115,16 @@ export function Settings() {
               </TabsContent>
 
               <TabsContent value="cabinet" className="space-y-4 outline-none focus-visible:ring-0 mt-0">
+                {hasStorageLimit && usage && (
+                  <div className="rounded-lg border border-border bg-card px-4 py-3">
+                    <PlanLimitBanner
+                      current={usage.storageUsedBytes}
+                      max={plans!.limits.maxStorageGb! * 1024 ** 3}
+                      label="Armazenamento"
+                      formatValue={formatBytes}
+                    />
+                  </div>
+                )}
                 <CabinetInfoCard />
                 <CabinetBrandingCard />
               </TabsContent>
