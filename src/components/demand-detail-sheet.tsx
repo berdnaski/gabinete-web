@@ -16,7 +16,7 @@ import {
 } from "./ui/sheet"
 import { useAuth } from "@/hooks/use-auth"
 import { useCurrentMember } from "@/hooks/use-current-member"
-import { cn } from "@/lib/utils"
+import { cn, formatBytes } from "@/lib/utils"
 import { getFirstLettersFromNames } from "@/utils/get-first-letters-from-names"
 import { formatDateToNow } from "@/utils/date"
 import {
@@ -35,11 +35,6 @@ import {
 } from "lucide-react"
 import { useRef, useState } from "react"
 
-function formatBytes(bytes: number) {
-  if (bytes < 1024) return `${bytes} B`
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
-}
 import { Link } from "react-router-dom"
 import { DemandPriority } from "@/pages/private/demands/components/demand-priority"
 import { toast } from "sonner"

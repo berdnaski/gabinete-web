@@ -30,7 +30,7 @@ export interface Plan {
   priceInCents: number
   maxMembers: number | null
   maxDemands: number | null
-  maxStorageGb: number | null
+  maxStorageBytes: number | null
   isActive: boolean
   features: PlanFeatureItem[]
 }
@@ -64,7 +64,7 @@ export interface CabinetEntitlements {
   limits: {
     maxMembers: number | null
     maxDemands: number | null
-    maxStorageGb: number | null
+    maxStorageBytes: number | null
   }
 }
 

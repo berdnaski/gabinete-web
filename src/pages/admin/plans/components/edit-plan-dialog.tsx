@@ -31,7 +31,9 @@ export function EditPlanDialog({ plan }: Props) {
   const [price, setPrice] = useState(toReais(plan.priceInCents))
   const [maxMembers, setMaxMembers] = useState(plan.maxMembers?.toString() ?? "")
   const [maxDemands, setMaxDemands] = useState(plan.maxDemands?.toString() ?? "")
-  const [maxStorageGb, setMaxStorageGb] = useState(plan.maxStorageGb?.toString() ?? "")
+  const [storageMbInput, setStorageMbInput] = useState(
+    plan.maxStorageBytes !== null ? Math.round(plan.maxStorageBytes / 1024 ** 2).toString() : ""
+  )
 
   useEffect(() => {
     if (open) {
@@ -39,7 +41,9 @@ export function EditPlanDialog({ plan }: Props) {
       setPrice(toReais(plan.priceInCents))
       setMaxMembers(plan.maxMembers?.toString() ?? "")
       setMaxDemands(plan.maxDemands?.toString() ?? "")
-      setMaxStorageGb(plan.maxStorageGb?.toString() ?? "")
+      setStorageMbInput(
+        plan.maxStorageBytes !== null ? Math.round(plan.maxStorageBytes / 1024 ** 2).toString() : ""
+      )
     }
   }, [open, plan])
 
@@ -57,7 +61,7 @@ export function EditPlanDialog({ plan }: Props) {
           priceInCents,
           maxMembers: maxMembers === "" ? null : Number(maxMembers),
           maxDemands: maxDemands === "" ? null : Number(maxDemands),
-          maxStorageGb: maxStorageGb === "" ? null : Number(maxStorageGb),
+          maxStorageBytes: storageMbInput === "" ? null : Number(storageMbInput) * 1024 ** 2,
         },
       },
       { onSuccess: () => setOpen(false) },
@@ -126,14 +130,14 @@ export function EditPlanDialog({ plan }: Props) {
                 />
               </div>
               <div className="flex flex-col gap-1.5">
-                <Label className="text-xs">Storage (GB)</Label>
+                <Label className="text-xs">Storage (MB)</Label>
                 <input
                   className="h-8 rounded-md border border-input bg-background px-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
                   placeholder="Ilimitado"
                   type="number"
                   min={1}
-                  value={maxStorageGb}
-                  onChange={(e) => setMaxStorageGb(e.target.value)}
+                  value={storageMbInput}
+                  onChange={(e) => setStorageMbInput(e.target.value)}
                 />
               </div>
             </div>

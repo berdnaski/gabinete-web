@@ -34,7 +34,7 @@ export const PlansApi = {
 
   updatePlan: async (
     planId: string,
-    data: { name?: string; priceInCents?: number; maxMembers?: number | null; maxDemands?: number | null; maxStorageGb?: number | null },
+    data: { name?: string; priceInCents?: number; maxMembers?: number | null; maxDemands?: number | null; maxStorageBytes?: number | null },
   ): Promise<void> => {
     await apiClient.patch(`/admin/plans/${planId}`, data)
   },

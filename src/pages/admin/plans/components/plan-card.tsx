@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { cn } from "@/lib/utils"
+import { cn, formatBytes } from "@/lib/utils"
 import { Loader2, PlusIcon, PowerIcon, Trash2Icon } from "lucide-react"
 import { useState } from "react"
 import { AddPlanFeatureDialog } from "./add-plan-feature-dialog"
@@ -28,6 +28,7 @@ function formatPrice(cents: number) {
 function formatLimit(value: number | null, unit: string) {
   return value === null ? "Ilimitado" : `${value} ${unit}`
 }
+
 
 interface RemoveFeatureDialogProps {
   planName: string
@@ -157,7 +158,7 @@ export function PlanCard({ plan }: Props) {
         {[
           { label: "Membros", value: formatLimit(plan.maxMembers, "max") },
           { label: "Demandas/mês", value: formatLimit(plan.maxDemands, "max") },
-          { label: "Armazenamento", value: plan.maxStorageGb === null ? "Ilimitado" : `${plan.maxStorageGb} GB` },
+          { label: "Armazenamento", value: plan.maxStorageBytes === null ? "Ilimitado" : formatBytes(plan.maxStorageBytes) },
         ].map(({ label, value }) => (
           <div key={label} className="px-3 py-2.5 flex flex-col gap-0.5">
             <span className="text-2xs text-muted-foreground">{label}</span>

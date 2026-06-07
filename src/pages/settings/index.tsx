@@ -12,7 +12,7 @@ import { UserRole } from "@/api/users/types";
 import { PlanLimitBanner } from "@/components/plan-limit-banner";
 import { useCabinetFeatures } from "@/hooks/use-cabinet-features";
 import { useCabinetUsage } from "@/api/cabinets/hooks";
-import { formatBytes } from "@/lib/format-bytes";
+import { formatBytes } from "@/lib/utils";
 
 const TAB_ICONS: Record<string, React.ElementType> = {
   profile: User,
@@ -27,7 +27,7 @@ export function Settings() {
   const { plans } = useCabinetFeatures();
 
   const hasStorageLimit =
-    plans?.limits.maxStorageGb !== null && plans?.limits.maxStorageGb !== undefined
+    plans?.limits.maxStorageBytes !== null && plans?.limits.maxStorageBytes !== undefined
   const { data: usage } = useCabinetUsage(
     user?.isCabinetMember && hasStorageLimit ? cabinet?.slug : undefined,
   );
@@ -119,7 +119,7 @@ export function Settings() {
                   <div className="rounded-lg border border-border bg-card px-4 py-3">
                     <PlanLimitBanner
                       current={usage.storageUsedBytes}
-                      max={plans!.limits.maxStorageGb! * 1024 ** 3}
+                      max={plans!.limits.maxStorageBytes!}
                       label="Armazenamento"
                       formatValue={formatBytes}
                     />

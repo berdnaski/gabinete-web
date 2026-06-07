@@ -61,7 +61,7 @@ export function useAdminUpdatePlan() {
       data,
     }: {
       planId: string
-      data: { name?: string; priceInCents?: number; maxMembers?: number | null; maxDemands?: number | null; maxStorageGb?: number | null }
+      data: { name?: string; priceInCents?: number; maxMembers?: number | null; maxDemands?: number | null; maxStorageBytes?: number | null }
     }) => PlansApi.updatePlan(planId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-plans"] })

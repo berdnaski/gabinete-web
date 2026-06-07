@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/use-auth"
 import { usePageTitle } from "@/hooks/use-page-title"
 import { useEffect } from "react"
 import { DemandsTable } from "./components/demands-table"
-import { formatBytes } from "@/lib/format-bytes"
+import { formatBytes } from "@/lib/utils"
 
 export function Demands() {
   const { setTitle } = usePageTitle()
@@ -14,7 +14,7 @@ export function Demands() {
 
   const hasAnyLimit =
     (plans?.limits.maxDemands !== null && plans?.limits.maxDemands !== undefined) ||
-    (plans?.limits.maxStorageGb !== null && plans?.limits.maxStorageGb !== undefined)
+    (plans?.limits.maxStorageBytes !== null && plans?.limits.maxStorageBytes !== undefined)
 
   const { data: usage } = useCabinetUsage(hasAnyLimit ? cabinet?.slug : undefined)
 
@@ -25,7 +25,7 @@ export function Demands() {
   const showDemandBanner =
     plans?.limits.maxDemands !== null && plans?.limits.maxDemands !== undefined && usage
   const showStorageBanner =
-    plans?.limits.maxStorageGb !== null && plans?.limits.maxStorageGb !== undefined && usage
+    plans?.limits.maxStorageBytes !== null && plans?.limits.maxStorageBytes !== undefined && usage
 
   return (
     <div className="flex flex-col gap-4">
@@ -41,7 +41,7 @@ export function Demands() {
           {showStorageBanner && (
             <PlanLimitBanner
               current={usage.storageUsedBytes}
-              max={plans.limits.maxStorageGb! * 1024 ** 3}
+              max={plans.limits.maxStorageBytes!}
               label="Armazenamento"
               formatValue={formatBytes}
             />
