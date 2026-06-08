@@ -10,12 +10,15 @@ import {
 import { useAuth } from '@/hooks/use-auth'
 import { loginFormSchema, type LoginFormData } from '@/validation-schemas/login'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Eye, EyeOff } from 'lucide-react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 
 export function LoginForm() {
 
 	const { login } = useAuth()
+	const [showPassword, setShowPassword] = useState(false)
 
 	const form = useForm<LoginFormData>({
 		resolver: zodResolver(loginFormSchema),
@@ -63,15 +66,27 @@ export function LoginForm() {
 							Esqueceu sua senha?
 						</Link>
 					</div>
-					<InputForm
-						required
-						id="password"
-						name="password"
-						type="password"
-						inputMode='text'
-						control={control}
-						autoComplete='current-password webauthn'
-					/>
+					<div className="relative">
+						<InputForm
+							required
+							id="password"
+							name="password"
+							type={showPassword ? 'text' : 'password'}
+							inputMode='text'
+							control={control}
+							autoComplete='current-password webauthn'
+							className="pr-10"
+						/>
+						<button
+							type="button"
+							onClick={() => setShowPassword(v => !v)}
+							className="absolute right-3 top-2 text-muted-foreground hover:text-foreground transition-colors"
+							tabIndex={-1}
+							aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+						>
+							{showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+						</button>
+					</div>
 				</Field>
 				<Field>
 					<Button type="submit">Login</Button>
