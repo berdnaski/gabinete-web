@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useUpdateDemandStatus } from "@/api/demands/hooks"
-import type { Demand } from "@/api/demands/types"
+import type { Demand, DemandStatus } from "@/api/demands/types"
 import { Badge } from "@/components/ui/badge"
 import {
   DropdownMenu,
@@ -18,25 +18,15 @@ export function StatusCell({ row }: { row: Row<Demand> }) {
   const config = DEMAND_STATUS_CONFIG[demand.status]
   const { mutate: updateStatus, isPending } = useUpdateDemandStatus()
   const [showCreateResult, setShowCreateResult] = useState(false)
-  const [pendingStatusChange, setPendingStatusChange] = useState<string | null>(null)
 
   const hasResults = (demand.results && demand.results.length > 0) ?? false
 
-  function handleStatusChange(status: string) {
+  function handleStatusChange(status: DemandStatus) {
     if (status === 'RESOLVED' && !hasResults) {
-      setPendingStatusChange(status)
       setShowCreateResult(true)
       return
     }
     updateStatus({ id: demand.id, status })
-  }
-
-  function handleResultCreated() {
-    if (pendingStatusChange) {
-      updateStatus({ id: demand.id, status: pendingStatusChange })
-      setPendingStatusChange(null)
-    }
-    setShowCreateResult(false)
   }
 
   return (
@@ -72,10 +62,9 @@ export function StatusCell({ row }: { row: Row<Demand> }) {
 
       {showCreateResult && (
         <CreateResultDialog
-          demandId={demand.id}
+          demand={demand}
           open={showCreateResult}
           onOpenChange={setShowCreateResult}
-          onSuccess={handleResultCreated}
         />
       )}
     </>
