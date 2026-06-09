@@ -1,4 +1,4 @@
-import { Mail, MapPin, BarChart3, FileText, Zap, MessageCircle } from "lucide-react"
+﻿import { Mail, MapPin, BarChart3, FileText, Zap, MessageCircle } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useInView } from "../hooks/use-in-view"
 import logo from "@/assets/logo.png"
@@ -19,8 +19,8 @@ const HUB_NODES = [
   },
   {
     id: "reports",
-    label: "Relatórios",
-    sub: "PDF & Exportações",
+    label: "RelatÃ³rios",
+    sub: "PDF & ExportaÃ§Ãµes",
     Icon: FileText,
     posCls: "left-[52%] top-[78%]",
     svgTo: [122, 84] as [number, number],
@@ -30,8 +30,8 @@ const HUB_NODES = [
   },
   {
     id: "geo",
-    label: "Geolocalização",
-    sub: "Mapas & territórios",
+    label: "GeolocalizaÃ§Ã£o",
+    sub: "Mapas & territÃ³rios",
     Icon: MapPin,
     posCls: "left-[22%] top-[78%]",
     svgTo: [80, 84] as [number, number],
@@ -42,7 +42,7 @@ const HUB_NODES = [
   {
     id: "api",
     label: "API Aberta",
-    sub: "Integrações custom",
+    sub: "IntegraÃ§Ãµes custom",
     Icon: Zap,
     posCls: "left-[12%] top-[44%]",
     svgTo: [58, 50] as [number, number],
@@ -64,7 +64,7 @@ const HUB_NODES = [
   {
     id: "email",
     label: "E-mail",
-    sub: "Alertas automáticos",
+    sub: "Alertas automÃ¡ticos",
     Icon: Mail,
     posCls: "left-[52%] top-[9%]",
     svgTo: [122, 15] as [number, number],
@@ -98,8 +98,8 @@ export function EcosystemSection() {
             tudo no controle.
           </h2>
           <p className="text-base text-muted-foreground max-w-lg mx-auto leading-relaxed">
-            O Gabinete Digital centraliza todos os canais e fontes de dados
-            do seu mandato em uma plataforma única.
+            O Gabinete App centraliza todos os canais e fontes de dados
+            do seu mandato em uma plataforma Ãºnica.
           </p>
         </div>
 
@@ -165,7 +165,7 @@ export function EcosystemSection() {
             <div className="absolute -inset-5 rounded-full bg-primary/[0.08] animate-pulse" />
             <div className="absolute -inset-2.5 rounded-full bg-primary/[0.12]" />
             <div className="relative size-20 rounded-full bg-primary shadow-lg flex flex-col items-center justify-center gap-1.5">
-              <img src={logo} alt="Gabinete Digital" className="h-6 w-auto brightness-0 invert" />
+              <img src={logo} alt="Gabinete App" className="h-6 w-auto brightness-0 invert" />
             </div>
           </div>
 
@@ -195,3 +195,4 @@ export function EcosystemSection() {
     </section>
   )
 }
+

@@ -1,4 +1,4 @@
-import { useGetDemandsByCabinetSlug } from "@/api/demands/hooks"
+﻿import { useGetDemandsByCabinetSlug } from "@/api/demands/hooks"
 import { useAuth } from "@/hooks/use-auth"
 import { useCurrentMember } from "@/hooks/use-current-member"
 import { cn } from "@/lib/utils"
@@ -48,7 +48,7 @@ export function AppSidebar() {
     return (
       <Sidebar variant="inset">
         <SidebarHeader>
-          <img src={Logo} alt="Gabinete Digital" className="w-36" />
+          <img src={Logo} alt="Gabinete App" className="w-36" />
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup>
@@ -67,24 +67,24 @@ export function AppSidebar() {
               <SidebarMenuItem>
                 <SidebarMenuButton
                   asChild
-                  tooltip="Usuários"
+                  tooltip="UsuÃ¡rios"
                   isActive={pathname === "/admin/users"}
                 >
                   <Link to="/admin/users">
                     <Users className={cn({ "text-primary": pathname === "/admin/users" })} />
-                    <span>Usuários</span>
+                    <span>UsuÃ¡rios</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton
                   asChild
-                  tooltip="Denúncias"
+                  tooltip="DenÃºncias"
                   isActive={pathname === "/admin/denuncias"}
                 >
                   <Link to="/admin/denuncias">
                     <Flag className={cn({ "text-primary": pathname === "/admin/denuncias" })} />
-                    <span>Denúncias</span>
+                    <span>DenÃºncias</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -118,7 +118,7 @@ export function AppSidebar() {
   return (
     <Sidebar variant="inset">
       <SidebarHeader>
-        <img src={Logo} alt="Gabinete Digital" className="w-36" />
+        <img src={Logo} alt="Gabinete App" className="w-36" />
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
@@ -169,10 +169,10 @@ export function AppSidebar() {
               </SidebarGroupLabel>
               <SidebarMenu className="space-y-0.5">
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip="Início" isActive={pathname === "/home"}>
+                  <SidebarMenuButton asChild tooltip="InÃ­cio" isActive={pathname === "/home"}>
                     <Link to="/home">
                       <Home className={cn({ "text-primary": pathname === "/home" })} />
-                      <span>Início</span>
+                      <span>InÃ­cio</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -212,10 +212,10 @@ export function AppSidebar() {
                 </SidebarMenuItem>
 
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip="Relatórios" isActive={pathname === "/relatorios"}>
+                  <SidebarMenuButton asChild tooltip="RelatÃ³rios" isActive={pathname === "/relatorios"}>
                     <Link to="/relatorios">
                       <BarChart3 className={cn({ "text-primary": pathname === "/relatorios" })} />
-                      <span>Relatórios</span>
+                      <span>RelatÃ³rios</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -230,7 +230,7 @@ export function AppSidebar() {
         <SidebarFooter className="border-t border-border">
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip={cabinet.name ?? "Perfil público"}>
+              <SidebarMenuButton asChild tooltip={cabinet.name ?? "Perfil pÃºblico"}>
                 <Link to={`/${cabinet.slug}`} target="_blank" rel="noopener noreferrer">
                   <Globe className="text-muted-foreground" />
                   <span className="truncate">{cabinet.name ?? "Ver perfil"}</span>
@@ -244,3 +244,4 @@ export function AppSidebar() {
     </Sidebar>
   )
 }
+

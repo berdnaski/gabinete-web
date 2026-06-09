@@ -1,4 +1,4 @@
-import type { CabinetMetrics, Cabinet } from "@/api/cabinets/types"
+﻿import type { CabinetMetrics, Cabinet } from "@/api/cabinets/types"
 import { useGetCabinetBySlug, useGetCabinetMembers, useGetCabinetMetrics } from "@/api/cabinets/hooks"
 import { useGetDemandsByCabinetSlug } from "@/api/demands/hooks"
 import { Loading } from "@/components/loading"
@@ -35,7 +35,7 @@ import { Link, useParams } from "react-router-dom"
 import Logo from "@/assets/logo.png"
 import { PublicDemandForm } from "./public-demand-form"
 
-// ─── Accountability bar ───────────────────────────────────────────────────────
+// â”€â”€â”€ Accountability bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function AccountabilityBar({
   metrics,
@@ -72,7 +72,7 @@ function AccountabilityBar({
           Resolutividade do mandato
         </span>
         <span className="text-xs font-bold tabular-nums" style={{ color: resolvedColor }}>
-          {Math.round(resolvedPct)}% concluídas
+          {Math.round(resolvedPct)}% concluÃ­das
         </span>
       </div>
 
@@ -123,7 +123,7 @@ function LegendDot({
   )
 }
 
-// ─── Stats ────────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Stats â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function StatItem({ value, label }: { value: number; label: string }) {
   return (
@@ -140,7 +140,7 @@ function StatDivider() {
   return <div className="w-px h-8 bg-border/50 shrink-0" />
 }
 
-// ─── Transparency score badge ─────────────────────────────────────────────────
+// â”€â”€â”€ Transparency score badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function TransparencyBadge({ score, accent }: { score: number; accent: string }) {
   if (score === 0) return null
@@ -155,7 +155,7 @@ function TransparencyBadge({ score, accent }: { score: number; accent: string })
   )
 }
 
-// ─── Header ───────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function ProfileHeader({ accent }: { accent: string }) {
   const { isAuthenticated, user, logout } = useAuth()
@@ -173,7 +173,7 @@ function ProfileHeader({ accent }: { accent: string }) {
     <header className="fixed top-0 inset-x-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border/40">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
         <Link to="/" className="shrink-0">
-          <img src={Logo} alt="Gabinete Digital" className="w-24 sm:w-32" />
+          <img src={Logo} alt="Gabinete App" className="w-24 sm:w-32" />
         </Link>
 
         {isAuthenticated ? (
@@ -208,7 +208,7 @@ function ProfileHeader({ accent }: { accent: string }) {
                   <DropdownMenuItem asChild className="gap-2 rounded-lg">
                     <Link to="/settings">
                       <Settings className="size-4" />
-                      Configurações
+                      ConfiguraÃ§Ãµes
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -246,7 +246,7 @@ function ProfileHeader({ accent }: { accent: string }) {
   )
 }
 
-// ─── Banner ───────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Banner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function CabinetBanner({ cabinet, accent }: { cabinet: Cabinet; accent: string }) {
   if (cabinet.bannerUrl) {
@@ -313,7 +313,7 @@ function CabinetBanner({ cabinet, accent }: { cabinet: Cabinet; accent: string }
   )
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export function PublicCabinetProfile() {
   const { slug } = useParams() as { slug: string }
@@ -352,11 +352,11 @@ export function PublicCabinetProfile() {
             <Building2 className="size-7 text-muted-foreground" />
           </div>
           <div>
-            <h1 className="text-lg font-bold text-foreground">Gabinete não encontrado</h1>
+            <h1 className="text-lg font-bold text-foreground">Gabinete nÃ£o encontrado</h1>
             <p className="text-sm text-muted-foreground mt-1.5">
               O gabinete{" "}
               <span className="font-mono bg-muted px-1.5 py-0.5 rounded text-xs">@{slug}</span>{" "}
-              não existe ou foi desativado.
+              nÃ£o existe ou foi desativado.
             </p>
           </div>
           <Button asChild variant="outline" size="sm">
@@ -377,11 +377,11 @@ export function PublicCabinetProfile() {
       <ProfileHeader accent={accent} />
 
       <div className="min-h-screen bg-muted/20 pt-14">
-        {/* ── Banner ── */}
+        {/* â”€â”€ Banner â”€â”€ */}
         <CabinetBanner cabinet={cabinet} accent={accent} />
 
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
-          {/* ── Avatar + CTA row ── */}
+          {/* â”€â”€ Avatar + CTA row â”€â”€ */}
           <div className="flex items-end justify-between -mt-12 sm:-mt-14 md:-mt-16 mb-4">
             <Avatar className="size-24 sm:size-28 shrink-0 ring-[3px] ring-background shadow-xl">
               <AvatarImage src={cabinet.logoUrl ?? cabinet.avatarUrl ?? undefined} className={cabinet.logoUrl ? "object-contain p-1 bg-white" : "object-cover"} />
@@ -406,7 +406,7 @@ export function PublicCabinetProfile() {
             </div>
           </div>
 
-          {/* ── Profile card ── */}
+          {/* â”€â”€ Profile card â”€â”€ */}
           <div className="bg-background rounded-2xl border border-border/40 shadow-sm px-5 sm:px-6 pb-6 pt-5">
             <div>
               <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight leading-tight">
@@ -503,7 +503,7 @@ export function PublicCabinetProfile() {
             </div>
           </div>
 
-          {/* ── Team ── */}
+          {/* â”€â”€ Team â”€â”€ */}
           {membersList.length > 0 && (
             <div className="mt-2.5 bg-background rounded-2xl border border-border/40 shadow-sm px-5 sm:px-6 py-4">
               <p className="text-2xs font-semibold text-muted-foreground/70 uppercase tracking-widest mb-3">
@@ -546,7 +546,7 @@ export function PublicCabinetProfile() {
                         className="text-2xs font-semibold shrink-0"
                         style={{ color: accent }}
                       >
-                        responsável
+                        responsÃ¡vel
                       </span>
                     )}
                   </div>
@@ -555,12 +555,12 @@ export function PublicCabinetProfile() {
             </div>
           )}
 
-          {/* ── Demands feed ── */}
+          {/* â”€â”€ Demands feed â”€â”€ */}
           <div className="mt-2.5 mb-16">
             <div className="bg-background rounded-2xl border border-border/40 shadow-sm">
               <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-border/40">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-sm font-semibold text-foreground">Demandas públicas</h2>
+                  <h2 className="text-sm font-semibold text-foreground">Demandas pÃºblicas</h2>
                   {!isLoadingDemands && (
                     <span className="text-2xs font-semibold text-muted-foreground bg-muted rounded-full px-2 py-0.5 tabular-nums">
                       {demandsData?.meta?.total ?? demands.length}
@@ -589,9 +589,9 @@ export function PublicCabinetProfile() {
                       <FileText className="size-5 text-muted-foreground" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-foreground">Sem demandas públicas</p>
+                      <p className="text-sm font-semibold text-foreground">Sem demandas pÃºblicas</p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        Este gabinete ainda não registrou demandas.
+                        Este gabinete ainda nÃ£o registrou demandas.
                       </p>
                     </div>
                     <Button
@@ -616,7 +616,7 @@ export function PublicCabinetProfile() {
         </div>
       </div>
 
-      {/* ── Demand form modal ── */}
+      {/* â”€â”€ Demand form modal â”€â”€ */}
       <PublicDemandForm
         open={demandFormOpen}
         onOpenChange={setDemandFormOpen}
@@ -626,3 +626,4 @@ export function PublicCabinetProfile() {
     </>
   )
 }
+

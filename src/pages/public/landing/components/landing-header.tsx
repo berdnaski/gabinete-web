@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+﻿import { useState, useEffect } from "react"
 import { MessageCircle, Menu, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import logo from "@/assets/logo.png"
@@ -6,7 +6,7 @@ import { APP_URL, WHATSAPP_URL } from "../constants"
 import { trackWhatsappClick } from "@/lib/analytics"
 
 const NAV_LINKS = [
-  { label: "Início", href: "#inicio" },
+  { label: "InÃ­cio", href: "#inicio" },
   { label: "Como funciona", href: "#como-funciona" },
   { label: "Funcionalidades", href: "#funcionalidades" },
   { label: "Gabinetes", href: "#gabinetes" },
@@ -31,7 +31,7 @@ export function LandingHeader() {
       )}
     >
       <div className="max-w-7xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
-        <img src={logo} alt="Gabinete Digital" className="h-7 sm:h-8 w-auto shrink-0" />
+        <img src={logo} alt="Gabinete App" className="h-7 sm:h-8 w-auto shrink-0" />
 
         <nav className="hidden md:flex items-center gap-7">
           {NAV_LINKS.map((link) => (
@@ -112,3 +112,4 @@ export function LandingHeader() {
     </header>
   )
 }
+

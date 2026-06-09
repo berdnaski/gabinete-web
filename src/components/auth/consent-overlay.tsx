@@ -1,4 +1,4 @@
-import { UsersApi } from "@/api/users"
+﻿import { UsersApi } from "@/api/users"
 import { useAuth } from "@/hooks/use-auth"
 import { Button } from "../ui/button"
 import { Checkbox } from "../ui/checkbox"
@@ -15,7 +15,7 @@ export function ConsentOverlay() {
 
   async function handleAccept() {
     if (!accepted) {
-      toast.error("Você deve aceitar os termos para continuar.")
+      toast.error("VocÃª deve aceitar os termos para continuar.")
       return
     }
 
@@ -25,7 +25,7 @@ export function ConsentOverlay() {
       updateLocalUser({ termsAcceptedAt: new Date().toISOString() })
       toast.success("Termos aceitos com sucesso!")
     } catch {
-      toast.error("Erro ao processar sua solicitação.")
+      toast.error("Erro ao processar sua solicitaÃ§Ã£o.")
     } finally {
       setIsSubmitting(false)
     }
@@ -40,7 +40,7 @@ export function ConsentOverlay() {
               Privacidade e Termos
             </h2>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Para continuar no <strong className="text-foreground font-medium">Gabinete Digital</strong>, por favor aceite nossos termos atualizados conforme a LGPD.
+              Para continuar no <strong className="text-foreground font-medium">Gabinete App</strong>, por favor aceite nossos termos atualizados conforme a LGPD.
             </p>
           </div>
 
@@ -61,7 +61,7 @@ export function ConsentOverlay() {
               </Link>{" "}
               e a{" "}
               <Link to="/politica-de-privacidade" target="_blank" className="text-primary hover:underline">
-                Política de Privacidade
+                PolÃ­tica de Privacidade
               </Link>
             </label>
           </div>
@@ -86,3 +86,4 @@ export function ConsentOverlay() {
     </div>
   )
 }
+
