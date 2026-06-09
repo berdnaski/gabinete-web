@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { MessageCircle, Menu, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import logo from "@/assets/logo.png"
@@ -6,7 +6,7 @@ import { APP_URL, WHATSAPP_URL } from "../constants"
 import { trackWhatsappClick } from "@/lib/analytics"
 
 const NAV_LINKS = [
-  { label: "InÃ­cio", href: "#inicio" },
+  { label: "Início", href: "#inicio" },
   { label: "Como funciona", href: "#como-funciona" },
   { label: "Funcionalidades", href: "#funcionalidades" },
   { label: "Gabinetes", href: "#gabinetes" },

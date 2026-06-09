@@ -1,4 +1,4 @@
-﻿import { UsersApi } from "@/api/users"
+import { UsersApi } from "@/api/users"
 import { useAuth } from "@/hooks/use-auth"
 import { Button } from "../ui/button"
 import { Checkbox } from "../ui/checkbox"
@@ -15,7 +15,7 @@ export function ConsentOverlay() {
 
   async function handleAccept() {
     if (!accepted) {
-      toast.error("VocÃª deve aceitar os termos para continuar.")
+      toast.error("Você deve aceitar os termos para continuar.")
       return
     }
 
@@ -25,7 +25,7 @@ export function ConsentOverlay() {
       updateLocalUser({ termsAcceptedAt: new Date().toISOString() })
       toast.success("Termos aceitos com sucesso!")
     } catch {
-      toast.error("Erro ao processar sua solicitaÃ§Ã£o.")
+      toast.error("Erro ao processar sua solicitação.")
     } finally {
       setIsSubmitting(false)
     }
@@ -61,7 +61,7 @@ export function ConsentOverlay() {
               </Link>{" "}
               e a{" "}
               <Link to="/politica-de-privacidade" target="_blank" className="text-primary hover:underline">
-                PolÃ­tica de Privacidade
+                Política de Privacidade
               </Link>
             </label>
           </div>

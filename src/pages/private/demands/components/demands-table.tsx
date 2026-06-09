@@ -120,17 +120,37 @@ export function DemandsTable() {
     if (!cabinet?.slug || isExporting) return
     setIsExporting(true)
     try {
-      const result = await DemandsApi.listDemandsByCabinetSlug({
+      const PAGE_LIMIT = 100
+      const allItems: Demand[] = []
+      let page = 1
+
+      const first = await DemandsApi.listDemandsByCabinetSlug({
         slug: cabinet.slug,
-        page: 1,
-        limit: 9999,
+        page,
+        limit: PAGE_LIMIT,
         search: searchParams.get("search") ?? undefined,
         status: (searchParams.get("status") as DemandStatus) || undefined,
         priority: (searchParams.get("priority") as DemandPriority) || undefined,
         assigneeMemberId: assigneeMemberIdParam,
       })
-      exportDemandsCSV(result.items, cabinet.name)
-      toast.success(`${result.items.length} demandas exportadas`)
+      allItems.push(...first.items)
+
+      const totalPages = Math.ceil(first.meta.total / PAGE_LIMIT)
+      for (page = 2; page <= totalPages; page++) {
+        const next = await DemandsApi.listDemandsByCabinetSlug({
+          slug: cabinet.slug,
+          page,
+          limit: PAGE_LIMIT,
+          search: searchParams.get("search") ?? undefined,
+          status: (searchParams.get("status") as DemandStatus) || undefined,
+          priority: (searchParams.get("priority") as DemandPriority) || undefined,
+          assigneeMemberId: assigneeMemberIdParam,
+        })
+        allItems.push(...next.items)
+      }
+
+      exportDemandsCSV(allItems, cabinet.name)
+      toast.success(`${allItems.length} demandas exportadas`)
     } catch {
       toast.error("Erro ao exportar demandas")
     } finally {

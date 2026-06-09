@@ -1,4 +1,4 @@
-﻿import { DemandsApi } from "@/api/demands"
+import { DemandsApi } from "@/api/demands"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { useMutation, useQuery } from "@tanstack/react-query"
@@ -37,10 +37,10 @@ export function DemandSurveyPage() {
   if (isError || !survey) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-4 text-center">
-        <p className="text-lg font-semibold text-foreground">Pesquisa nÃ£o encontrada</p>
-        <p className="text-sm text-muted-foreground">Este link de avaliaÃ§Ã£o Ã© invÃ¡lido ou jÃ¡ expirou.</p>
+        <p className="text-lg font-semibold text-foreground">Pesquisa não encontrada</p>
+        <p className="text-sm text-muted-foreground">Este link de avaliação é inválido ou já expirou.</p>
         <Button asChild variant="outline" size="sm">
-          <Link to="/">Ir para a pÃ¡gina inicial</Link>
+          <Link to="/">Ir para a página inicial</Link>
         </Button>
       </div>
     )
@@ -61,9 +61,9 @@ export function DemandSurveyPage() {
               <div className="size-16 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center mx-auto">
                 <CheckCircle2 className="size-8 text-emerald-500" />
               </div>
-              <h1 className="text-xl font-bold text-foreground">Obrigado pela avaliaÃ§Ã£o!</h1>
+              <h1 className="text-xl font-bold text-foreground">Obrigado pela avaliação!</h1>
               <p className="text-sm text-muted-foreground">
-                Seu feedback Ã© muito importante para que o{" "}
+                Seu feedback é muito importante para que o{" "}
                 <span className="font-medium text-foreground">{survey.cabinetName}</span>{" "}
                 continue melhorando o atendimento.
               </p>
@@ -122,14 +122,14 @@ export function DemandSurveyPage() {
 
               <div className="space-y-2">
                 <label htmlFor="comment" className="text-sm font-medium text-foreground">
-                  ComentÃ¡rio{" "}
+                  Comentário{" "}
                   <span className="text-muted-foreground font-normal">(opcional)</span>
                 </label>
                 <textarea
                   id="comment"
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
-                  placeholder="Conte o que poderia ter sido melhor ou o que vocÃª gostou..."
+                  placeholder="Conte o que poderia ter sido melhor ou o que você gostou..."
                   rows={3}
                   maxLength={500}
                   className="w-full resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
@@ -142,7 +142,7 @@ export function DemandSurveyPage() {
                 className="w-full"
               >
                 {isPending && <Loader2 className="size-4 animate-spin" />}
-                Enviar avaliaÃ§Ã£o
+                Enviar avaliação
               </Button>
 
               {rating === 0 && (

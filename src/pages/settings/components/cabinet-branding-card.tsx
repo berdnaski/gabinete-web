@@ -1,4 +1,4 @@
-﻿import { FEATURES } from "@/api/plans/features"
+import { FEATURES } from "@/api/plans/features"
 import { FeatureGate } from "@/components/feature-gate"
 import { useRef, useState, useEffect } from "react"
 import { toast } from "sonner"
@@ -108,13 +108,13 @@ export function CabinetBrandingCard() {
         logoFile: selectedLogo ?? undefined,
       })
       await refreshProfile()
-      toast.success("PersonalizaÃ§Ã£o salva!")
+      toast.success("Personalização salva!")
       setSelectedBanner(null)
       setBannerPreview(null)
       setSelectedLogo(null)
       setLogoPreview(null)
     } catch {
-      toast.error("Erro ao salvar personalizaÃ§Ã£o.")
+      toast.error("Erro ao salvar personalização.")
     }
   }
 
@@ -159,13 +159,13 @@ export function CabinetBrandingCard() {
           </span>
         </div>
         <CardDescription className="text-sm text-muted-foreground">
-          Personalize a aparÃªncia do seu perfil pÃºblico â€” logo, cor, banner, QR Code e widget.
+          Personalize a aparência do seu perfil público — logo, cor, banner, QR Code e widget.
         </CardDescription>
       </CardHeader>
 
       <CardContent className="px-6 py-5 space-y-8">
 
-        {/* â”€â”€ Logo â”€â”€ */}
+        {/* ── Logo ── */}
         <FieldGroup>
           <div className="flex items-center gap-2 mb-3">
             <ImageIcon className="size-4 text-muted-foreground" />
@@ -199,10 +199,10 @@ export function CabinetBrandingCard() {
 
             <div className="flex flex-col gap-2 flex-1">
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Substitui o logo "Gabinete App" no cabeÃ§alho do seu perfil pÃºblico. Se nÃ£o configurado, o logo padrÃ£o do sistema Ã© exibido.
+                Substitui o logo "Gabinete App" no cabeçalho do seu perfil público. Se não configurado, o logo padrão do sistema é exibido.
               </p>
               <p className="text-xs text-muted-foreground">
-                Recomendado: formato horizontal, fundo transparente (PNG). MÃ¡x. 5 MB.
+                Recomendado: formato horizontal, fundo transparente (PNG). Máx. 5 MB.
               </p>
               {isOwner && !isSubmitting && (
                 <Button
@@ -228,7 +228,7 @@ export function CabinetBrandingCard() {
           />
         </FieldGroup>
 
-        {/* â”€â”€ Accent color â”€â”€ */}
+        {/* ── Accent color ── */}
         <FieldGroup>
           <div className="flex items-center gap-2 mb-3">
             <Palette className="size-4 text-muted-foreground" />
@@ -269,11 +269,11 @@ export function CabinetBrandingCard() {
             </div>
           </div>
           <p className="text-xs text-muted-foreground mt-2">
-            Aparece na barra de resolutividade, no banner e nos botÃµes do perfil pÃºblico.
+            Aparece na barra de resolutividade, no banner e nos botões do perfil público.
           </p>
         </FieldGroup>
 
-        {/* â”€â”€ Banner â”€â”€ */}
+        {/* ── Banner ── */}
         <FieldGroup>
           <div className="flex items-center gap-2 mb-3">
             <Image className="size-4 text-muted-foreground" />
@@ -294,7 +294,7 @@ export function CabinetBrandingCard() {
                   background: `linear-gradient(135deg, ${accentColor}cc 0%, ${accentColor} 100%)`,
                 }}
               >
-                <span className="text-xs text-white/70 font-medium">Banner padrÃ£o (gradiente)</span>
+                <span className="text-xs text-white/70 font-medium">Banner padrão (gradiente)</span>
               </div>
             )}
 
@@ -328,11 +328,11 @@ export function CabinetBrandingCard() {
             onChange={handleBannerSelect}
           />
           <p className="text-xs text-muted-foreground mt-1.5">
-            Recomendado: 1200Ã—400 px. Formatos: JPG, PNG ou WebP. MÃ¡x. 5 MB.
+            Recomendado: 1200×400 px. Formatos: JPG, PNG ou WebP. Máx. 5 MB.
           </p>
         </FieldGroup>
 
-        {/* â”€â”€ QR Code â”€â”€ */}
+        {/* ── QR Code ── */}
         <FieldGroup>
           <div className="flex items-center gap-2 mb-3">
             <QrCode className="size-4 text-muted-foreground" />
@@ -350,11 +350,11 @@ export function CabinetBrandingCard() {
             </div>
             <div className="flex flex-col gap-2 pt-1">
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Imprima em panfletos, banners e cartÃµes. Ao escanear, o cidadÃ£o Ã© direcionado
+                Imprima em panfletos, banners e cartões. Ao escanear, o cidadão é direcionado
                 direto ao perfil do seu gabinete para registrar uma demanda.
               </p>
               <Field>
-                <Label className="text-xs">URL do perfil pÃºblico</Label>
+                <Label className="text-xs">URL do perfil público</Label>
                 <div className="flex items-center h-9 rounded-md border border-border bg-muted/30 px-3 text-sm text-muted-foreground font-mono truncate">
                   {publicUrl}
                 </div>
@@ -363,7 +363,7 @@ export function CabinetBrandingCard() {
           </div>
         </FieldGroup>
 
-        {/* â”€â”€ Widget embed â”€â”€ */}
+        {/* ── Widget embed ── */}
         <FeatureGate feature={FEATURES.WIDGET} upgradePrompt upgradeClassName="mt-2">
           <FieldGroup>
             <div className="flex items-center gap-2 mb-3">
@@ -371,7 +371,7 @@ export function CabinetBrandingCard() {
               <span className="text-sm font-semibold text-foreground">Widget para seu site</span>
             </div>
             <p className="text-sm text-muted-foreground mb-3 leading-relaxed">
-              Cole este cÃ³digo no site oficial. Um botÃ£o flutuante aparecerÃ¡ para que os cidadÃ£os
+              Cole este código no site oficial. Um botão flutuante aparecerá para que os cidadãos
               enviem demandas diretamente.
             </p>
             <div className="relative">
@@ -410,12 +410,12 @@ export function CabinetBrandingCard() {
             className="ml-auto"
           >
             {isSubmitting && <Loader2 className="size-3.5 animate-spin" />}
-            Salvar personalizaÃ§Ã£o
+            Salvar personalização
           </Button>
         ) : (
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <Lock className="size-3.5 shrink-0" />
-            <span>Apenas o responsÃ¡vel pelo gabinete pode editar.</span>
+            <span>Apenas o responsável pelo gabinete pode editar.</span>
           </div>
         )}
       </CardFooter>

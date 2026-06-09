@@ -1,4 +1,4 @@
-﻿import { Mail, MapPin, BarChart3, FileText, Zap, MessageCircle } from "lucide-react"
+import { Mail, MapPin, BarChart3, FileText, Zap, MessageCircle } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useInView } from "../hooks/use-in-view"
 import logo from "@/assets/logo.png"
@@ -19,8 +19,8 @@ const HUB_NODES = [
   },
   {
     id: "reports",
-    label: "RelatÃ³rios",
-    sub: "PDF & ExportaÃ§Ãµes",
+    label: "Relatórios",
+    sub: "PDF & Exportações",
     Icon: FileText,
     posCls: "left-[52%] top-[78%]",
     svgTo: [122, 84] as [number, number],
@@ -30,8 +30,8 @@ const HUB_NODES = [
   },
   {
     id: "geo",
-    label: "GeolocalizaÃ§Ã£o",
-    sub: "Mapas & territÃ³rios",
+    label: "Geolocalização",
+    sub: "Mapas & territórios",
     Icon: MapPin,
     posCls: "left-[22%] top-[78%]",
     svgTo: [80, 84] as [number, number],
@@ -42,7 +42,7 @@ const HUB_NODES = [
   {
     id: "api",
     label: "API Aberta",
-    sub: "IntegraÃ§Ãµes custom",
+    sub: "Integrações custom",
     Icon: Zap,
     posCls: "left-[12%] top-[44%]",
     svgTo: [58, 50] as [number, number],
@@ -64,7 +64,7 @@ const HUB_NODES = [
   {
     id: "email",
     label: "E-mail",
-    sub: "Alertas automÃ¡ticos",
+    sub: "Alertas automáticos",
     Icon: Mail,
     posCls: "left-[52%] top-[9%]",
     svgTo: [122, 15] as [number, number],
@@ -99,7 +99,7 @@ export function EcosystemSection() {
           </h2>
           <p className="text-base text-muted-foreground max-w-lg mx-auto leading-relaxed">
             O Gabinete App centraliza todos os canais e fontes de dados
-            do seu mandato em uma plataforma Ãºnica.
+            do seu mandato em uma plataforma única.
           </p>
         </div>
 

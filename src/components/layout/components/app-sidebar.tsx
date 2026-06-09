@@ -1,4 +1,4 @@
-﻿import { useGetDemandsByCabinetSlug } from "@/api/demands/hooks"
+import { useGetDemandsByCabinetSlug } from "@/api/demands/hooks"
 import { useAuth } from "@/hooks/use-auth"
 import { useCurrentMember } from "@/hooks/use-current-member"
 import { cn } from "@/lib/utils"
@@ -67,24 +67,24 @@ export function AppSidebar() {
               <SidebarMenuItem>
                 <SidebarMenuButton
                   asChild
-                  tooltip="UsuÃ¡rios"
+                  tooltip="Usuários"
                   isActive={pathname === "/admin/users"}
                 >
                   <Link to="/admin/users">
                     <Users className={cn({ "text-primary": pathname === "/admin/users" })} />
-                    <span>UsuÃ¡rios</span>
+                    <span>Usuários</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton
                   asChild
-                  tooltip="DenÃºncias"
+                  tooltip="Denúncias"
                   isActive={pathname === "/admin/denuncias"}
                 >
                   <Link to="/admin/denuncias">
                     <Flag className={cn({ "text-primary": pathname === "/admin/denuncias" })} />
-                    <span>DenÃºncias</span>
+                    <span>Denúncias</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -169,10 +169,10 @@ export function AppSidebar() {
               </SidebarGroupLabel>
               <SidebarMenu className="space-y-0.5">
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip="InÃ­cio" isActive={pathname === "/home"}>
+                  <SidebarMenuButton asChild tooltip="Início" isActive={pathname === "/home"}>
                     <Link to="/home">
                       <Home className={cn({ "text-primary": pathname === "/home" })} />
-                      <span>InÃ­cio</span>
+                      <span>Início</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -212,10 +212,10 @@ export function AppSidebar() {
                 </SidebarMenuItem>
 
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip="RelatÃ³rios" isActive={pathname === "/relatorios"}>
+                  <SidebarMenuButton asChild tooltip="Relatórios" isActive={pathname === "/relatorios"}>
                     <Link to="/relatorios">
                       <BarChart3 className={cn({ "text-primary": pathname === "/relatorios" })} />
-                      <span>RelatÃ³rios</span>
+                      <span>Relatórios</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -230,7 +230,7 @@ export function AppSidebar() {
         <SidebarFooter className="border-t border-border">
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip={cabinet.name ?? "Perfil pÃºblico"}>
+              <SidebarMenuButton asChild tooltip={cabinet.name ?? "Perfil público"}>
                 <Link to={`/${cabinet.slug}`} target="_blank" rel="noopener noreferrer">
                   <Globe className="text-muted-foreground" />
                   <span className="truncate">{cabinet.name ?? "Ver perfil"}</span>

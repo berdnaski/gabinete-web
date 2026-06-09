@@ -1,4 +1,4 @@
-﻿import logo from "@/assets/logo.png"
+import logo from "@/assets/logo.png"
 
 type FooterLink = { label: string; href: string }
 
@@ -10,7 +10,7 @@ const FOOTER_LINKS: Record<string, FooterLink[]> = {
     { label: "FAQ", href: "#faq" },
   ],
   Empresa: [
-    { label: "Sobre nÃ³s", href: "#" },
+    { label: "Sobre nós", href: "#" },
     { label: "Blog", href: "#" },
     { label: "Imprensa", href: "#" },
     { label: "Contato", href: "#" },
@@ -34,7 +34,7 @@ export function LandingFooter() {
               className="h-6 w-auto max-w-32.5 object-contain object-left"
             />
             <p className="text-sm text-muted-foreground leading-relaxed max-w-50">
-              A plataforma de gestÃ£o de mandato feita para o gestor pÃºblico moderno.
+              A plataforma de gestão de mandato feita para o gestor público moderno.
             </p>
             <div className="flex items-center gap-1.5">
               <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -65,7 +65,7 @@ export function LandingFooter() {
 
         <div className="py-5 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3">
           <span className="text-xs text-muted-foreground">
-            Â© {new Date().getFullYear()} Gabinete App. Todos os direitos reservados.
+            © {new Date().getFullYear()} Gabinete App. Todos os direitos reservados.
           </span>
           <span className="text-xs text-muted-foreground">
             Feito com cuidado no Brasil.
