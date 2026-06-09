@@ -26,13 +26,14 @@ export const UsersApi = {
     return response.data;
   },
 
-  updateProfile: async (id: string, data: Partial<User>, file?: File): Promise<User> => {
+  updateProfile: async (id: string, data: Partial<User> & { removeAvatar?: boolean }, file?: File): Promise<User> => {
     const formData = new FormData();
     if (data.name) formData.append("name", data.name);
     if (data.phone) formData.append("phone", data.phone);
     if (data.termsAcceptedAt) {
       formData.append("termsAcceptedAt", typeof data.termsAcceptedAt === 'string' ? data.termsAcceptedAt : data.termsAcceptedAt.toISOString());
     }
+    if (data.removeAvatar) formData.append("removeAvatar", "true");
     if (file) formData.append("avatar", file);
 
     const response = await apiClient.patch<User>(`${baseURL}/${id}`, formData, {
