@@ -259,7 +259,7 @@ export function Home() {
                   className="text-muted-foreground"
                   tickLine={false}
                   axisLine={false}
-                  interval={1}
+                  interval="preserveStartEnd"
                 />
                 <YAxis
                   tick={{ fontSize: 11, fill: "currentColor" }}
@@ -268,6 +268,9 @@ export function Home() {
                   axisLine={false}
                   allowDecimals={false}
                   width={24}
+                  tickCount={5}
+                  domain={[0, "auto"]}
+                  tickFormatter={(v: number) => String(Math.floor(v))}
                 />
                 <ChartTooltip
                   cursor={{ fill: "hsl(var(--muted))", opacity: 0.5, radius: 6 }}
