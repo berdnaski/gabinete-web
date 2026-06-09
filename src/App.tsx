@@ -11,10 +11,14 @@ import { AppRouter } from "./routes/app-router";
 import { AuthProvider } from "./contexts/auth-context";
 import { SocketProvider } from "./contexts/socket-context";
 import { NavigationCityProvider } from "./contexts/navigation-city-context";
+import { usePageTracking } from "./hooks/use-page-tracking";
 
 function AppContent() {
   const { isInitializing } = useAuth();
   const [splashDone, setSplashDone] = useState(false);
+
+  // Track SPA route changes as GA4 page_view events
+  usePageTracking();
 
   if (!splashDone || isInitializing) {
     return (

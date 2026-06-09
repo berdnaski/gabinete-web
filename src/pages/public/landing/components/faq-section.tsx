@@ -3,9 +3,9 @@ import { ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useInView } from "../hooks/use-in-view"
 
-type FaqItem = { q: string; a: string }
+export type FaqItem = { q: string; a: string }
 
-const FAQ_ITEMS: FaqItem[] = [
+export const FAQ_ITEMS: FaqItem[] = [
   {
     q: "Quanto tempo leva para configurar o gabinete?",
     a: "A configuração inicial leva menos de 15 minutos. Você cadastra os membros da equipe, define as categorias de demanda e já está pronto para receber os primeiros chamados.",

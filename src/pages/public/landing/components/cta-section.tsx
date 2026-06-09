@@ -2,6 +2,7 @@ import { ArrowRight, MessageCircle } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useInView } from "../hooks/use-in-view"
 import { APP_URL, WHATSAPP_URL } from "../constants"
+import { trackCtaClick, trackWhatsappClick } from "@/lib/analytics"
 
 export function CTASection() {
   const { ref, visible } = useInView()
@@ -39,6 +40,7 @@ export function CTASection() {
             <div className="flex flex-col sm:flex-row items-center gap-2.5 pt-1">
               <a
                 href={`${APP_URL}/sign-up`}
+                onClick={() => trackCtaClick("cta_section")}
                 className="inline-flex items-center gap-2 bg-background text-foreground font-semibold rounded-lg px-6 py-3 text-sm hover:bg-background/90 active:scale-95 transition-all duration-150 shadow-sm"
               >
                 Começar grátis
@@ -48,6 +50,7 @@ export function CTASection() {
                 href={WHATSAPP_URL}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackWhatsappClick("cta_section")}
                 className="inline-flex items-center gap-2 bg-background/5 border border-background/10 text-background/70 font-medium rounded-lg px-6 py-3 text-sm hover:bg-background/10 hover:text-background/90 active:scale-95 transition-all duration-150"
               >
                 <MessageCircle className="size-4" />

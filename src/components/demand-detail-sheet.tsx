@@ -1,5 +1,6 @@
 import type { Demand } from "@/api/demands/types"
 import { useDeleteResult, useGetDemandResults, useUploadResultProtocol } from "@/api/results/hooks"
+import { useUnlinkDemand } from "@/api/demands/hooks"
 import type { Result, ResultType } from "@/api/results/types"
 import { CreateResultDialog } from "./create-result-dialog"
 import { DemandStatusBadge } from "./demand-status-badge"
@@ -14,6 +15,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "./ui/sheet"
+
 import { useAuth } from "@/hooks/use-auth"
 import { useCurrentMember } from "@/hooks/use-current-member"
 import { cn, formatBytes } from "@/lib/utils"
@@ -38,6 +40,7 @@ import { useRef, useState } from "react"
 import { Link } from "react-router-dom"
 import { DemandPriority } from "@/pages/private/demands/components/demand-priority"
 import { toast } from "sonner"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "./ui/alert-dialog"
 
 const RESULT_TYPE_LABELS: Record<ResultType, string> = {
   INFRASTRUCTURE: "Infraestrutura",
@@ -68,6 +71,8 @@ export function DemandDetailSheet({
   const { currentMember } = useCurrentMember()
   const [progressOpen, setProgressOpen] = useState(false)
   const [resultOpen, setResultOpen] = useState(false)
+  const [unlinkConfirm, setUnlinkConfirm] = useState(false)
+  const { mutate: unlinkDemand, isPending: isUnlinking } = useUnlinkDemand()
 
   const { data: resultsData, isLoading: resultsLoading } = useGetDemandResults(demand?.id)
   const results = resultsData?.items ?? []
@@ -78,6 +83,19 @@ export function DemandDetailSheet({
   const isMyDemand = !!demand.cabinetId && cabinet?.id === demand.cabinetId
   const isAssignedMember = !!demand.assigneeMemberId && currentMember?.id === demand.assigneeMemberId
   const canManage = isCabinetMember && isMyDemand
+
+  function handleUnlink() {
+    if (!demand) return
+    unlinkDemand(demand.id, {
+      onSuccess: () => {
+        toast.success("Demanda desvinculada com sucesso")
+        setUnlinkConfirm(false)
+      },
+      onError: () => {
+        toast.error("Erro ao desvincular demanda")
+      },
+    })
+  }
 
   const mapsUrl =
     demand.lat && demand.long
@@ -246,7 +264,17 @@ export function DemandDetailSheet({
 
               {demand.cabinet && (
                 <section>
-                  <SectionLabel>Gabinete responsável</SectionLabel>
+                  <div className="flex items-center justify-between gap-2 mb-3">
+                    <SectionLabel noMargin>Gabinete responsável</SectionLabel>
+                    {canManage && (
+                      <button
+                        onClick={() => setUnlinkConfirm(true)}
+                        className="text-xs text-destructive hover:text-destructive/80 font-medium transition-colors"
+                      >
+                        Desvincular
+                      </button>
+                    )}
+                  </div>
                   <Link
                     to={`/${demand.cabinet.slug}`}
                     onClick={() => onOpenChange(false)}
@@ -289,7 +317,7 @@ export function DemandDetailSheet({
         </SheetContent>
       </Sheet>
 
-      {isAssignedMember && (
+      {isAssignedMember && demand && (
         <UpdateProgressDialog
           demandId={demand.id}
           currentStatus={demand.status}
@@ -301,12 +329,35 @@ export function DemandDetailSheet({
         />
       )}
 
-      {isAssignedMember && (
+      {isAssignedMember && demand && (
         <CreateResultDialog
           demand={demand}
           open={resultOpen}
           onOpenChange={setResultOpen}
         />
+      )}
+
+      {demand && (
+        <AlertDialog open={unlinkConfirm} onOpenChange={setUnlinkConfirm}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Desvincular demanda?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Esta ação desvincular a demanda do gabinete "{demand.cabinet?.name}". A demanda voltará a estar disponível para reivindicação.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={isUnlinking}>Cancelar</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleUnlink}
+                disabled={isUnlinking}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                {isUnlinking ? "Desvinculando..." : "Desvincular"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       )}
     </>
   )

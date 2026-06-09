@@ -94,7 +94,7 @@ export function PersonalInfoCard() {
 
   return (
     <form onSubmit={onSubmit}>
-      <Card className="bg-card rounded-xl border border-border shadow-sm animate-in fade-in duration-300">
+      <Card className="border border-border rounded-xl bg-card shadow-sm animate-in fade-in duration-300">
         <CardHeader className="px-6 pt-5 pb-4 border-b border-border">
           <CardTitle className="text-base font-semibold text-foreground">
             Informações Pessoais
@@ -123,7 +123,7 @@ export function PersonalInfoCard() {
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 rounded-full transition-opacity flex items-center justify-center"
+                      className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity"
                     >
                       <Camera className="size-5 text-white" />
                     </button>
@@ -142,7 +142,7 @@ export function PersonalInfoCard() {
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="inline-flex items-center justify-center gap-1.5 h-8 px-3 bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground rounded-lg text-xs font-medium transition-colors duration-200"
+                      className="h-8 inline-flex items-center justify-center gap-1.5 px-3 rounded-lg bg-muted text-xs font-medium text-muted-foreground hover:bg-muted/80 hover:text-foreground transition-colors duration-200"
                     >
                       <Camera className="size-3.5" />
                       Alterar foto
@@ -152,7 +152,7 @@ export function PersonalInfoCard() {
                       <button
                         type="button"
                         onClick={handleRemoveAvatar}
-                        className="inline-flex items-center justify-center gap-1.5 h-8 px-3 bg-destructive/10 hover:bg-destructive/20 text-destructive hover:text-red-600 rounded-lg text-xs font-medium transition-colors duration-200"
+                        className="h-8 inline-flex items-center justify-center gap-1.5 px-3 rounded-lg bg-destructive/10 text-xs font-medium text-destructive hover:bg-destructive/20 hover:text-red-600 transition-colors duration-200"
                       >
                         <Trash2 className="size-3.5" />
                         Remover foto
@@ -164,7 +164,7 @@ export function PersonalInfoCard() {
                         <button
                           type="button"
                           onClick={handleCancelRemove}
-                          className="flex-1 inline-flex items-center justify-center gap-1 h-8 bg-secondary hover:bg-secondary/80 text-secondary-foreground rounded-lg text-xs font-medium transition-colors duration-200"
+                          className="flex-1 h-8 inline-flex items-center justify-center gap-1 rounded-lg bg-secondary text-xs font-medium text-secondary-foreground hover:bg-secondary/80 transition-colors duration-200"
                         >
                           <X className="size-3.5" />
                           Cancelar

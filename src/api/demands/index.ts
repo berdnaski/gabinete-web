@@ -195,4 +195,24 @@ export const DemandsApi = {
 		const { data } = await apiClient.get<MyDemandsSummary>(`${baseURL}/me/summary`);
 		return data;
 	},
+
+	export: async (params: ListDemandsParams): Promise<PaginatedResponse<Demand>> => {
+		const response = await apiClient.get<PaginatedResponse<Demand>>(`${baseURL}/export`, {
+			params: {
+				page: params.page,
+				limit: Math.min(params.limit || 100, 100),
+				status: params.status,
+				statuses: params.statuses?.join(','),
+				categories: params.categories?.join(','),
+				search: params.search,
+				endDate: params.endDate,
+				priority: params.priority,
+				startDate: params.startDate,
+				neighborhood: params.neighborhood,
+				city: params.city,
+				state: params.state,
+			}
+		});
+		return response.data;
+	},
 };

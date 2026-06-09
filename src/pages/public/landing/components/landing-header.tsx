@@ -3,6 +3,7 @@ import { MessageCircle, Menu, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import logo from "@/assets/logo.png"
 import { APP_URL, WHATSAPP_URL } from "../constants"
+import { trackWhatsappClick } from "@/lib/analytics"
 
 const NAV_LINKS = [
   { label: "Início", href: "#inicio" },
@@ -55,6 +56,7 @@ export function LandingHeader() {
             href={WHATSAPP_URL}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => trackWhatsappClick("header")}
             className="cursor-pointer inline-flex items-center gap-2 border border-border rounded-lg px-4 py-2 text-sm font-semibold text-foreground hover:bg-muted transition-colors"
           >
             <MessageCircle className="size-4 text-muted-foreground" />
@@ -97,7 +99,7 @@ export function LandingHeader() {
                 href={WHATSAPP_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={() => setOpen(false)}
+                onClick={() => { setOpen(false); trackWhatsappClick("header_mobile") }}
                 className="cursor-pointer w-full inline-flex items-center justify-center gap-2 border border-border rounded-lg px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-muted transition-colors"
               >
                 <MessageCircle className="size-4 text-muted-foreground" />
