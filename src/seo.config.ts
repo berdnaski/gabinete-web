@@ -6,8 +6,8 @@
  */
 
 export const SITE_CONFIG = {
-  name: "Gabinete Digital",
-  domain: "https://gabineteapp.com.br",
+  name: "Gabinete App",
+  domain: "https://www.gabineteapp.com.br",
   defaultOgImage: "/og-default.png",
   locale: "pt_BR",
   twitterHandle: "@gabineteapp",
@@ -26,43 +26,43 @@ export interface PageSeoConfig {
 
 export const SEO_CONFIG: Record<string, PageSeoConfig> = {
   home: {
-    title: "Gabinete Digital — Gestão de Mandato para Parlamentares",
+    title: "Gabinete App | Software de Gestão de Demandas para Políticos",
     description:
-      "Centralize demandas, conecte cidadãos e comprove resultados. A plataforma de gestão cívica feita para vereadores, deputados e senadores. Comece grátis.",
-    canonical: "https://gabineteapp.com.br/",
+      "Organize demandas de constituintes, gerencie seu gabinete 100% online. Acompanhe solicitações, analise dados e responda mais rápido com Gabinete App. Teste grátis, sem cartão de crédito.",
+    canonical: "https://www.gabineteapp.com.br/",
     ogImage: "/og-default.png",
     ogType: "website",
     keywords:
-      "gestão de mandato, gabinete parlamentar, demandas cidadãos, vereador, deputado, gestão pública, plataforma cívica",
+      "gabinete app, gestão de demandas, software gabinete, gerenciamento mandato, software político, demandas cidadãos, vereador, deputado",
   },
   termsOfUse: {
-    title: "Termos de Uso — Gabinete Digital",
+    title: "Termos de Uso — Gabinete App",
     description:
-      "Leia os Termos de Uso da plataforma Gabinete Digital. Condições de uso, responsabilidades e diretrizes para gabinetes e cidadãos.",
-    canonical: "https://gabineteapp.com.br/termos-de-uso",
+      "Leia os Termos de Uso da plataforma Gabinete App. Condições de uso, responsabilidades e diretrizes para gabinetes e cidadãos.",
+    canonical: "https://www.gabineteapp.com.br/termos-de-uso",
     ogType: "website",
     noindex: true,
   },
   privacyPolicy: {
-    title: "Política de Privacidade (LGPD) — Gabinete Digital",
+    title: "Política de Privacidade (LGPD) — Gabinete App",
     description:
-      "Saiba como o Gabinete Digital coleta, usa e protege seus dados pessoais em conformidade com a LGPD — Lei nº 13.709/2018.",
-    canonical: "https://gabineteapp.com.br/politica-de-privacidade",
+      "Saiba como o Gabinete App coleta, usa e protege seus dados pessoais em conformidade com a LGPD — Lei nº 13.709/2018.",
+    canonical: "https://www.gabineteapp.com.br/politica-de-privacidade",
     ogType: "website",
     noindex: true,
   },
   login: {
-    title: "Entrar — Gabinete Digital",
-    description: "Acesse sua conta no Gabinete Digital e gerencie as demandas do seu mandato.",
-    canonical: "https://gabineteapp.com.br/login",
+    title: "Entrar — Gabinete App",
+    description: "Acesse sua conta no Gabinete App e gerencie as demandas do seu mandato.",
+    canonical: "https://www.gabineteapp.com.br/login",
     ogType: "website",
     noindex: true,
   },
   signUp: {
-    title: "Criar conta grátis — Gabinete Digital",
+    title: "Criar conta grátis — Gabinete App",
     description:
-      "Cadastre-se gratuitamente e comece a centralizar demandas do seu gabinete parlamentar hoje. Sem cartão de crédito.",
-    canonical: "https://gabineteapp.com.br/sign-up",
+      "Cadastre-se gratuitamente no Gabinete App e comece a centralizar demandas do seu gabinete parlamentar. Sem cartão de crédito.",
+    canonical: "https://www.gabineteapp.com.br/sign-up",
     ogType: "website",
     noindex: true,
   },

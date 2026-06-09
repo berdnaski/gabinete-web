@@ -14,19 +14,20 @@ export function buildOrganizationSchema() {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "Gabinete Digital",
+    name: "Gabinete App",
     url: SITE_CONFIG.domain,
     logo: `${SITE_CONFIG.domain}/logo.svg`,
     description:
-      "Plataforma de gestão cívica que conecta gabinetes parlamentares aos cidadãos.",
+      "Software de gestão de demandas para gabinetes políticos. Organize solicitações de cidadãos, acompanhe andamento e prove resultados.",
     foundingDate: "2024",
     contactPoint: {
       "@type": "ContactPoint",
       contactType: "customer support",
       availableLanguage: "Portuguese",
-      email: "suporte@gabinete.app",
+      email: "suporte@gabineteapp.com.br",
     },
     sameAs: [
+      "https://twitter.com/gabineteapp",
       "https://instagram.com/gabineteapp",
       "https://linkedin.com/company/gabineteapp",
     ],
@@ -40,33 +41,33 @@ export function buildSoftwareApplicationSchema() {
   return {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    name: "Gabinete Digital",
+    name: "Gabinete App",
     operatingSystem: "Web",
     applicationCategory: "BusinessApplication",
     url: SITE_CONFIG.domain,
     description:
-      "Plataforma SaaS para gestão de mandatos parlamentares. Centralize demandas, gerencie equipe e comprove resultados com analytics em tempo real.",
+      "Software de gestão de demandas para gabinetes políticos. Organize solicitações de cidadãos, acompanhe andamento e comprove resultados com analytics em tempo real.",
     offers: {
       "@type": "Offer",
       price: "0",
       priceCurrency: "BRL",
-      description: "14 dias grátis com acesso completo. Sem cartão de crédito.",
+      description: "Teste grátis, sem cartão de crédito.",
     },
     aggregateRating: {
       "@type": "AggregateRating",
       ratingValue: "4.8",
-      ratingCount: "4200",
+      ratingCount: "150",
       bestRating: "5",
       worstRating: "1",
     },
     featureList: [
-      "Gestão Kanban de demandas",
-      "Analytics e KPIs de mandato",
+      "Gestão de demandas",
+      "Analytics e KPIs",
       "Mapa de calor geolocalizado",
-      "Relatórios em PDF",
-      "Notificações em tempo real",
+      "Relatórios em tempo real",
+      "Notificações automáticas",
       "Gestão de equipe",
-      "Canal público para cidadãos",
+      "Portal para cidadãos",
     ],
   }
 }
@@ -101,7 +102,7 @@ export function buildWebSiteSchema() {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "Gabinete Digital",
+    name: "Gabinete App",
     url: SITE_CONFIG.domain,
     inLanguage: "pt-BR",
     potentialAction: {

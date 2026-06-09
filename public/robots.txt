@@ -1,37 +1,20 @@
-User-agent: *
+﻿User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /private/
+Disallow: /*.js$
+Disallow: /*.css$
+Disallow: /api/
+Disallow: /auth/
+Disallow: /auth/callback
+
+Sitemap: https://www.gabineteapp.com.br/sitemap.xml
+
+User-agent: AdsBot-Google
 Allow: /
 
-# Block authenticated app routes — no SEO value, requires login
-Disallow: /feed
-Disallow: /mapa
-Disallow: /my-demands
-Disallow: /my-neighborhood
-Disallow: /gabinetes
-Disallow: /profile/
-Disallow: /settings
-Disallow: /demand/
-Disallow: /comments/
+User-agent: Googlebot
+Allow: /
 
-# Block cabinet staff routes
-Disallow: /home
-Disallow: /demands
-Disallow: /equipe
-Disallow: /minhas-tarefas
-Disallow: /relatorios
-
-# Block admin routes
-Disallow: /admin/
-
-# Block auth utility routes
-Disallow: /auth/callback
-Disallow: /verify-email
-Disallow: /reset-password
-Disallow: /forgot-password
-Disallow: /confirm-password
-Disallow: /cabinets/invites/
-Disallow: /pesquisa/
-
-# Block sandbox
-Disallow: /sandbox
-
-Sitemap: https://gabineteapp.com.br/sitemap.xml
+User-agent: *
+Crawl-delay: 1
