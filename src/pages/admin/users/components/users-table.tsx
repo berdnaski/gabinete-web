@@ -1,10 +1,11 @@
 import { useGetUsersPaginated } from "@/api/users/hooks"
 import { UserRole } from "@/api/users/types"
 import { DataTable, type DataTableFilterField } from "@/components/data-table"
+import { useAuth } from "@/hooks/use-auth"
 import { TABLE_PARAM_KEYS, useDataTable } from "@/hooks/use-data-table"
 import { useMemo } from "react"
 import { useSearchParams } from "react-router-dom"
-import { usersColumns } from "./users-columns"
+import { getUsersColumns } from "./users-columns"
 
 const filterFields: DataTableFilterField[] = [
   {
@@ -22,6 +23,7 @@ const filterFields: DataTableFilterField[] = [
     label: "Status",
     type: "select",
     options: [
+      { label: "Todos", value: "" },
       { label: "Ativos", value: "false" },
       { label: "Inativos", value: "true" },
     ],
@@ -29,7 +31,8 @@ const filterFields: DataTableFilterField[] = [
 ]
 
 export function UsersTable() {
-  const columns = useMemo(() => usersColumns, [])
+  const { user } = useAuth()
+  const columns = useMemo(() => getUsersColumns(user?.id ?? ""), [user?.id])
   const [searchParams] = useSearchParams()
 
   const page = Math.max(1, Number(searchParams.get(TABLE_PARAM_KEYS.PAGE) ?? 1))
@@ -40,7 +43,9 @@ export function UsersTable() {
   const role = (Object.values(UserRole) as string[]).includes(rawRole)
     ? (rawRole as UserRole)
     : undefined
-  const showInactive = searchParams.get("showInactive") === "true"
+  const showInactiveRaw = searchParams.get("showInactive")
+  const showInactive =
+    showInactiveRaw === "true" ? true : showInactiveRaw === "false" ? false : undefined
 
   const { data, isLoading } = useGetUsersPaginated({ page, limit, search, role, showInactive })
 

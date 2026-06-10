@@ -1,41 +1,106 @@
 import type { User } from "@/api/users"
 import { UserRole, UserRoleLabel } from "@/api/users/types"
-import { useAdminEnableUser } from "@/api/admin/hooks"
+import { useAdminDisableUser, useAdminEnableUser } from "@/api/admin/hooks"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { getFirstLettersFromNames } from "@/utils/get-first-letters-from-names"
 import type { ColumnDef } from "@tanstack/react-table"
-import { ArrowRight, Loader2, UserCheck } from "lucide-react"
-import { Link } from "react-router-dom"
+import { Loader2, UserCheck, UserX } from "lucide-react"
+import { useState } from "react"
 import { toast } from "sonner"
 import { UserEditSheet } from "./user-edit-sheet"
 
 function EnableButton({ userId }: { userId: string }) {
+  const [open, setOpen] = useState(false)
   const { mutate, isPending } = useAdminEnableUser()
 
-  function handleEnable() {
+  function handleConfirm() {
     mutate(userId, {
-      onSuccess: () => toast.success("Usuário reativado com sucesso."),
+      onSuccess: () => { toast.success("Usuário reativado com sucesso."); setOpen(false) },
       onError: () => toast.error("Erro ao reativar usuário."),
     })
   }
 
   return (
-    <Button
-      variant="outline"
-      size="sm"
-      className="gap-1 text-xs h-7 text-green-700 border-green-200 hover:bg-green-50 hover:text-green-800"
-      onClick={handleEnable}
-      disabled={isPending}
-    >
-      {isPending ? <Loader2 className="size-3 animate-spin" /> : <UserCheck className="size-3" />}
-      Ativar
-    </Button>
+    <>
+      <Button
+        variant="outline"
+        size="sm"
+        className="gap-1 text-xs h-7 text-green-700 border-green-200 hover:bg-green-50 hover:text-green-800"
+        onClick={() => setOpen(true)}
+      >
+        <UserCheck className="size-3" />
+        Ativar
+      </Button>
+      <AlertDialog open={open} onOpenChange={setOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reativar usuário?</AlertDialogTitle>
+            <AlertDialogDescription>
+              O usuário voltará a ter acesso à plataforma normalmente.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isPending}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirm} disabled={isPending}>
+              {isPending ? <Loader2 className="size-4 animate-spin" /> : "Reativar"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   )
 }
 
-export const usersColumns: ColumnDef<User>[] = [
+function DisableButton({ userId }: { userId: string }) {
+  const [open, setOpen] = useState(false)
+  const { mutate, isPending } = useAdminDisableUser()
+
+  function handleConfirm() {
+    mutate(userId, {
+      onSuccess: () => { toast.success("Usuário desativado com sucesso."); setOpen(false) },
+      onError: () => toast.error("Erro ao desativar usuário."),
+    })
+  }
+
+  return (
+    <>
+      <Button
+        variant="outline"
+        size="sm"
+        className="gap-1 text-xs h-7 text-red-700 border-red-200 hover:bg-red-50 hover:text-red-800"
+        onClick={() => setOpen(true)}
+      >
+        <UserX className="size-3" />
+        Desativar
+      </Button>
+      <AlertDialog open={open} onOpenChange={setOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Desativar usuário?</AlertDialogTitle>
+            <AlertDialogDescription>
+              O usuário perderá o acesso à plataforma. Você poderá reativá-lo a qualquer momento.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isPending}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirm}
+              disabled={isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isPending ? <Loader2 className="size-4 animate-spin" /> : "Desativar"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  )
+}
+
+export function getUsersColumns(currentUserId: string): ColumnDef<User>[] { return [
   {
     accessorKey: "name",
     header: "Usuário",
@@ -99,16 +164,13 @@ export const usersColumns: ColumnDef<User>[] = [
           {u.disabledAt ? (
             <EnableButton userId={u.id} />
           ) : (
-            <UserEditSheet userId={u.id} />
+            <>
+              {u.id !== currentUserId && <DisableButton userId={u.id} />}
+              <UserEditSheet userId={u.id} />
+            </>
           )}
-          <Link
-            to={`/profile/${u.id}`}
-            className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
-          >
-            Abrir <ArrowRight className="size-3" />
-          </Link>
         </div>
       )
     },
-  },
-]
+  }
+]}
