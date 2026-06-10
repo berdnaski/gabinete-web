@@ -243,7 +243,6 @@ export function ReportDetailSheet({ item, open, onOpenChange }: ReportDetailShee
         </SheetContent>
       </Sheet>
 
-      {/* Confirm dismiss reports */}
       <Dialog open={confirmDismiss} onOpenChange={setConfirmDismiss}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
@@ -267,7 +266,6 @@ export function ReportDetailSheet({ item, open, onOpenChange }: ReportDetailShee
         </DialogContent>
       </Dialog>
 
-      {/* Confirm delete demand */}
       <Dialog open={confirmDelete} onOpenChange={setConfirmDelete}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>

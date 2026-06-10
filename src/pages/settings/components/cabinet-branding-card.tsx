@@ -163,7 +163,6 @@ export function CabinetBrandingCard() {
 
       <CardContent className="px-6 py-5 space-y-8">
 
-        {/* ── Logo ── */}
         <FieldGroup>
           <div className="flex items-center gap-2 mb-3">
             <ImageIcon className="size-4 text-muted-foreground" />
@@ -171,7 +170,6 @@ export function CabinetBrandingCard() {
           </div>
 
           <div className="flex items-start gap-4">
-            {/* Preview */}
             <div className="relative size-20 rounded-xl overflow-hidden border border-border bg-muted/30 shrink-0 flex items-center justify-center">
               {logoPreview || cabinet.logoUrl ? (
                 <img
@@ -226,7 +224,6 @@ export function CabinetBrandingCard() {
           />
         </FieldGroup>
 
-        {/* ── Accent color ── */}
         <FieldGroup>
           <div className="flex items-center gap-2 mb-3">
             <Palette className="size-4 text-muted-foreground" />
@@ -271,7 +268,6 @@ export function CabinetBrandingCard() {
           </p>
         </FieldGroup>
 
-        {/* ── Banner ── */}
         <FieldGroup>
           <div className="flex items-center gap-2 mb-3">
             <Image className="size-4 text-muted-foreground" />
@@ -330,7 +326,6 @@ export function CabinetBrandingCard() {
           </p>
         </FieldGroup>
 
-        {/* ── QR Code ── */}
         <FieldGroup>
           <div className="flex items-center gap-2 mb-3">
             <QrCode className="size-4 text-muted-foreground" />
@@ -361,7 +356,6 @@ export function CabinetBrandingCard() {
           </div>
         </FieldGroup>
 
-        {/* ── Widget embed ── */}
         <FeatureGate feature={FEATURES.WIDGET} upgradePrompt upgradeClassName="mt-2">
           <FieldGroup>
             <div className="flex items-center gap-2 mb-3">

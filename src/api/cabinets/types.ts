@@ -20,6 +20,7 @@ export interface Cabinet {
   resolved_count: number;
   transparencyScore: number;
   resolution_rate: number;
+  disabledAt?: string | null;
 }
 
 export interface CabinetMember {

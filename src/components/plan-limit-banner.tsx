@@ -25,7 +25,6 @@ export function PlanLimitBanner({ current, max, label, warnThreshold = 0.8, form
 
   return (
     <div className="flex flex-col gap-2">
-      {/* Progress row */}
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center justify-between">
           <span className="text-xs text-muted-foreground">{label}</span>
@@ -41,7 +40,6 @@ export function PlanLimitBanner({ current, max, label, warnThreshold = 0.8, form
         </div>
       </div>
 
-      {/* Warning banner */}
       {(isWarning || isExceeded) && (
         <div
           className={cn(

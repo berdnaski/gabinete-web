@@ -177,7 +177,6 @@ export function NotificationPopover() {
         collisionPadding={8}
         className="w-[calc(100vw-1rem)] max-w-96 p-0 rounded-2xl shadow-xl overflow-hidden border-border/50"
       >
-        {/* Header */}
         <div className="flex items-center justify-between px-4 py-3.5 border-b border-border/50 bg-background">
           <div className="flex items-center gap-2">
             <h3 className="font-bold text-base text-foreground">Notificações</h3>
@@ -208,7 +207,6 @@ export function NotificationPopover() {
           )}
         </div>
 
-        {/* Body */}
         <div className="max-h-[min(460px,60vh)] overflow-y-auto">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-12 gap-3">
@@ -265,7 +263,6 @@ export function NotificationPopover() {
           )}
         </div>
 
-        {/* Footer */}
         <div className="px-4 py-2 border-t border-border/30 bg-muted/20 flex items-center gap-1.5">
           <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
           <p className="text-2xs text-muted-foreground/50">

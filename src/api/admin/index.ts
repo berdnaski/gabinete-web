@@ -1,6 +1,7 @@
 import { apiClient } from ".."
 import { UserRole } from "@/api/users/types"
 import type { Demand } from "@/api/demands/types"
+import type { Cabinet } from "@/api/cabinets/types"
 
 export interface CreateCabinetWithOwnerRequest {
   ownerUserId: string
@@ -198,5 +199,20 @@ export const AdminApi = {
 
   enableUser: async (userId: string): Promise<void> => {
     await apiClient.patch(`/admin/users/${userId}/enable`)
+  },
+
+  listCabinetsPaginated: async (params: {
+    page: number
+    limit: number
+    search?: string
+    hasDemands?: boolean
+    showInactive?: boolean
+  }): Promise<{ items: Cabinet[]; total: number }> => {
+    const response = await apiClient.get<{ items: Cabinet[]; total: number }>("/admin/cabinets", { params })
+    return response.data
+  },
+
+  enableCabinet: async (id: string): Promise<void> => {
+    await apiClient.patch(`/admin/cabinets/${id}/enable`)
   },
 }

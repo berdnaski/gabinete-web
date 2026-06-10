@@ -1,12 +1,11 @@
 import type { Cabinet } from "@/api/cabinets/types"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
 import { getFirstLettersFromNames } from "@/utils/get-first-letters-from-names"
 import type { ColumnDef } from "@tanstack/react-table"
-import { ArrowRight } from "lucide-react"
-import { Link } from "react-router-dom"
 import { CabinetEditSheet } from "./cabinet-edit-sheet"
 import { CabinetPlansSheet } from "./cabinet-plans-sheet"
-import { DisableCabinetDialog } from "./disable-cabinet-dialog"
+import { CabinetEnableButton, CabinetDisableButton } from "./cabinet-action-buttons"
 
 export function createCabinetsColumns(
   subscriptionMap: Map<string, string>,
@@ -26,7 +25,12 @@ export function createCabinetsColumns(
               </AvatarFallback>
             </Avatar>
             <div className="flex flex-col gap-0.5 min-w-0">
-              <span className="text-sm font-semibold text-foreground truncate">{c.name}</span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-sm font-semibold text-foreground truncate">{c.name}</span>
+                {c.disabledAt && (
+                  <Badge variant="secondary" className="text-2xs px-1.5 py-0 shrink-0">Inativo</Badge>
+                )}
+              </div>
               <span className="text-xs text-muted-foreground truncate">{c.slug}</span>
             </div>
           </div>
@@ -96,20 +100,20 @@ export function createCabinetsColumns(
     {
       id: "actions",
       header: "Ações",
-      size: 120,
+      size: 180,
       cell: ({ row }) => {
         const c = row.original
         return (
           <div className="flex items-center justify-end gap-1.5">
-            <CabinetEditSheet cabinetId={c.id} />
-            <CabinetPlansSheet cabinetId={c.id} cabinetName={c.name} />
-            <DisableCabinetDialog cabinet={c} />
-            <Link
-              to={`/${c.slug}`}
-              className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
-            >
-              Abrir <ArrowRight className="size-3" />
-            </Link>
+            {c.disabledAt ? (
+              <CabinetEnableButton cabinetId={c.id} />
+            ) : (
+              <>
+                <CabinetDisableButton cabinetId={c.id} />
+                <CabinetEditSheet cabinetId={c.id} />
+                <CabinetPlansSheet cabinetId={c.id} cabinetName={c.name} />
+              </>
+            )}
           </div>
         )
       },

@@ -64,7 +64,6 @@ export function CabinetDetail() {
         Todos os gabinetes
       </Link>
 
-      {/* Profile header */}
       <div className="bg-card rounded-xl border border-border p-5 flex items-start gap-4">
         <Avatar className="size-16 shrink-0">
           <AvatarImage src={cabinet.avatarUrl} />
@@ -102,7 +101,6 @@ export function CabinetDetail() {
         </div>
       </div>
 
-      {/* Stats — only when metrics are available */}
       {hasMetrics && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <StatItem
@@ -128,7 +126,6 @@ export function CabinetDetail() {
         </div>
       )}
 
-      {/* Demands */}
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-2">
           <h2 className="text-sm font-semibold text-foreground">Demandas do gabinete</h2>

@@ -90,17 +90,6 @@ export function Settings() {
                   );
                 })}
 
-                {/* <div className="mt-8 pt-6 border-t border-border/40">
-                  <p className="text-xs text-muted-foreground/60 leading-relaxed px-3">
-                    Precisa de ajuda?{" "}
-                    <a
-                      href="#"
-                      className="font-semibold text-muted-foreground hover:text-primary transition-colors underline underline-offset-2"
-                    >
-                      Suporte
-                    </a>
-                  </p>
-                </div> */}
               </TabsPrimitive.List>
             </aside>
 
@@ -131,7 +120,6 @@ export function Settings() {
             </main>
           </div>
 
-          {/* Mobile footer */}
           <footer className="md:hidden mt-10 pt-6 border-t border-border/40 text-center">
             <p className="text-sm text-muted-foreground">
               Precisa de ajuda?{" "}

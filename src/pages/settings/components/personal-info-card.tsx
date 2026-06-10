@@ -107,7 +107,6 @@ export function PersonalInfoCard() {
         <CardContent className="px-6 py-5">
           <FieldGroup>
             <div className="flex flex-col gap-6">
-              {/* Avatar Section */}
               <div className="flex flex-col sm:flex-row gap-5">
                 <div className="flex flex-col items-center gap-3 shrink-0">
                   <div className="relative group">
@@ -137,7 +136,6 @@ export function PersonalInfoCard() {
                     accept="image/png, image/jpeg, image/jpg"
                   />
 
-                  {/* Actions */}
                   <div className="flex flex-col items-center gap-2 w-full">
                     <button
                       type="button"
@@ -174,7 +172,6 @@ export function PersonalInfoCard() {
                   </div>
                 </div>
 
-                {/* Fields */}
                 <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Field>
                     <Label htmlFor="name">Nome completo</Label>

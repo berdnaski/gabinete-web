@@ -113,7 +113,6 @@ export function VirtualSelectForm<T extends FieldValues>({
   return (
     <>
       <div ref={containerRef} className="relative">
-        {/* Trigger — matches SelectTrigger styles */}
         <button
           type="button"
           disabled={disabled}
@@ -142,7 +141,6 @@ export function VirtualSelectForm<T extends FieldValues>({
         {/* Inline dropdown — no portal, so scroll works inside Dialog */}
         {open && (
           <div className="absolute z-50 mt-1 w-full overflow-hidden rounded-lg bg-popover text-popover-foreground shadow-md ring-1 ring-foreground/10">
-            {/* Search */}
             <div className="border-b border-input px-2 py-1.5">
               <input
                 ref={inputRef}
@@ -158,7 +156,6 @@ export function VirtualSelectForm<T extends FieldValues>({
               />
             </div>
 
-            {/* Virtual list */}
             {filteredOptions.length === 0 ? (
               <div className="py-4 text-center text-sm text-muted-foreground">
                 Nenhum resultado encontrado
