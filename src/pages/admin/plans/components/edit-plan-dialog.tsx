@@ -11,6 +11,7 @@ import {
 import { Label } from "@/components/ui/label"
 import { Loader2, PencilIcon } from "lucide-react"
 import { useEffect, useState } from "react"
+import { toast } from "sonner"
 
 interface Props {
   plan: Plan
@@ -51,7 +52,8 @@ export function EditPlanDialog({ plan }: Props) {
 
   function handleSubmit() {
     const priceInCents = parseReais(price)
-    if (!name.trim() || isNaN(priceInCents) || priceInCents <= 0) return
+    if (!name.trim()) return toast.error("O nome do plano é obrigatório.")
+    if (isNaN(priceInCents) || priceInCents <= 0) return toast.error("Informe um preço válido.")
 
     updatePlan(
       {

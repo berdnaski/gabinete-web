@@ -28,6 +28,7 @@ export function useAdminAddFeatureToPlan() {
       PlansApi.addFeatureToPlan(planId, featureSlug, retroactive),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-plans"] })
+      queryClient.invalidateQueries({ queryKey: ["admin-features"] })
       toast.success("Feature adicionada ao plano")
     },
     onError: () => toast.error("Erro ao adicionar feature"),
@@ -40,6 +41,7 @@ export function useAdminRemoveFeatureFromPlan() {
       PlansApi.removeFeatureFromPlan(planId, featureSlug),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-plans"] })
+      queryClient.invalidateQueries({ queryKey: ["admin-features"] })
       toast.success("Feature removida do plano")
     },
     onError: () => toast.error("Erro ao remover feature"),
