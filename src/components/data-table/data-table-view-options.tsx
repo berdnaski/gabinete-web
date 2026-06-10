@@ -33,13 +33,15 @@ export function DataTableViewOptions<TData>({
 				<DropdownMenuSeparator />
 				{columns.map((column) => {
 					const isChecked = column.getIsVisible()
+					const header = column.columnDef.header
+					const label = typeof header === 'string' && header ? header : column.id
 					return (
 						<DropdownMenuPrimitive.CheckboxItem
 							key={column.id}
 							checked={isChecked}
 							onSelect={(e) => e.preventDefault()}
 							onCheckedChange={(value) => column.toggleVisibility(value)}
-							className="flex h-9 cursor-default select-none items-center gap-2 rounded-md px-1.5 py-1 text-sm capitalize outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50"
+							className="flex h-9 cursor-default select-none items-center gap-2 rounded-md px-1.5 py-1 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50"
 						>
 							<span
 								className={cn(
@@ -53,7 +55,7 @@ export function DataTableViewOptions<TData>({
 									<Check className="size-3 text-primary-foreground" />
 								)}
 							</span>
-							{column.id}
+							{label}
 						</DropdownMenuPrimitive.CheckboxItem>
 					)
 				})}

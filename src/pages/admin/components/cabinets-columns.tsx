@@ -95,7 +95,7 @@ export function createCabinetsColumns(
     },
     {
       id: "actions",
-      header: "",
+      header: "Ações",
       size: 120,
       cell: ({ row }) => {
         const c = row.original
