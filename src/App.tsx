@@ -17,7 +17,6 @@ function AppContent() {
   const { isInitializing } = useAuth();
   const [splashDone, setSplashDone] = useState(false);
 
-  // Track SPA route changes as GA4 page_view events
   usePageTracking();
 
   if (!splashDone || isInitializing) {

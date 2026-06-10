@@ -7,9 +7,6 @@
 
 import { SITE_CONFIG } from "@/seo.config"
 
-// ---------------------------------------------------------------------------
-// Organization
-// ---------------------------------------------------------------------------
 export function buildOrganizationSchema() {
   return {
     "@context": "https://schema.org",
@@ -34,9 +31,6 @@ export function buildOrganizationSchema() {
   }
 }
 
-// ---------------------------------------------------------------------------
-// SoftwareApplication (homepage)
-// ---------------------------------------------------------------------------
 export function buildSoftwareApplicationSchema() {
   return {
     "@context": "https://schema.org",
@@ -72,9 +66,6 @@ export function buildSoftwareApplicationSchema() {
   }
 }
 
-// ---------------------------------------------------------------------------
-// FAQ Page
-// ---------------------------------------------------------------------------
 export interface FaqItem {
   q: string
   a: string
@@ -95,9 +86,6 @@ export function buildFaqSchema(items: FaqItem[]) {
   }
 }
 
-// ---------------------------------------------------------------------------
-// WebSite (sitelinks searchbox signal)
-// ---------------------------------------------------------------------------
 export function buildWebSiteSchema() {
   return {
     "@context": "https://schema.org",
@@ -116,9 +104,6 @@ export function buildWebSiteSchema() {
   }
 }
 
-// ---------------------------------------------------------------------------
-// BreadcrumbList — generic helper
-// ---------------------------------------------------------------------------
 export interface BreadcrumbItem {
   name: string
   url: string

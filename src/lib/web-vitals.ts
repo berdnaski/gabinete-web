@@ -76,9 +76,7 @@ export function reportWebVitals(): void {
     }
     document.addEventListener("visibilitychange", reportLcp, { once: true })
     window.addEventListener("pagehide", reportLcp, { once: true })
-  } catch {
-    // PerformanceObserver not supported
-  }
+  } catch {}
 
   // CLS — Cumulative Layout Shift
   try {
@@ -97,9 +95,7 @@ export function reportWebVitals(): void {
     }
     document.addEventListener("visibilitychange", reportCls, { once: true })
     window.addEventListener("pagehide", reportCls, { once: true })
-  } catch {
-    // Not supported
-  }
+  } catch {}
 
   // INP — Interaction to Next Paint
   try {
@@ -121,9 +117,7 @@ export function reportWebVitals(): void {
     }
     document.addEventListener("visibilitychange", reportInp, { once: true })
     window.addEventListener("pagehide", reportInp, { once: true })
-  } catch {
-    // Not supported
-  }
+  } catch {}
 
   // FCP — First Contentful Paint
   try {
@@ -140,7 +134,5 @@ export function reportWebVitals(): void {
       }
     })
     fcpObserver.observe({ type: "paint", buffered: true })
-  } catch {
-    // Not supported
-  }
+  } catch {}
 }

@@ -17,7 +17,6 @@ import { SITE_CONFIG } from "@/seo.config"
  */
 export function useSeo(config: PageSeoConfig) {
   useEffect(() => {
-    // --- title ---
     document.title = config.title
 
     const metas: { [key: string]: string } = {
@@ -25,7 +24,6 @@ export function useSeo(config: PageSeoConfig) {
       ...(config.keywords ? { keywords: config.keywords } : {}),
       robots: config.noindex ? "noindex, nofollow" : "index, follow",
 
-      // Open Graph
       "og:title": config.title,
       "og:description": config.description,
       "og:url": config.canonical,
@@ -37,7 +35,6 @@ export function useSeo(config: PageSeoConfig) {
       "og:image:height": "630",
       "og:image:alt": config.title,
 
-      // Twitter Card
       "twitter:card": "summary_large_image",
       "twitter:title": config.title,
       "twitter:description": config.description,
@@ -66,7 +63,6 @@ export function useSeo(config: PageSeoConfig) {
       el.setAttribute("content", value)
     })
 
-    // --- canonical ---
     let canonicalEl = document.head.querySelector('link[rel="canonical"]') as HTMLLinkElement | null
     if (!canonicalEl) {
       canonicalEl = document.createElement("link")

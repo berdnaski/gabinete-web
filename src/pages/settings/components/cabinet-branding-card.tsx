@@ -44,12 +44,10 @@ export function CabinetBrandingCard() {
 
   const [accentColor, setAccentColor] = useState(cabinet?.accentColor ?? "#0058F3")
 
-  // banner
   const [selectedBanner, setSelectedBanner] = useState<File | null>(null)
   const [bannerPreview, setBannerPreview] = useState<string | null>(null)
   const bannerInputRef = useRef<HTMLInputElement>(null)
 
-  // logo
   const [selectedLogo, setSelectedLogo] = useState<File | null>(null)
   const [logoPreview, setLogoPreview] = useState<string | null>(null)
   const logoInputRef = useRef<HTMLInputElement>(null)

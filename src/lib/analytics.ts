@@ -72,10 +72,6 @@ export function trackEvent(
   window.gtag("event", eventName, params)
 }
 
-// ---------------------------------------------------------------------------
-// Predefined conversion events — call these on high-value interactions
-// ---------------------------------------------------------------------------
-
 /** Track "Começar grátis" CTA clicks with source context */
 export function trackCtaClick(location: "hero" | "cta_section" | "header" | "footer") {
   trackEvent("cta_click", {

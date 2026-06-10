@@ -35,7 +35,6 @@ import { Link, useParams } from "react-router-dom"
 import Logo from "@/assets/logo.png"
 import { PublicDemandForm } from "./public-demand-form"
 
-// ─── Accountability bar ───────────────────────────────────────────────────────
 
 function AccountabilityBar({
   metrics,

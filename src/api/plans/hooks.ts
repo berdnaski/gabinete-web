@@ -4,8 +4,6 @@ import { queryClient } from "../queryClient"
 import { PlansApi } from "."
 import type { AddOverrideRequest } from "./types"
 
-// Admin — plans
-
 export function useAdminListPlans() {
   return useQuery({
     queryKey: ["admin-plans"],
@@ -85,8 +83,6 @@ export function useAdminSetPlanActive() {
   })
 }
 
-// Admin — cabinet subscription
-
 export function useAdminCabinetSubscription(cabinetId: string | null) {
   return useQuery({
     queryKey: ["admin-cabinet-subscription", cabinetId],
@@ -116,8 +112,6 @@ export function useAdminUpsertCabinetSubscription() {
     onError: () => toast.error("Erro ao atualizar plano"),
   })
 }
-
-// Admin — cabinet overrides
 
 export function useAdminCabinetOverrides(cabinetId: string | null) {
   return useQuery({
