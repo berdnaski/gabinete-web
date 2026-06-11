@@ -6,9 +6,10 @@ import {
   useAdminListFeatures,
   useAdminListPlans,
   useAdminRemoveCabinetOverride,
+  useAdminUpdateCabinetSubscriptionLimits,
   useAdminUpsertCabinetSubscription,
 } from "@/api/plans/hooks"
-import type { AddOverrideRequest, CabinetOverride, OverrideSource, OverrideType } from "@/api/plans/types"
+import type { AddOverrideRequest, CabinetOverride, CabinetSubscription, OverrideSource, OverrideType } from "@/api/plans/types"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -33,8 +34,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
-import { cn } from "@/lib/utils"
-import { Loader2, PackageIcon, PlusIcon, Trash2Icon } from "lucide-react"
+import { cn, formatBytes } from "@/lib/utils"
+import { Loader2, PackageIcon, PencilIcon, PlusIcon, Trash2Icon } from "lucide-react"
 import { useState } from "react"
 
 const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
@@ -50,6 +51,134 @@ const SOURCE_LABELS: Record<OverrideSource, string> = {
   TRIAL: "Trial",
   GIFT: "Presente",
   ADMIN: "Admin",
+}
+
+function formatPrice(cents: number) {
+  return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(cents / 100)
+}
+
+function EditSubscriptionLimitsDialog({
+  cabinetId,
+  subscription,
+}: {
+  cabinetId: string
+  subscription: CabinetSubscription
+}) {
+  const [open, setOpen] = useState(false)
+  const [priceInput, setPriceInput] = useState("")
+  const [maxMembersInput, setMaxMembersInput] = useState("")
+  const [maxDemandsInput, setMaxDemandsInput] = useState("")
+  const [storageMbInput, setStorageMbInput] = useState("")
+
+  function resetFromSubscription() {
+    setPriceInput(((subscription.priceInCents ?? subscription.plan.priceInCents) / 100).toFixed(2).replace(".", ","))
+    setMaxMembersInput((subscription.maxMembers ?? subscription.plan.maxMembers)?.toString() ?? "")
+    setMaxDemandsInput((subscription.maxDemands ?? subscription.plan.maxDemands)?.toString() ?? "")
+    const bytes = subscription.maxStorageBytes ?? subscription.plan.maxStorageBytes
+    setStorageMbInput(bytes !== null ? Math.round(bytes / 1024 ** 2).toString() : "")
+  }
+
+  function handleOpen() {
+    resetFromSubscription()
+    setOpen(true)
+  }
+
+  const { mutate: updateLimits, isPending } = useAdminUpdateCabinetSubscriptionLimits()
+
+  function handleSubmit() {
+    const priceInCents = Math.round(parseFloat(priceInput.replace(",", ".")) * 100)
+    if (isNaN(priceInCents) || priceInCents <= 0) return
+    updateLimits(
+      {
+        cabinetId,
+        data: {
+          priceInCents,
+          maxMembers: maxMembersInput === "" ? null : Number(maxMembersInput),
+          maxDemands: maxDemandsInput === "" ? null : Number(maxDemandsInput),
+          maxStorageBytes: storageMbInput === "" ? null : Number(storageMbInput) * 1024 ** 2,
+        },
+      },
+      { onSuccess: () => setOpen(false) },
+    )
+  }
+
+  return (
+    <>
+      <Button variant="ghost" size="icon" className="size-6 text-muted-foreground hover:text-foreground" onClick={handleOpen}>
+        <PencilIcon className="size-3.5" />
+      </Button>
+
+      <Dialog open={open} onOpenChange={(v) => !isPending && setOpen(v)}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="text-base">Editar limites da assinatura</DialogTitle>
+          </DialogHeader>
+
+          <div className="flex flex-col gap-4 py-1">
+            <div className="flex flex-col gap-1.5">
+              <Label className="text-xs">Preço cobrado (R$)</Label>
+              <input
+                className="h-8 rounded-md border border-input bg-background px-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                placeholder="0,00"
+                value={priceInput}
+                onChange={(e) => setPriceInput(e.target.value)}
+              />
+            </div>
+
+            <div className="grid grid-cols-3 gap-3">
+              <div className="flex flex-col gap-1.5">
+                <Label className="text-xs">Membros máx.</Label>
+                <input
+                  className="h-8 rounded-md border border-input bg-background px-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                  placeholder="Ilimitado"
+                  type="number"
+                  min={1}
+                  value={maxMembersInput}
+                  onChange={(e) => setMaxMembersInput(e.target.value)}
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <Label className="text-xs">Demandas máx.</Label>
+                <input
+                  className="h-8 rounded-md border border-input bg-background px-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                  placeholder="Ilimitado"
+                  type="number"
+                  min={1}
+                  value={maxDemandsInput}
+                  onChange={(e) => setMaxDemandsInput(e.target.value)}
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <Label className="text-xs">Storage (MB)</Label>
+                <input
+                  className="h-8 rounded-md border border-input bg-background px-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                  placeholder="Ilimitado"
+                  type="number"
+                  min={1}
+                  value={storageMbInput}
+                  onChange={(e) => setStorageMbInput(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <p className="text-2xs text-muted-foreground">
+              Valores independentes do plano template. Deixe em branco para ilimitado.
+            </p>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpen(false)} disabled={isPending}>
+              Cancelar
+            </Button>
+            <Button onClick={handleSubmit} disabled={isPending}>
+              {isPending && <Loader2 className="size-4 animate-spin" />}
+              Salvar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  )
 }
 
 function AddOverrideDialog({
@@ -259,26 +388,68 @@ export function CabinetPlansSheet({ cabinetId, cabinetName }: Props) {
                 <p className="text-xs font-medium text-muted-foreground">Assinatura ativa</p>
 
                 {subscription ? (
-                  <div className="rounded-lg border border-border bg-card overflow-hidden">
-                    <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-foreground">{subscription.plan.name}</p>
-                        <p className="text-xs font-mono text-muted-foreground">{subscription.plan.tier}</p>
+                  <>
+                    <div className="rounded-lg border border-border bg-card overflow-hidden">
+                      <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-foreground">{subscription.plan.name}</p>
+                          <p className="text-xs font-mono text-muted-foreground">{subscription.plan.tier}</p>
+                        </div>
+                        <Badge
+                          variant="outline"
+                          className={cn("text-2xs shrink-0", STATUS_CONFIG[subscription.status]?.className)}
+                        >
+                          {STATUS_CONFIG[subscription.status]?.label ?? subscription.status}
+                        </Badge>
                       </div>
-                      <Badge
-                        variant="outline"
-                        className={cn("text-2xs shrink-0", STATUS_CONFIG[subscription.status]?.className)}
-                      >
-                        {STATUS_CONFIG[subscription.status]?.label ?? subscription.status}
-                      </Badge>
+                      <div className="px-4 py-2.5 text-xs text-muted-foreground">
+                        Desde {new Date(subscription.currentPeriodStart).toLocaleDateString("pt-BR")}
+                        {subscription.currentPeriodEnd && (
+                          <> · até {new Date(subscription.currentPeriodEnd).toLocaleDateString("pt-BR")}</>
+                        )}
+                      </div>
                     </div>
-                    <div className="px-4 py-2.5 text-xs text-muted-foreground">
-                      Desde {new Date(subscription.currentPeriodStart).toLocaleDateString("pt-BR")}
-                      {subscription.currentPeriodEnd && (
-                        <> · até {new Date(subscription.currentPeriodEnd).toLocaleDateString("pt-BR")}</>
-                      )}
+
+                    {/* Subscription-level limits */}
+                    <div className="rounded-lg border border-border bg-card overflow-hidden">
+                      <div className="flex items-center justify-between px-4 py-2.5 border-b border-border">
+                        <span className="text-xs font-medium text-muted-foreground">Limites desta assinatura</span>
+                        <EditSubscriptionLimitsDialog cabinetId={cabinetId} subscription={subscription} />
+                      </div>
+                      <div className="grid grid-cols-2 divide-x divide-border">
+                        <div className="px-3 py-2 flex flex-col gap-0.5">
+                          <span className="text-2xs text-muted-foreground">Preço cobrado</span>
+                          <span className="text-sm font-medium text-foreground">
+                            {formatPrice(subscription.priceInCents ?? subscription.plan.priceInCents)}
+                          </span>
+                          {subscription.priceInCents !== null && subscription.priceInCents !== subscription.plan.priceInCents && (
+                            <span className="text-2xs text-amber-600">Plano: {formatPrice(subscription.plan.priceInCents)}</span>
+                          )}
+                        </div>
+                        <div className="px-3 py-2 flex flex-col gap-0.5">
+                          <span className="text-2xs text-muted-foreground">Armazenamento</span>
+                          <span className="text-sm font-medium text-foreground">
+                            {(() => {
+                              const b = subscription.maxStorageBytes ?? subscription.plan.maxStorageBytes
+                              return b === null ? "Ilimitado" : formatBytes(b)
+                            })()}
+                          </span>
+                        </div>
+                        <div className="px-3 py-2 flex flex-col gap-0.5">
+                          <span className="text-2xs text-muted-foreground">Membros máx.</span>
+                          <span className="text-sm font-medium text-foreground">
+                            {(subscription.maxMembers ?? subscription.plan.maxMembers) ?? "Ilimitado"}
+                          </span>
+                        </div>
+                        <div className="px-3 py-2 flex flex-col gap-0.5">
+                          <span className="text-2xs text-muted-foreground">Demandas máx.</span>
+                          <span className="text-sm font-medium text-foreground">
+                            {(subscription.maxDemands ?? subscription.plan.maxDemands) ?? "Ilimitado"}
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  </>
                 ) : (
                   <p className="text-sm text-muted-foreground/60">Nenhum plano atribuído.</p>
                 )}

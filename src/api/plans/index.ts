@@ -43,7 +43,7 @@ export const PlansApi = {
     await apiClient.patch(`/admin/plans/${planId}/active`, { isActive })
   },
 
-  getCabinetSubscriptionsSummary: async (): Promise<Array<{ cabinetId: string; planName: string; planTier: string; status: string }>> => {
+  getCabinetSubscriptionsSummary: async (): Promise<Array<{ cabinetId: string; planName: string; planTier: string; status: string; priceInCents: number }>> => {
     const res = await apiClient.get("/admin/plans/subscriptions-summary")
     return res.data
   },
@@ -55,6 +55,14 @@ export const PlansApi = {
 
   getCabinetSubscriptionHistory: async (cabinetId: string): Promise<CabinetSubscription[]> => {
     const res = await apiClient.get<CabinetSubscription[]>(`/admin/cabinets/${cabinetId}/subscriptions`)
+    return res.data
+  },
+
+  updateCabinetSubscriptionLimits: async (
+    cabinetId: string,
+    data: { priceInCents?: number | null; maxMembers?: number | null; maxDemands?: number | null; maxStorageBytes?: number | null },
+  ): Promise<CabinetSubscription> => {
+    const res = await apiClient.patch<CabinetSubscription>(`/admin/cabinets/${cabinetId}/subscription/limits`, data)
     return res.data
   },
 
