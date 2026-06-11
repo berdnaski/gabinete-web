@@ -36,13 +36,14 @@ export function InviteMemberDialog({ open, onOpenChange }: InviteMemberDialogPro
       { email: email.trim(), role },
       {
         onSuccess: (data) => {
-          toast.success(data.message ?? "Convite enviado com sucesso.")
+          toast.success(data?.message || "Convite enviado com sucesso.")
           setEmail("")
           setRole("STAFF")
           onOpenChange(false)
         },
         onError: (err: any) => {
-          const msg = err?.message ?? "Erro ao enviar convite. Tente novamente."
+          const raw = err?.response?.data?.message ?? err?.message
+          const msg = (Array.isArray(raw) ? raw[0] : raw) || "Erro ao enviar convite. Tente novamente."
           toast.error(msg)
         },
       },

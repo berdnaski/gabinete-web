@@ -84,6 +84,7 @@ export function useUpdateCabinet() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["cabinet", variables.slug] });
       queryClient.invalidateQueries({ queryKey: ["cabinets"] });
+      queryClient.invalidateQueries({ queryKey: ["cabinet-usage"] });
     },
   });
 }

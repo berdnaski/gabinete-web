@@ -24,9 +24,10 @@ export const DemandsApi = {
 				endDate: params.endDate,
 				priority: params.priority,
 				startDate: params.startDate,
-				neighborhood: params.neighborhood,
+				neighborhoods: params.neighborhood,
 				city: params.city,
 				state: params.state,
+				unassignedOnly: params.unassignedOnly || undefined,
 			}
 		});
 		return response.data;
@@ -208,9 +209,10 @@ export const DemandsApi = {
 				endDate: params.endDate,
 				priority: params.priority,
 				startDate: params.startDate,
-				neighborhood: params.neighborhood,
+				neighborhoods: params.neighborhood,
 				city: params.city,
 				state: params.state,
+				unassignedOnly: params.unassignedOnly || undefined,
 			}
 		});
 		return response.data;

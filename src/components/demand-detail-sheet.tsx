@@ -23,6 +23,9 @@ import { getFirstLettersFromNames } from "@/utils/get-first-letters-from-names"
 import { formatDateToNow } from "@/utils/date"
 import {
   CalendarIcon,
+  Check,
+  CheckCircle2,
+  Copy,
   ExternalLinkIcon,
   FileTextIcon,
   Loader2,
@@ -74,7 +77,12 @@ export function DemandDetailSheet({
   const [unlinkConfirm, setUnlinkConfirm] = useState(false)
   const { mutate: unlinkDemand, isPending: isUnlinking } = useUnlinkDemand()
 
-  const { data: resultsData, isLoading: resultsLoading } = useGetDemandResults(demand?.id)
+  const {
+    data: resultsData,
+    isLoading: resultsLoading,
+    isError: resultsError,
+    refetch: refetchResults,
+  } = useGetDemandResults(demand?.id)
   const results = resultsData?.items ?? []
 
   if (!demand) return null
@@ -122,7 +130,7 @@ export function DemandDetailSheet({
             </div>
           </SheetHeader>
 
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 min-h-0 overflow-y-auto">
             <div className="px-5 py-4 flex flex-col gap-5">
               <section>
                 <SectionLabel>Descrição</SectionLabel>
@@ -245,6 +253,18 @@ export function DemandDetailSheet({
                   <div className="flex justify-center py-6">
                     <Loader2 className="size-4 text-muted-foreground animate-spin" />
                   </div>
+                ) : resultsError ? (
+                  <div className="rounded-lg border border-destructive/20 bg-destructive/5 px-4 py-5 text-center">
+                    <p className="text-sm text-foreground font-medium">
+                      Não foi possível carregar os resultados.
+                    </p>
+                    <button
+                      onClick={() => refetchResults()}
+                      className="mt-1.5 text-xs font-medium text-primary hover:underline"
+                    >
+                      Tentar novamente
+                    </button>
+                  </div>
                 ) : results.length > 0 ? (
                   <div className="flex flex-col gap-2">
                     {results.map((result) => (
@@ -261,6 +281,8 @@ export function DemandDetailSheet({
                   </div>
                 )}
               </section>
+
+              {canManage && <SurveyLinkSection demand={demand} />}
 
               {demand.cabinet && (
                 <section>
@@ -360,6 +382,56 @@ export function DemandDetailSheet({
         </AlertDialog>
       )}
     </>
+  )
+}
+
+function SurveyLinkSection({ demand }: { demand: Demand }) {
+  const [copied, setCopied] = useState(false)
+
+  if (!demand.surveyToken) return null
+
+  const surveyUrl = `${window.location.origin}/pesquisa/${demand.surveyToken}`
+
+  function handleCopy() {
+    navigator.clipboard.writeText(surveyUrl).then(() => {
+      setCopied(true)
+      toast.success("Link da pesquisa copiado!")
+      setTimeout(() => setCopied(false), 2000)
+    })
+  }
+
+  return (
+    <section>
+      <SectionLabel>Pesquisa de satisfação</SectionLabel>
+      {demand.surveySubmittedAt ? (
+        <div className="flex items-center gap-2.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2.5 dark:border-emerald-800 dark:bg-emerald-950/30">
+          <CheckCircle2 className="size-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+          <p className="text-xs font-medium text-emerald-700 dark:text-emerald-300">
+            Pesquisa respondida
+            {demand.surveyRating ? ` — nota ${demand.surveyRating}/5` : ""}
+          </p>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 min-w-0 flex-1 items-center overflow-hidden rounded-lg border border-border bg-muted/30 px-3">
+              <span className="truncate font-mono text-xs text-muted-foreground">{surveyUrl}</span>
+            </div>
+            <Button variant="outline" size="sm" className="h-8 shrink-0 gap-1.5" onClick={handleCopy}>
+              {copied ? (
+                <Check className="size-3.5 text-emerald-500" />
+              ) : (
+                <Copy className="size-3.5" />
+              )}
+              Copiar
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Envie este link ao cidadão para avaliar o atendimento da demanda.
+          </p>
+        </div>
+      )}
+    </section>
   )
 }
 

@@ -120,6 +120,7 @@ export interface ListDemandsParams {
 	neighborhood?: string;
 	city?: string;
 	state?: string;
+	unassignedOnly?: boolean;
 }
 
 export interface HeatmapPoint {

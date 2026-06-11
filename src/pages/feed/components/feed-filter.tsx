@@ -3,6 +3,7 @@ import { useGetNeighborhoods } from "@/api/demands/hooks";
 import { DemandPriority, DemandStatus, DemandStatusLabel } from "@/api/demands/types";
 import { AsyncMultiSelect } from "@/components/ui/async-multi-select";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldGroup } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,8 +22,9 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/use-auth";
 import { DEMAND_STATUS_CONFIG } from "@/pages/private/demands/components/demand-utils";
-import { Filter, Info, MapPin, Search, Shapes, SlidersHorizontalIcon, XIcon } from "lucide-react";
+import { Building2, Filter, Info, MapPin, Search, Shapes, SlidersHorizontalIcon, XIcon } from "lucide-react";
 import { useCallback, useState } from "react";
 import type { DateRange } from "react-day-picker";
 
@@ -33,6 +35,7 @@ export interface DemandsFilterValue {
   priority: DemandPriority | null;
   dateRange: DateRange | undefined;
   neighborhood: string | null;
+  unassignedOnly: boolean;
 }
 
 interface DemandsFilterProps {
@@ -51,7 +54,9 @@ interface SharedFieldsProps {
 }
 
 function CategoryAndStatusFields({ value, onChange, fetchCategories }: SharedFieldsProps) {
+  const { user } = useAuth();
   const { data: neighborhoods } = useGetNeighborhoods();
+  const isCabinetMember = user?.isCabinetMember ?? false;
 
   function toggleStatus(status: DemandStatus) {
     const next = value.status.includes(status)
@@ -109,6 +114,26 @@ function CategoryAndStatusFields({ value, onChange, fetchCategories }: SharedFie
         </div>
       </Field>
 
+      {isCabinetMember && (
+        <Field>
+          <label className="flex cursor-pointer items-center justify-between gap-2">
+            <span className="flex items-center gap-1.5 text-xs font-medium text-foreground">
+              <Building2 className="size-3.5 text-primary" />
+              Sem gabinete vinculado
+            </span>
+            <Checkbox
+              checked={value.unassignedOnly}
+              onCheckedChange={(checked) =>
+                onChange({ ...value, unassignedOnly: checked === true })
+              }
+            />
+          </label>
+          <p className="text-2xs text-muted-foreground">
+            Exibe apenas demandas disponíveis para reivindicação.
+          </p>
+        </Field>
+      )}
+
       {neighborhoods && neighborhoods.length > 0 && (
         <Field>
           <Label className="text-xs">
@@ -154,7 +179,7 @@ export function FeedFilter({ value, onChange, resultCount }: DemandsFilterProps)
   }, []);
 
   function clearMobileFilters() {
-    onChange({ ...value, status: [], categories: [], priority: null, dateRange: undefined, neighborhood: null });
+    onChange({ ...value, status: [], categories: [], priority: null, dateRange: undefined, neighborhood: null, unassignedOnly: false });
   }
 
   const mobileActiveCount = [
@@ -163,6 +188,7 @@ export function FeedFilter({ value, onChange, resultCount }: DemandsFilterProps)
     value.priority !== null,
     !!value.dateRange?.from,
     value.neighborhood !== null,
+    value.unassignedOnly,
   ].filter(Boolean).length;
 
   return (

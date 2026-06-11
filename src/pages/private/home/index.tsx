@@ -101,6 +101,12 @@ export function Home() {
   const trendCreatedTotal = trendData.reduce((s, d) => s + d.created, 0)
   const trendResolvedTotal = trendData.reduce((s, d) => s + d.resolved, 0)
 
+  const trendYTicks = useMemo(() => {
+    const max = trendData.reduce((m, d) => Math.max(m, d.created, d.resolved), 0)
+    const step = Math.max(1, Math.ceil(max / 4))
+    return [0, step, step * 2, step * 3, step * 4]
+  }, [trendData])
+
   const categoryData = useMemo(() => {
     return (dashboardSummary?.categories ?? []).slice(0, 6).map((c, i) => ({
       ...c,
@@ -268,9 +274,8 @@ export function Home() {
                   axisLine={false}
                   allowDecimals={false}
                   width={24}
-                  tickCount={5}
-                  domain={[0, "auto"]}
-                  tickFormatter={(v: number) => String(Math.floor(v))}
+                  ticks={trendYTicks}
+                  domain={[0, trendYTicks[trendYTicks.length - 1]]}
                 />
                 <ChartTooltip
                   cursor={{ fill: "hsl(var(--muted))", opacity: 0.5, radius: 6 }}

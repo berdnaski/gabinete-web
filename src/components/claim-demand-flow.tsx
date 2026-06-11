@@ -82,11 +82,23 @@ export function ClaimDemandFlow({ demand, open, onOpenChange }: ClaimDemandFlowP
   const { mutate: claimDemand, isPending: isClaiming } = useClaimDemand()
   const { mutate: assignDemand, isPending: isAssigning } = useAssignDemand()
 
-  function handleClose() {
+  function resetAndClose() {
     setStep("confirm")
     setSelectedMemberId(null)
     setClaimedId(null)
     onOpenChange(false)
+  }
+
+  function handleDialogOpenChange(next: boolean) {
+    if (next) {
+      onOpenChange(true)
+      return
+    }
+    if (isClaiming || isAssigning) return
+    if (step === "assign") {
+      toast.success("Demanda vinculada ao gabinete!")
+    }
+    resetAndClose()
   }
 
   function handleClaim() {
@@ -112,11 +124,10 @@ export function ClaimDemandFlow({ demand, open, onOpenChange }: ClaimDemandFlowP
       {
         onSuccess: () => {
           toast.success("Demanda vinculada e responsável atribuído com sucesso!")
-          handleClose()
+          resetAndClose()
         },
         onError: () => {
-          toast.error("Erro ao atribuir responsável")
-          handleClose()
+          toast.error("Erro ao atribuir responsável. Tente novamente ou pule esta etapa.")
         },
       },
     )
@@ -124,11 +135,11 @@ export function ClaimDemandFlow({ demand, open, onOpenChange }: ClaimDemandFlowP
 
   function handleSkip() {
     toast.success("Demanda vinculada ao gabinete!")
-    handleClose()
+    resetAndClose()
   }
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
+    <Dialog open={open} onOpenChange={handleDialogOpenChange}>
       <DialogContent className="sm:max-w-md">
         {step === "confirm" ? (
           <>
@@ -168,7 +179,7 @@ export function ClaimDemandFlow({ demand, open, onOpenChange }: ClaimDemandFlowP
             </div>
 
             <DialogFooter>
-              <Button variant="outline" onClick={handleClose} disabled={isClaiming}>
+              <Button variant="outline" onClick={resetAndClose} disabled={isClaiming}>
                 Cancelar
               </Button>
               <Button onClick={handleClaim} disabled={isClaiming}>

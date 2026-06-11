@@ -18,9 +18,19 @@ export function Feed() {
     priority: null,
     dateRange: undefined,
     neighborhood: null,
+    unassignedOnly: false,
   })
 
   const sentinelRef = useRef<HTMLDivElement>(null)
+  const isFirstRender = useRef(true)
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      return
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }, [filters])
 
   const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } = useInfiniteGetDemands({
     search: filters.search.trim() || undefined,
@@ -30,6 +40,7 @@ export function Feed() {
     startDate: filters.dateRange?.from?.toISOString(),
     endDate: filters.dateRange?.to?.toISOString(),
     neighborhood: filters.neighborhood ?? undefined,
+    unassignedOnly: filters.unassignedOnly || undefined,
     city: navigationCity?.city,
     state: navigationCity?.state,
     limit: 20,

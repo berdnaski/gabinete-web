@@ -55,6 +55,7 @@ export function useGetDemands(params: ListDemandsParams) {
     queryKey: ["demands", params],
     queryFn: () => DemandsApi.list(params),
     placeholderData: (previousData) => previousData,
+    staleTime: 0,
   });
 }
 
@@ -73,6 +74,7 @@ export function useInfiniteGetDemands(params: Omit<ListDemandsParams, "page">) {
     queryKey: ["demands-infinite", params],
     queryFn: ({ pageParam }) => DemandsApi.list({ ...params, page: pageParam as number }),
     initialPageParam: 1,
+    staleTime: 0,
     getNextPageParam: (lastPage) => {
       const { page, totalPages } = lastPage.meta;
       return page < totalPages ? page + 1 : undefined;
@@ -140,7 +142,8 @@ export function useConfirmEvidenceUpload() {
       DemandsApi.confirmEvidenceUpload(demandId, storageKey, size),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["demands"] });
-      queryClient.refetchQueries({ queryKey: ["demands"] });
+      queryClient.invalidateQueries({ queryKey: ["demands-infinite"] });
+      queryClient.invalidateQueries({ queryKey: ["cabinet-usage"] });
     },
   });
 }

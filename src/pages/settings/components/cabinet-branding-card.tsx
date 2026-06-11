@@ -121,7 +121,7 @@ export function CabinetBrandingCard() {
     : `https://gabineteapp.com.br/${cabinet?.slug}`
 
   const widgetCode = cabinet
-    ? `<script src="${window.location.origin}/api/cabinets/${cabinet.slug}/widget.js"></script>`
+    ? `<script src="${import.meta.env.VITE_API_URL}/cabinets/${cabinet.slug}/widget.js"></script>`
     : ""
 
   const copyWidget = () => {
