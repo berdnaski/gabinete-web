@@ -42,8 +42,8 @@ export function Settings() {
     <div className="flex-1 px-4 sm:px-8 lg:px-12 pt-8 pb-16">
       <div className="max-w-6xl mx-auto">
 
-        <header className="mb-10">
-          <h1 className="text-2xl font-bold tracking-tight">Configurações</h1>
+        <header className="mb-8">
+          <h1 className="text-lg font-semibold tracking-tight">Configurações</h1>
           <p className="text-muted-foreground text-sm mt-1">
             {user?.role === UserRole.CITIZEN ?
               'Gerencie suas informações pessoais.'
@@ -53,8 +53,8 @@ export function Settings() {
         </header>
 
         <Tabs value={active} onValueChange={setActive} className="w-full">
-          <div className="flex flex-col md:flex-row gap-0 md:gap-10">
-            <aside className="md:w-44 shrink-0">
+          <div className="flex flex-col md:flex-row gap-0 md:gap-8">
+            <aside className="md:w-48 shrink-0">
               <div className="md:hidden overflow-x-auto pb-px mb-6">
                 <TabsPrimitive.List className="flex border-b border-border/50 min-w-max">
                   {tabs.map((tab) => {
@@ -63,9 +63,9 @@ export function Settings() {
                       <TabsPrimitive.Trigger
                         key={tab.value}
                         value={tab.value}
-                        className="group relative flex items-center gap-2 px-4 pb-3 pt-1 text-sm font-semibold text-muted-foreground outline-none transition-colors data-[state=active]:text-foreground whitespace-nowrap"
+                        className="group relative flex items-center gap-2 px-4 pb-3 pt-1 text-sm font-medium text-muted-foreground outline-none transition-colors data-[state=active]:text-foreground whitespace-nowrap"
                       >
-                        <Icon className="w-3.5 h-3.5 shrink-0" />
+                        <Icon className="size-3.5 shrink-0 stroke-[1.5]" />
                         {tab.label}
                         <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary scale-x-0 group-data-[state=active]:scale-x-100 transition-transform duration-200 origin-left" />
                       </TabsPrimitive.Trigger>
@@ -81,10 +81,9 @@ export function Settings() {
                     <TabsPrimitive.Trigger
                       key={tab.value}
                       value={tab.value}
-                      className="group relative flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-muted-foreground outline-none rounded-sm transition-all duration-150 hover:text-foreground hover:bg-muted/50 data-[state=active]:text-foreground data-[state=active]:bg-muted/60 data-[state=active]:font-semibold"
+                      className="flex h-9 items-center gap-2.5 rounded-lg px-2.5 text-sm font-normal text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground data-[state=active]:bg-primary/10 data-[state=active]:font-medium data-[state=active]:text-primary"
                     >
-                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-primary rounded-full scale-y-0 group-data-[state=active]:scale-y-100 transition-transform duration-200 origin-center" />
-                      <Icon className="w-4 h-4 shrink-0 transition-colors" />
+                      <Icon className="size-4 shrink-0 stroke-[1.5]" />
                       {tab.label}
                     </TabsPrimitive.Trigger>
                   );
@@ -105,7 +104,7 @@ export function Settings() {
 
               <TabsContent value="cabinet" className="space-y-4 outline-none focus-visible:ring-0 mt-0">
                 {hasStorageLimit && usage && (
-                  <div className="rounded-lg border border-border bg-card px-4 py-3">
+                  <div className="rounded-xl border border-border/60 bg-card px-4 py-3">
                     <PlanLimitBanner
                       current={usage.storageUsedBytes}
                       max={plans!.limits.maxStorageBytes!}

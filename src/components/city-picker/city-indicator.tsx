@@ -36,11 +36,11 @@ export function CityIndicator({ align = "start" }: Props) {
             navigationCity ? "text-foreground" : "text-muted-foreground",
           )}
         >
-          <MapPin className={cn("size-3 shrink-0", navigationCity ? "text-primary" : "text-muted-foreground")} />
+          <MapPin className={cn("size-3 shrink-0 stroke-[1.5]", navigationCity ? "text-primary" : "text-muted-foreground")} />
           <span className="hidden sm:inline max-w-32 truncate">
             {navigationCity?.label ?? "Todas as cidades"}
           </span>
-          <ChevronDown className={cn("size-3 text-muted-foreground shrink-0 transition-transform duration-150", open && "rotate-180")} />
+          <ChevronDown className={cn("size-3 shrink-0 stroke-[1.5] text-muted-foreground transition-transform duration-150", open && "rotate-180")} />
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-72 p-0 gap-0 rounded-xl" align={align} sideOffset={6}>

@@ -54,9 +54,9 @@ export function SecurityCard() {
   return (
     <form onSubmit={onSubmit}>
       <Input type="text" name="username" autoComplete="username" value={user?.email ?? ""} readOnly hidden />
-      <Card className="bg-card rounded-xl border border-border shadow-sm animate-in fade-in duration-300">
-        <CardHeader className="px-6 pt-5 pb-4 border-b border-border">
-          <CardTitle className="text-base font-semibold text-foreground">Segurança</CardTitle>
+      <Card className="animate-in fade-in duration-300">
+        <CardHeader className="border-b border-border/60 px-5">
+          <CardTitle className="text-sm font-semibold text-foreground">Segurança</CardTitle>
           <CardDescription className="text-sm text-muted-foreground">
             {hasSetPassword
               ? "Altere sua senha para manter sua conta protegida."
@@ -64,7 +64,7 @@ export function SecurityCard() {
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="px-6 py-5">
+        <CardContent className="px-5">
           <FieldGroup>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg">
               {hasSetPassword && (
@@ -100,7 +100,7 @@ export function SecurityCard() {
           </FieldGroup>
         </CardContent>
 
-        <CardFooter className="px-6 py-4 border-t border-border flex justify-end">
+        <CardFooter className="justify-end border-t border-border/60 bg-transparent px-5 py-3">
           <Button type="submit" disabled={isSubmittingForm} size="sm">
             {isSubmittingForm && <Loader2 className="size-3.5 animate-spin" />}
             {hasSetPassword ? "Trocar senha" : "Criar senha"}

@@ -133,7 +133,7 @@ export function CabinetBrandingCard() {
 
   if (isLoading) {
     return (
-      <Card className="bg-card rounded-xl border border-border shadow-sm">
+      <Card>
         <CardContent className="flex items-center justify-center py-20">
           <Loader2 className="size-5 text-muted-foreground/30 animate-spin" />
         </CardContent>
@@ -146,10 +146,10 @@ export function CabinetBrandingCard() {
   const isSubmitting = isPending
 
   return (
-    <Card className="bg-card rounded-xl border border-border shadow-sm animate-in fade-in duration-300">
-      <CardHeader className="px-6 pt-5 pb-4 border-b border-border">
+    <Card className="animate-in fade-in duration-300">
+      <CardHeader className="border-b border-border/60 px-5">
         <div className="flex items-center gap-2">
-          <CardTitle className="text-base font-semibold text-foreground">
+          <CardTitle className="text-sm font-semibold text-foreground">
             Identidade Visual
           </CardTitle>
           <span className="bg-muted text-muted-foreground text-2xs font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0">
@@ -161,7 +161,7 @@ export function CabinetBrandingCard() {
         </CardDescription>
       </CardHeader>
 
-      <CardContent className="px-6 py-5 space-y-8">
+      <CardContent className="px-5 space-y-8">
 
         <FieldGroup>
           <div className="flex items-center gap-2 mb-3">
@@ -392,7 +392,7 @@ export function CabinetBrandingCard() {
         </FeatureGate>
       </CardContent>
 
-      <CardFooter className="px-6 py-4 border-t border-border flex items-center justify-between">
+      <CardFooter className="items-center justify-between border-t border-border/60 bg-transparent px-5 py-3">
         {isOwner ? (
           <Button
             type="button"

@@ -159,10 +159,10 @@ export function NotificationPopover() {
   return (
     <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
-        <button className="relative p-2 rounded-full hover:bg-muted transition-colors group">
-          <Bell className="size-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+        <button className="group relative flex size-8 shrink-0 items-center justify-center rounded-xl border border-border/60 bg-card shadow-sm transition-colors hover:bg-muted data-[state=open]:bg-muted">
+          <Bell className="size-4.5 stroke-[1.5] text-muted-foreground group-hover:text-foreground transition-colors" />
           {unreadCount > 0 && (
-            <span className="absolute top-1 right-1 flex size-4 items-center justify-center rounded-full bg-primary text-2xs font-bold text-primary-foreground border-2 border-background">
+            <span className="absolute -top-1.5 -right-1.5 flex size-4 items-center justify-center rounded-full bg-primary text-2xs font-bold text-primary-foreground border-2 border-background">
               {unreadCount > 9 ? "9+" : unreadCount}
             </span>
           )}

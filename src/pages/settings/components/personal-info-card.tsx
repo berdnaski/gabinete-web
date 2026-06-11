@@ -2,9 +2,9 @@ import { useRef, useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
-import { Camera, Loader2, Trash2, User, X } from "lucide-react"
+import { Camera, Loader2, Trash2, X } from "lucide-react"
 import { Input } from "@/components/ui/input"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { UserAvatar } from "@/components/user-avatar"
 import { useAuth } from "@/hooks/use-auth"
 import { useUpdateUser } from "@/api/users/hooks"
 import { personalInfoSchema, type PersonalInfoData } from "./schemas"
@@ -94,9 +94,9 @@ export function PersonalInfoCard() {
 
   return (
     <form onSubmit={onSubmit}>
-      <Card className="border border-border rounded-xl bg-card shadow-sm animate-in fade-in duration-300">
-        <CardHeader className="px-6 pt-5 pb-4 border-b border-border">
-          <CardTitle className="text-base font-semibold text-foreground">
+      <Card className="animate-in fade-in duration-300">
+        <CardHeader className="border-b border-border/60 px-5">
+          <CardTitle className="text-sm font-semibold text-foreground">
             Informações Pessoais
           </CardTitle>
           <CardDescription className="text-sm text-muted-foreground">
@@ -104,25 +104,17 @@ export function PersonalInfoCard() {
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="px-6 py-5">
+        <CardContent className="px-5">
           <FieldGroup>
             <div className="flex flex-col gap-6">
               <div className="flex flex-col sm:flex-row gap-5">
                 <div className="flex flex-col items-center gap-3 shrink-0">
                   <div className="relative group">
-                    <Avatar className="size-20 ring-2 ring-border">
-                      <AvatarImage
-                        src={currentAvatar}
-                        className="object-cover"
-                      />
-                      <AvatarFallback className="bg-muted text-muted-foreground">
-                        <User className="size-8" />
-                      </AvatarFallback>
-                    </Avatar>
+                    <UserAvatar size="xl" name={user?.name} avatarUrl={currentAvatar} />
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity"
                     >
                       <Camera className="size-5 text-white" />
                     </button>
@@ -136,38 +128,42 @@ export function PersonalInfoCard() {
                     accept="image/png, image/jpeg, image/jpg"
                   />
 
-                  <div className="flex flex-col items-center gap-2 w-full">
-                    <button
+                  <div className="flex flex-col items-center gap-1.5 w-full">
+                    <Button
                       type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-7 gap-1.5 text-xs"
                       onClick={() => fileInputRef.current?.click()}
-                      className="h-8 inline-flex items-center justify-center gap-1.5 px-3 rounded-lg bg-muted text-xs font-medium text-muted-foreground hover:bg-muted/80 hover:text-foreground transition-colors duration-200"
                     >
                       <Camera className="size-3.5" />
                       Alterar foto
-                    </button>
+                    </Button>
 
                     {hasAvatar && !removeAvatar && (
-                      <button
+                      <Button
                         type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 gap-1.5 text-xs text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                         onClick={handleRemoveAvatar}
-                        className="h-8 inline-flex items-center justify-center gap-1.5 px-3 rounded-lg bg-destructive/10 text-xs font-medium text-destructive hover:bg-destructive/20 hover:text-red-600 transition-colors duration-200"
                       >
                         <Trash2 className="size-3.5" />
                         Remover foto
-                      </button>
+                      </Button>
                     )}
 
                     {removeAvatar && (
-                      <div className="flex gap-2 w-full px-1">
-                        <button
-                          type="button"
-                          onClick={handleCancelRemove}
-                          className="flex-1 h-8 inline-flex items-center justify-center gap-1 rounded-lg bg-secondary text-xs font-medium text-secondary-foreground hover:bg-secondary/80 transition-colors duration-200"
-                        >
-                          <X className="size-3.5" />
-                          Cancelar
-                        </button>
-                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 gap-1.5 text-xs text-muted-foreground"
+                        onClick={handleCancelRemove}
+                      >
+                        <X className="size-3.5" />
+                        Cancelar
+                      </Button>
                     )}
                   </div>
                 </div>
@@ -186,20 +182,12 @@ export function PersonalInfoCard() {
 
                   <Field>
                     <Label>E-mail</Label>
-                    <Input
-                      disabled
-                      defaultValue={user?.email ?? ""}
-                      className="opacity-50 cursor-not-allowed"
-                    />
+                    <Input disabled defaultValue={user?.email ?? ""} />
                   </Field>
 
                   <Field>
                     <Label>Cargo</Label>
-                    <Input
-                      disabled
-                      defaultValue={UserRoleLabel[user?.role as UserRole] ?? ""}
-                      className="opacity-50 cursor-not-allowed"
-                    />
+                    <Input disabled defaultValue={UserRoleLabel[user?.role as UserRole] ?? ""} />
                   </Field>
 
                   <Field>
@@ -218,7 +206,7 @@ export function PersonalInfoCard() {
           </FieldGroup>
         </CardContent>
 
-        <CardFooter className="px-6 py-4 border-t border-border flex justify-end">
+        <CardFooter className="justify-end border-t border-border/60 bg-transparent px-5 py-3">
           <Button type="submit" disabled={isSubmittingForm} size="sm">
             {isSubmittingForm && <Loader2 className="size-3.5 animate-spin" />}
             Salvar
