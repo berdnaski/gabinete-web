@@ -159,10 +159,10 @@ export function NotificationPopover() {
   return (
     <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
-        <button className="relative p-2 rounded-full hover:bg-muted transition-colors group">
-          <Bell className="size-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+        <button className="group relative flex size-8 shrink-0 items-center justify-center rounded-xl border border-border/60 bg-card shadow-sm transition-colors hover:bg-muted data-[state=open]:bg-muted">
+          <Bell className="size-4.5 stroke-[1.5] text-muted-foreground group-hover:text-foreground transition-colors" />
           {unreadCount > 0 && (
-            <span className="absolute top-1 right-1 flex size-4 items-center justify-center rounded-full bg-primary text-2xs font-bold text-primary-foreground border-2 border-background">
+            <span className="absolute -top-1.5 -right-1.5 flex size-4 items-center justify-center rounded-full bg-primary text-2xs font-bold text-primary-foreground border-2 border-background">
               {unreadCount > 9 ? "9+" : unreadCount}
             </span>
           )}
@@ -177,7 +177,6 @@ export function NotificationPopover() {
         collisionPadding={8}
         className="w-[calc(100vw-1rem)] max-w-96 p-0 rounded-2xl shadow-xl overflow-hidden border-border/50"
       >
-        {/* Header */}
         <div className="flex items-center justify-between px-4 py-3.5 border-b border-border/50 bg-background">
           <div className="flex items-center gap-2">
             <h3 className="font-bold text-base text-foreground">Notificações</h3>
@@ -208,7 +207,6 @@ export function NotificationPopover() {
           )}
         </div>
 
-        {/* Body */}
         <div className="max-h-[min(460px,60vh)] overflow-y-auto">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-12 gap-3">
@@ -265,7 +263,6 @@ export function NotificationPopover() {
           )}
         </div>
 
-        {/* Footer */}
         <div className="px-4 py-2 border-t border-border/30 bg-muted/20 flex items-center gap-1.5">
           <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
           <p className="text-2xs text-muted-foreground/50">

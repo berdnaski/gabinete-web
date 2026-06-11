@@ -13,7 +13,7 @@ export function useGetUserById(id: string | undefined) {
 
 export function useUpdateUser() {
   return useMutation({
-    mutationFn: ({ id, data, file }: { id: string; data: Partial<User>; file?: File }) =>
+    mutationFn: ({ id, data, file }: { id: string; data: Partial<User> & { removeAvatar?: boolean }; file?: File }) =>
       UsersApi.updateProfile(id, data, file),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["user", variables.id] });

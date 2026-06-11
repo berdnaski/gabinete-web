@@ -117,7 +117,6 @@ export function PlanCard({ plan }: Props) {
 
   return (
     <div className="rounded-lg border border-border bg-card overflow-hidden">
-      {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
         <span className={cn("w-0.75 self-stretch rounded-full shrink-0", TIER_COLORS[plan.tier] ?? "bg-border")} />
         <div className="flex-1 min-w-0">
@@ -153,7 +152,6 @@ export function PlanCard({ plan }: Props) {
         </div>
       </div>
 
-      {/* Limits */}
       <div className="grid grid-cols-3 divide-x divide-border border-b border-border">
         {[
           { label: "Membros", value: formatLimit(plan.maxMembers, "max") },
@@ -167,7 +165,6 @@ export function PlanCard({ plan }: Props) {
         ))}
       </div>
 
-      {/* Features */}
       <div className="px-4 py-3 flex flex-col gap-2">
         <div className="flex items-center justify-between">
           <span className="text-xs font-medium text-muted-foreground">Features</span>

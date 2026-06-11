@@ -383,7 +383,6 @@ export function CabinetPlansSheet({ cabinetId, cabinetName }: Props) {
         ) : (
           <div className="flex-1 overflow-y-auto">
             <div className="px-5 py-4 flex flex-col gap-6">
-              {/* Subscription */}
               <section className="flex flex-col gap-3">
                 <p className="text-xs font-medium text-muted-foreground">Assinatura ativa</p>
 
@@ -454,7 +453,6 @@ export function CabinetPlansSheet({ cabinetId, cabinetName }: Props) {
                   <p className="text-sm text-muted-foreground/60">Nenhum plano atribuído.</p>
                 )}
 
-                {/* Change plan */}
                 <div className="flex items-center gap-2">
                   <Select value={selectedPlanId} onValueChange={setSelectedPlanId}>
                     <SelectTrigger className="h-8 text-sm flex-1">
@@ -480,7 +478,6 @@ export function CabinetPlansSheet({ cabinetId, cabinetName }: Props) {
                 </div>
               </section>
 
-              {/* Subscription history */}
               {history.length > 1 && (
                 <section className="flex flex-col gap-3">
                   <p className="text-xs font-medium text-muted-foreground">Histórico de assinaturas</p>
@@ -508,7 +505,6 @@ export function CabinetPlansSheet({ cabinetId, cabinetName }: Props) {
                 </section>
               )}
 
-              {/* Overrides */}
               <section className="flex flex-col gap-3">
                 <div className="flex items-center justify-between">
                   <p className="text-xs font-medium text-muted-foreground">Overrides de feature</p>

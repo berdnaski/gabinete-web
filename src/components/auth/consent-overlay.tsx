@@ -40,7 +40,7 @@ export function ConsentOverlay() {
               Privacidade e Termos
             </h2>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Para continuar no <strong className="text-foreground font-medium">Gabinete Digital</strong>, por favor aceite nossos termos atualizados conforme a LGPD.
+              Para continuar no <strong className="text-foreground font-medium">Gabinete App</strong>, por favor aceite nossos termos atualizados conforme a LGPD.
             </p>
           </div>
 
@@ -86,3 +86,4 @@ export function ConsentOverlay() {
     </div>
   )
 }
+

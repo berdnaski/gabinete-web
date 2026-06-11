@@ -115,3 +115,35 @@ export function useAdminEnableUser() {
     },
   })
 }
+
+export function useAdminGetCabinetsPaginated(params: {
+  page: number
+  limit: number
+  search?: string
+  hasDemands?: boolean
+  showInactive?: boolean
+}) {
+  return useQuery({
+    queryKey: ["admin-cabinets", params],
+    queryFn: () => AdminApi.listCabinetsPaginated(params),
+    placeholderData: (prev) => prev,
+  })
+}
+
+export function useAdminDisableCabinet() {
+  return useMutation({
+    mutationFn: (id: string) => AdminApi.deleteCabinet(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-cabinets"] })
+    },
+  })
+}
+
+export function useAdminEnableCabinet() {
+  return useMutation({
+    mutationFn: (id: string) => AdminApi.enableCabinet(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-cabinets"] })
+    },
+  })
+}

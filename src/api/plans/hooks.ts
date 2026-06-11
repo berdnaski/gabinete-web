@@ -4,8 +4,6 @@ import { queryClient } from "../queryClient"
 import { PlansApi } from "."
 import type { AddOverrideRequest } from "./types"
 
-// Admin — plans
-
 export function useAdminListPlans() {
   return useQuery({
     queryKey: ["admin-plans"],
@@ -28,6 +26,7 @@ export function useAdminAddFeatureToPlan() {
       PlansApi.addFeatureToPlan(planId, featureSlug, retroactive),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-plans"] })
+      queryClient.invalidateQueries({ queryKey: ["admin-features"] })
       toast.success("Feature adicionada ao plano")
     },
     onError: () => toast.error("Erro ao adicionar feature"),
@@ -40,6 +39,7 @@ export function useAdminRemoveFeatureFromPlan() {
       PlansApi.removeFeatureFromPlan(planId, featureSlug),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-plans"] })
+      queryClient.invalidateQueries({ queryKey: ["admin-features"] })
       toast.success("Feature removida do plano")
     },
     onError: () => toast.error("Erro ao remover feature"),
@@ -82,8 +82,6 @@ export function useAdminSetPlanActive() {
     onError: () => toast.error("Erro ao alterar status do plano"),
   })
 }
-
-// Admin — cabinet subscription
 
 export function useAdminCabinetSubscription(cabinetId: string | null) {
   return useQuery({
@@ -132,8 +130,6 @@ export function useAdminUpsertCabinetSubscription() {
     onError: () => toast.error("Erro ao atualizar plano"),
   })
 }
-
-// Admin — cabinet overrides
 
 export function useAdminCabinetOverrides(cabinetId: string | null) {
   return useQuery({

@@ -58,7 +58,6 @@ export function MemberHeader() {
         ))}
       </nav>
 
-      {/* Desktop Actions */}
       <div className="hidden md:flex items-center gap-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -117,7 +116,6 @@ export function MemberHeader() {
         </DropdownMenu>
       </div>
 
-      {/* Mobile Actions */}
       <div className="flex md:hidden items-center gap-2">
         <DemandsForm sizeTrigger="icon" />
 
@@ -133,7 +131,6 @@ export function MemberHeader() {
           </SheetTrigger>
 
           <SheetContent side="right" className="w-72 p-0 flex flex-col">
-            {/* User info */}
             <div className="flex items-center gap-3 px-5 py-5 border-b border-muted">
               <Avatar size="lg">
                 <AvatarFallback className="bg-primary text-white font-semibold">
@@ -146,7 +143,6 @@ export function MemberHeader() {
               </div>
             </div>
 
-            {/* Nav */}
             <nav className="flex flex-col gap-1 px-3 py-4">
               {navItems.map(({ to, label, icon: Icon }) => (
                 <Link
@@ -167,7 +163,6 @@ export function MemberHeader() {
 
             <div className="h-px bg-muted mx-3" />
 
-            {/* Settings / Profile */}
             <div className="flex flex-col gap-1 px-3 py-4">
               <button
                 type="button"
@@ -185,7 +180,6 @@ export function MemberHeader() {
               </button>
             </div>
 
-            {/* Logout pinned to bottom */}
             <div className="mt-auto px-3 py-4 border-t border-muted">
               <button
                 type="button"

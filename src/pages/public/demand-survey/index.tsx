@@ -51,7 +51,7 @@ export function DemandSurveyPage() {
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col">
       <header className="bg-background border-b border-border/40 px-4 py-3 flex items-center">
-        <img src={Logo} alt="Gabinete Digital" className="w-28" />
+        <img src={Logo} alt="Gabinete App" className="w-28" />
       </header>
 
       <main className="flex-1 flex items-center justify-center px-4 py-12">
@@ -155,3 +155,4 @@ export function DemandSurveyPage() {
     </div>
   )
 }
+

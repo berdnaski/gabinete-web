@@ -2,9 +2,9 @@ import { useRef, useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
-import { Camera, Loader2, User } from "lucide-react"
+import { Camera, Loader2, Trash2, X } from "lucide-react"
 import { Input } from "@/components/ui/input"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { UserAvatar } from "@/components/user-avatar"
 import { useAuth } from "@/hooks/use-auth"
 import { useUpdateUser } from "@/api/users/hooks"
 import { personalInfoSchema, type PersonalInfoData } from "./schemas"
@@ -29,6 +29,7 @@ export function PersonalInfoCard() {
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [removeAvatar, setRemoveAvatar] = useState(false)
 
   const { control, handleSubmit, formState: { isSubmitting } } = useForm<PersonalInfoData>({
     resolver: zodResolver(personalInfoSchema),
@@ -44,7 +45,20 @@ export function PersonalInfoCard() {
       if (previewUrl) URL.revokeObjectURL(previewUrl)
       setSelectedFile(file)
       setPreviewUrl(URL.createObjectURL(file))
+      setRemoveAvatar(false)
     }
+    e.target.value = ""
+  }
+
+  const handleRemoveAvatar = () => {
+    if (previewUrl) URL.revokeObjectURL(previewUrl)
+    setSelectedFile(null)
+    setPreviewUrl(null)
+    setRemoveAvatar(true)
+  }
+
+  const handleCancelRemove = () => {
+    setRemoveAvatar(false)
   }
 
   useEffect(() => {
@@ -58,7 +72,7 @@ export function PersonalInfoCard() {
     try {
       const updatedUser = await updateUser({
         id: user.id,
-        data: { name: data.name, phone: data.phone },
+        data: { name: data.name, phone: data.phone, removeAvatar },
         file: selectedFile || undefined,
       })
       updateLocalUser({
@@ -68,18 +82,21 @@ export function PersonalInfoCard() {
       })
       toast.success("Informações pessoais atualizadas!")
       setSelectedFile(null)
+      setRemoveAvatar(false)
     } catch {
       toast.error("Erro ao atualizar informações pessoais.")
     }
   })
 
   const isSubmittingForm = isPending || isSubmitting
+  const currentAvatar = removeAvatar ? undefined : (previewUrl || user?.avatarUrl)
+  const hasAvatar = currentAvatar ? true : false
 
   return (
     <form onSubmit={onSubmit}>
-      <Card className="bg-card rounded-xl border border-border shadow-sm animate-in fade-in duration-300">
-        <CardHeader className="px-6 pt-5 pb-4 border-b border-border">
-          <CardTitle className="text-base font-semibold text-foreground">
+      <Card className="animate-in fade-in duration-300">
+        <CardHeader className="border-b border-border/60 px-5">
+          <CardTitle className="text-sm font-semibold text-foreground">
             Informações Pessoais
           </CardTitle>
           <CardDescription className="text-sm text-muted-foreground">
@@ -87,91 +104,109 @@ export function PersonalInfoCard() {
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="px-6 py-5">
+        <CardContent className="px-5">
           <FieldGroup>
-            <div className="flex flex-col sm:flex-row gap-6">
-              {/* Avatar */}
-              <div className="flex flex-col items-center gap-3 shrink-0">
-                <div className="relative group">
-                  <Avatar className="size-20 ring-2 ring-border">
-                    <AvatarImage src={previewUrl || user?.avatarUrl} className="object-cover" />
-                    <AvatarFallback className="bg-muted text-muted-foreground">
-                      <User className="size-8" />
-                    </AvatarFallback>
-                  </Avatar>
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 rounded-full transition-opacity flex items-center justify-center"
-                  >
-                    <Camera className="size-5 text-white" />
-                  </button>
+            <div className="flex flex-col gap-6">
+              <div className="flex flex-col sm:flex-row gap-5">
+                <div className="flex flex-col items-center gap-3 shrink-0">
+                  <div className="relative group">
+                    <UserAvatar size="xl" name={user?.name} avatarUrl={currentAvatar} />
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <Camera className="size-5 text-white" />
+                    </button>
+                  </div>
+
+                  <Input
+                    type="file"
+                    ref={fileInputRef}
+                    className="hidden"
+                    onChange={handleFileSelect}
+                    accept="image/png, image/jpeg, image/jpg"
+                  />
+
+                  <div className="flex flex-col items-center gap-1.5 w-full">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-7 gap-1.5 text-xs"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <Camera className="size-3.5" />
+                      Alterar foto
+                    </Button>
+
+                    {hasAvatar && !removeAvatar && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 gap-1.5 text-xs text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                        onClick={handleRemoveAvatar}
+                      >
+                        <Trash2 className="size-3.5" />
+                        Remover foto
+                      </Button>
+                    )}
+
+                    {removeAvatar && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 gap-1.5 text-xs text-muted-foreground"
+                        onClick={handleCancelRemove}
+                      >
+                        <X className="size-3.5" />
+                        Cancelar
+                      </Button>
+                    )}
+                  </div>
                 </div>
-                <Input
-                  type="file"
-                  ref={fileInputRef}
-                  className="hidden"
-                  onChange={handleFileSelect}
-                  accept="image/png, image/jpeg, image/jpg"
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="text-xs text-muted-foreground h-7"
-                >
-                  Alterar foto
-                </Button>
-              </div>
 
-              {/* Fields */}
-              <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Field>
-                  <Label htmlFor="name">Nome completo</Label>
-                  <InputForm
-                    name="name"
-                    control={control}
-                    id="name"
-                    placeholder="Seu nome"
-                    disabled={isSubmittingForm}
-                  />
-                </Field>
+                <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Field>
+                    <Label htmlFor="name">Nome completo</Label>
+                    <InputForm
+                      name="name"
+                      control={control}
+                      id="name"
+                      placeholder="Seu nome"
+                      disabled={isSubmittingForm}
+                    />
+                  </Field>
 
-                <Field>
-                  <Label>E-mail</Label>
-                  <Input
-                    disabled
-                    defaultValue={user?.email ?? ""}
-                    className="opacity-50 cursor-not-allowed"
-                  />
-                </Field>
+                  <Field>
+                    <Label>E-mail</Label>
+                    <Input disabled defaultValue={user?.email ?? ""} />
+                  </Field>
 
-                <Field>
-                  <Label>Cargo</Label>
-                  <Input
-                    disabled
-                    defaultValue={UserRoleLabel[user?.role as UserRole] ?? ""}
-                    className="opacity-50 cursor-not-allowed"
-                  />
-                </Field>
+                  <Field>
+                    <Label>Cargo</Label>
+                    <Input disabled defaultValue={UserRoleLabel[user?.role as UserRole] ?? ""} />
+                  </Field>
 
-                <Field>
-                  <Label htmlFor="phone">Telefone</Label>
-                  <InputForm
-                    name="phone"
-                    control={control}
-                    id="phone"
-                    placeholder="Seu telefone"
-                    disabled={isSubmittingForm}
-                  />
-                </Field>
+                  <Field>
+                    <Label htmlFor="phone">Telefone</Label>
+                    <InputForm
+                      name="phone"
+                      control={control}
+                      id="phone"
+                      placeholder="Seu telefone"
+                      disabled={isSubmittingForm}
+                    />
+                  </Field>
+                </div>
               </div>
             </div>
           </FieldGroup>
         </CardContent>
 
-        <CardFooter className="px-6 py-4 border-t border-border flex justify-end">
+        <CardFooter className="justify-end border-t border-border/60 bg-transparent px-5 py-3">
           <Button type="submit" disabled={isSubmittingForm} size="sm">
             {isSubmittingForm && <Loader2 className="size-3.5 animate-spin" />}
             Salvar

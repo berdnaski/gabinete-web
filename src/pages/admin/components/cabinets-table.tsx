@@ -1,4 +1,4 @@
-import { useGetCabinetsPaginated } from "@/api/cabinets/hooks"
+import { useAdminGetCabinetsPaginated } from "@/api/admin/hooks"
 import { useAdminCabinetSubscriptionsSummary } from "@/api/plans/hooks"
 import { DataTable, type DataTableFilterField } from "@/components/data-table"
 import { useDataTable, TABLE_PARAM_KEYS } from "@/hooks/use-data-table"
@@ -7,6 +7,15 @@ import { useSearchParams } from "react-router-dom"
 import { createCabinetsColumns } from "./cabinets-columns"
 
 const filterFields: DataTableFilterField[] = [
+  {
+    id: "showInactive",
+    label: "Status",
+    type: "select",
+    options: [
+      { label: "Ativos", value: "false" },
+      { label: "Inativos", value: "true" },
+    ],
+  },
   {
     id: "hasDemands",
     label: "Demandas",
@@ -36,12 +45,16 @@ export function CabinetsTable() {
   const rawHasDemands = searchParams.get("hasDemands") ?? undefined
   const hasDemands =
     rawHasDemands === "true" ? true : rawHasDemands === "false" ? false : undefined
+  const rawShowInactive = searchParams.get("showInactive") ?? ""
+  const showInactive =
+    rawShowInactive === "true" ? true : rawShowInactive === "false" ? false : undefined
 
-  const { data, isLoading } = useGetCabinetsPaginated({
+  const { data, isLoading } = useAdminGetCabinetsPaginated({
     page,
     limit,
     search,
     hasDemands,
+    showInactive,
   })
 
   const { table, ...tableState } = useDataTable({

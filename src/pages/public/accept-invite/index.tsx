@@ -79,7 +79,11 @@ export function AcceptInvite() {
         ) : accepted ? (
           <SuccessState cabinetName={invite!.cabinetName} />
         ) : !user ? (
-          <UnauthenticatedState token={token} cabinetName={invite!.cabinetName} />
+          <UnauthenticatedState
+            token={token}
+            cabinetName={invite!.cabinetName}
+            inviteEmail={invite!.email}
+          />
         ) : (
           <InviteDetails
             invite={invite!}
@@ -162,10 +166,14 @@ function SuccessState({ cabinetName }: { cabinetName: string }) {
 function UnauthenticatedState({
   token,
   cabinetName,
+  inviteEmail,
 }: {
   token: string
   cabinetName: string
+  inviteEmail: string
 }) {
+  const inviteParams = `redirect=${encodeURIComponent(`/cabinets/invites/${token}`)}&email=${encodeURIComponent(inviteEmail)}`
+
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-1">
@@ -188,13 +196,13 @@ function UnauthenticatedState({
       </div>
 
       <div className="flex flex-col gap-2.5">
-        <Link to={`/login?redirect=/cabinets/invites/${token}`} className="w-full">
+        <Link to={`/login?${inviteParams}`} className="w-full">
           <Button className="w-full gap-2">
             <LogIn className="size-4" />
             Entrar para aceitar
           </Button>
         </Link>
-        <Link to={`/sign-up?redirect=/cabinets/invites/${token}`} className="w-full">
+        <Link to={`/sign-up?${inviteParams}`} className="w-full">
           <Button variant="outline" className="w-full gap-2">
             Criar conta e aceitar
             <ArrowRight className="size-4" />

@@ -6,14 +6,13 @@ import {
 } from "@/api/demands/hooks";
 import { queryClient } from "@/api/queryClient";
 import { DemandForm } from "@/components/forms/demand";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { UserAvatar } from "@/components/user-avatar";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
-import { getFirstLettersFromNames } from "@/utils/get-first-letters-from-names";
 import { defaultDemandValues, demandSchema, type DemandFormData } from "@/validation-schemas/demand";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { User, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -120,28 +119,23 @@ export function DialogDemandForm() {
   }, [open, reset])
 
   return (
-    <div className="bg-white rounded shadow-sm flex p-4 gap-2 items-center ">
+    <div className="flex items-center gap-3 rounded-xl border border-border/60 bg-card p-4">
 
       {isAuthenticated && user ? (
         <Link to={`/profile/${user.id}`} className="shrink-0">
-          <Avatar size="lg">
-            <AvatarImage src={user.avatarUrl} />
-            <AvatarFallback className="bg-primary/10 text-primary font-semibold text-sm">
-              {getFirstLettersFromNames(user.name)}
-            </AvatarFallback>
-          </Avatar>
+          <UserAvatar size="lg" name={user.name} avatarUrl={user.avatarUrl} />
         </Link>
       ) : (
-        <Avatar size="lg">
-          <AvatarFallback className="bg-primary/10 text-primary font-semibold text-sm">
-            <User />
-          </AvatarFallback>
-        </Avatar>
+        <UserAvatar size="lg" />
       )}
 
       <Dialog open={open} onOpenChange={onOpenChangeDialog}>
         <DialogTrigger asChild>
-          <Button variant="outline" size="lg" className="rounded-full bg-white flex-1 justify-start h-12">
+          <Button
+            variant="outline"
+            size="lg"
+            className="h-10 flex-1 justify-start rounded-xl bg-card px-4 font-normal text-muted-foreground hover:text-foreground"
+          >
             Registrar nova demanda
           </Button>
         </DialogTrigger>

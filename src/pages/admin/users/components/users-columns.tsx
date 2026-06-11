@@ -1,41 +1,13 @@
 import type { User } from "@/api/users"
 import { UserRole, UserRoleLabel } from "@/api/users/types"
-import { useAdminEnableUser } from "@/api/admin/hooks"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { getFirstLettersFromNames } from "@/utils/get-first-letters-from-names"
 import type { ColumnDef } from "@tanstack/react-table"
-import { ArrowRight, Loader2, UserCheck } from "lucide-react"
-import { Link } from "react-router-dom"
-import { toast } from "sonner"
 import { UserEditSheet } from "./user-edit-sheet"
+import { UserEnableButton, UserDisableButton } from "./user-action-buttons"
 
-function EnableButton({ userId }: { userId: string }) {
-  const { mutate, isPending } = useAdminEnableUser()
-
-  function handleEnable() {
-    mutate(userId, {
-      onSuccess: () => toast.success("Usuário reativado com sucesso."),
-      onError: () => toast.error("Erro ao reativar usuário."),
-    })
-  }
-
-  return (
-    <Button
-      variant="outline"
-      size="sm"
-      className="gap-1 text-xs h-7 text-green-700 border-green-200 hover:bg-green-50 hover:text-green-800"
-      onClick={handleEnable}
-      disabled={isPending}
-    >
-      {isPending ? <Loader2 className="size-3 animate-spin" /> : <UserCheck className="size-3" />}
-      Ativar
-    </Button>
-  )
-}
-
-export const usersColumns: ColumnDef<User>[] = [
+export function getUsersColumns(currentUserId: string): ColumnDef<User>[] { return [
   {
     accessorKey: "name",
     header: "Usuário",
@@ -90,25 +62,22 @@ export const usersColumns: ColumnDef<User>[] = [
   },
   {
     id: "actions",
-    header: "",
+    header: "Ações",
     size: 160,
     cell: ({ row }) => {
       const u = row.original
       return (
         <div className="flex items-center justify-end gap-1.5">
           {u.disabledAt ? (
-            <EnableButton userId={u.id} />
+            <UserEnableButton userId={u.id} />
           ) : (
-            <UserEditSheet userId={u.id} />
+            <>
+              {u.id !== currentUserId && <UserDisableButton userId={u.id} />}
+              <UserEditSheet userId={u.id} />
+            </>
           )}
-          <Link
-            to={`/profile/${u.id}`}
-            className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
-          >
-            Abrir <ArrowRight className="size-3" />
-          </Link>
         </div>
       )
     },
-  },
-]
+  }
+]}

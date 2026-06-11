@@ -22,13 +22,13 @@ export function CitizenHeader() {
   const { isAuthenticated } = useAuth()
 
   return (
-    <header className="fixed bg-background top-0 inset-x-0 z-50 flex items-center justify-between px-4 sm:px-6 py-2 border-b border-border">
-      <div className="flex items-center gap-3">
-        <Link to="/">
-          <img src={GIcon} alt="Ícone do Gabinete" className="size-12" />
+    <header className="fixed top-0 inset-x-0 z-50 flex h-14 items-center justify-between border-b border-border/60 bg-background px-4 sm:px-6">
+      <div className="flex items-center gap-3 min-w-0">
+        <Link to="/" className="shrink-0">
+          <img src={GIcon} alt="Ícone do Gabinete" className="size-9" />
         </Link>
 
-        <nav className="flex items-center gap-0.5">
+        <nav className="flex items-center gap-1">
           {[...PUBLIC_NAV_LINKS, ...(isAuthenticated ? CITIZEN_NAV_LINKS : [])].map(({ to, label, icon: Icon }) => (
             <NavLink key={to} to={to}>
               {({ isActive }) => (
@@ -36,13 +36,13 @@ export function CitizenHeader() {
                   variant="ghost"
                   size="sm"
                   className={cn(
-                    "gap-1.5 rounded-md text-xs font-medium transition-colors",
+                    "h-8 gap-2 rounded-lg px-2.5 text-sm transition-colors",
                     isActive
-                      ? "bg-muted text-foreground"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted/60",
+                      ? "bg-primary/10 font-medium text-primary hover:bg-primary/10 hover:text-primary"
+                      : "font-normal text-muted-foreground hover:bg-muted hover:text-foreground",
                   )}
                 >
-                  <Icon className="size-3.5" />
+                  <Icon className="size-4 stroke-[1.5]" />
                   <span className="hidden sm:inline">{label}</span>
                 </Button>
               )}
@@ -53,7 +53,7 @@ export function CitizenHeader() {
         <CityIndicator />
       </div>
 
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-2">
         {isAuthenticated && <NotificationPopover />}
         {isAuthenticated ? (
           <UserDropdown />

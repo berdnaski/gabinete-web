@@ -8,6 +8,10 @@ export function useDeleteResult(demandId?: string | null) {
     mutationFn: (id: string) => ResultsApi.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["results", { demandId }] })
+      queryClient.invalidateQueries({ queryKey: ["demands"] })
+      queryClient.invalidateQueries({ queryKey: ["demands-infinite"] })
+      queryClient.invalidateQueries({ queryKey: ["my-demands"] })
+      queryClient.invalidateQueries({ queryKey: ["cabinet-usage"] })
     },
   })
 }

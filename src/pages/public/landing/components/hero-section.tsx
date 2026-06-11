@@ -2,6 +2,7 @@ import { ArrowRight, Play } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { APP_URL } from "../constants"
+import { trackCtaClick, trackEvent } from "@/lib/analytics"
 
 const TRUST_STATS = [
   { value: "200+", label: "gabinetes ativos" },
@@ -33,14 +34,23 @@ export function HeroSection() {
         </p>
 
         <div className="flex flex-col sm:flex-row items-center gap-3 mb-4">
-          <Button size="lg" onClick={() => { window.location.href = `${APP_URL}/sign-up` }}>
+          <Button
+            size="lg"
+            onClick={() => {
+              trackCtaClick("hero")
+              window.location.href = `${APP_URL}/sign-up`
+            }}
+          >
             Começar grátis
             <ArrowRight className="size-4" />
           </Button>
           <Button
             variant="outline"
             size="lg"
-            onClick={() => document.getElementById("funcionalidades")?.scrollIntoView({ behavior: "smooth" })}
+            onClick={() => {
+              trackEvent("scroll_to_features", { location: "hero" })
+              document.getElementById("funcionalidades")?.scrollIntoView({ behavior: "smooth" })
+            }}
           >
             Ver funcionalidades
           </Button>

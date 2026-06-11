@@ -10,22 +10,26 @@ import {
 import { useAuth } from '@/hooks/use-auth'
 import { loginFormSchema, type LoginFormData } from '@/validation-schemas/login'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Eye, EyeOff, Loader2 } from 'lucide-react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 
 export function LoginForm() {
 
 	const { login } = useAuth()
+	const [searchParams] = useSearchParams()
+	const [showPassword, setShowPassword] = useState(false)
 
 	const form = useForm<LoginFormData>({
 		resolver: zodResolver(loginFormSchema),
 		defaultValues: {
-			email: "",
+			email: searchParams.get("email") ?? "",
 			password: "",
 		},
 	});
 
-	const { handleSubmit, control } = form
+	const { handleSubmit, control, formState: { isSubmitting } } = form
 
 	const onSubmit = handleSubmit(async (data: LoginFormData) => {
 		await login(data);
@@ -50,7 +54,7 @@ export function LoginForm() {
 						name="email"
 						autoComplete='email webauthn'
 						inputMode='email'
-						placeholder="m@example.com"
+						placeholder="m@example.com" className="h-10"
 					/>
 				</Field>
 				<Field>
@@ -63,24 +67,40 @@ export function LoginForm() {
 							Esqueceu sua senha?
 						</Link>
 					</div>
-					<InputForm
-						required
-						id="password"
-						name="password"
-						type="password"
-						inputMode='text'
-						control={control}
-						autoComplete='current-password webauthn'
-					/>
+					<div className="relative">
+						<InputForm
+							required
+							id="password"
+							name="password"
+							type={showPassword ? 'text' : 'password'}
+							inputMode='text'
+							control={control}
+							autoComplete='current-password webauthn'
+							className="h-10 pr-10"
+						/>
+						<button
+							type="button"
+							onClick={() => setShowPassword(v => !v)}
+							className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+							tabIndex={-1}
+							aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+						>
+							{showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+						</button>
+					</div>
 				</Field>
 				<Field>
-					<Button type="submit">Login</Button>
+					<Button type="submit" disabled={isSubmitting} className="h-10">
+						{isSubmitting && <Loader2 className="size-4 animate-spin" />}
+						{isSubmitting ? "Entrando..." : "Login"}
+					</Button>
 				</Field>
 				<FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">Ou continue com</FieldSeparator>
 				<Field>
 					<Button
 						type="button"
 						variant="secondary"
+							className="h-10"
 						onClick={() => {
 							window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`
 						}}

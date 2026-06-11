@@ -30,7 +30,7 @@ export function LandingFooter() {
           <div className="col-span-2 flex flex-col gap-4">
             <img
               src={logo}
-              alt="Gabinete Digital"
+              alt="Gabinete App"
               className="h-6 w-auto max-w-32.5 object-contain object-left"
             />
             <p className="text-sm text-muted-foreground leading-relaxed max-w-50">
@@ -65,7 +65,7 @@ export function LandingFooter() {
 
         <div className="py-5 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3">
           <span className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} Gabinete Digital. Todos os direitos reservados.
+            © {new Date().getFullYear()} Gabinete App. Todos os direitos reservados.
           </span>
           <span className="text-xs text-muted-foreground">
             Feito com cuidado no Brasil.
@@ -75,3 +75,4 @@ export function LandingFooter() {
     </footer>
   )
 }
+

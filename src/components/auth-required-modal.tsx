@@ -41,7 +41,6 @@ export function AuthRequiredModal({
         className="p-0 overflow-hidden gap-0 sm:max-w-sm"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Hero */}
         <div className="bg-auth-gradient px-6 pt-8 pb-7 flex flex-col items-center text-center">
           <div className="relative mb-5">
             <span className="absolute inset-0 rounded-full bg-white/25 animate-ping" />
@@ -57,7 +56,6 @@ export function AuthRequiredModal({
           </DialogDescription>
         </div>
 
-        {/* Actions */}
         <div className="px-5 py-5 space-y-4">
           <p className="text-xs text-center text-muted-foreground leading-relaxed">
             Junte-se à comunidade e participe<br />das decisões da sua cidade.

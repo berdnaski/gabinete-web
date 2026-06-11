@@ -12,7 +12,8 @@ import { cn } from "@/lib/utils"
 import { Building2, CheckCircle2, MessageCircle, MessageCircleIcon, Send, TrendingUp } from "lucide-react"
 import { ResultEntry } from "./components/result-entry"
 import { useRef, useState } from "react"
-import { useParams } from "react-router-dom"
+import { Link, useParams } from "react-router-dom"
+import { toast } from "sonner"
 import { UserAvatar } from "@/components/user-avatar"
 import { CommentItem } from "./components/comment-item"
 import { Loading } from "@/components/loading"
@@ -33,7 +34,12 @@ export function DemandComments() {
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
   const { mutate: createComment, isPending: isSubmitting } = useCreateDemandComment()
-  const { data: demand, isLoading: isLoadingDemand } = useGetDemandById({ id: demandId })
+  const {
+    data: demand,
+    isLoading: isLoadingDemand,
+    isError: isDemandError,
+    refetch: refetchDemand,
+  } = useGetDemandById({ id: demandId })
   const { data: comments, isLoading: isLoadingComments } = useListDemandComments({
     demandId,
     page: 1,
@@ -54,6 +60,9 @@ export function DemandComments() {
           setMessage("")
           inputRef.current?.focus()
         },
+        onError: () => {
+          toast.error("Erro ao enviar comentário. Tente novamente.")
+        },
       },
     )
   }
@@ -65,7 +74,31 @@ export function DemandComments() {
     }
   }
 
-  if (isLoadingDemand || !demand) return <Loading fullPage />
+  if (isLoadingDemand) return <Loading fullPage />
+
+  if (isDemandError || !demand) {
+    return (
+      <div className="flex flex-col items-center justify-center py-32 text-center gap-3">
+        <div className="size-14 rounded-full bg-muted flex items-center justify-center">
+          <MessageCircle className="size-6 text-muted-foreground" />
+        </div>
+        <div>
+          <p className="text-sm font-semibold text-foreground">Não foi possível carregar a demanda</p>
+          <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">
+            Verifique sua conexão ou tente novamente em instantes.
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={() => refetchDemand()}>
+            Tentar novamente
+          </Button>
+          <Button size="sm" asChild>
+            <Link to="/">Voltar ao feed</Link>
+          </Button>
+        </div>
+      </div>
+    )
+  }
 
   const commentList = comments?.items ?? []
   const resultList = resultsData?.items ?? []

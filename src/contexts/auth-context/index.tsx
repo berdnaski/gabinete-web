@@ -95,7 +95,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const redirect = params.get("redirect");
       navigate(redirect?.startsWith("/") ? redirect : "/");
     } catch (error) {
-      toast.error("Erro ao realizar login. Verifique suas credenciais.");
+      const apiError = error as { response?: { status?: number; data?: { message?: string | string[] } } };
+      const status = apiError.response?.status;
+      const rawMessage = apiError.response?.data?.message;
+      const message = Array.isArray(rawMessage) ? rawMessage[0] : rawMessage;
+
+      if (status === 403 && message) {
+        toast.error(message, {
+          description: "Não recebeu o e-mail? Verifique a caixa de spam ou cadastre-se novamente para reenviar.",
+        });
+      } else {
+        toast.error("Erro ao realizar login. Verifique suas credenciais.");
+      }
       throw error;
     } finally {
       setIsLoading(false);

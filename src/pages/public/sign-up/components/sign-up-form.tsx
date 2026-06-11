@@ -7,7 +7,7 @@ import { registerFormSchema, type RegisterFormData } from '@/validation-schemas/
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Check, X } from 'lucide-react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { Checkbox } from '@/components/ui/checkbox'
 import { cn } from '@/lib/utils'
@@ -29,11 +29,15 @@ function parseApiError(err: unknown): { field?: 'email' | 'password'; message: s
 
 export function SignUpForm() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const { mutateAsync: registerUser, isPending } = useRegister()
+
+  const redirectParam = searchParams.get('redirect')
+  const emailParam = searchParams.get('email')
 
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerFormSchema),
-    defaultValues: { name: '', email: '', password: '', termsAccepted: false as unknown as true },
+    defaultValues: { name: '', email: emailParam ?? '', password: '', termsAccepted: false as unknown as true },
   })
 
   const { control, handleSubmit, setError, formState: { isSubmitting } } = form
@@ -44,9 +48,11 @@ export function SignUpForm() {
   const onSubmit = handleSubmit(async (data: RegisterFormData) => {
     try {
       await registerUser(data)
-      toast.success('Cadastro realizado! Você já pode fazer login.')
+      toast.success('Cadastro realizado! Verifique seu e-mail e faça login para continuar.')
       await new Promise((r) => setTimeout(r, 1500))
-      navigate('/login')
+      const loginParams = new URLSearchParams({ email: data.email })
+      if (redirectParam?.startsWith('/')) loginParams.set('redirect', redirectParam)
+      navigate(`/login?${loginParams.toString()}`)
     } catch (err) {
       const { field, message } = parseApiError(err)
       if (field) {
@@ -69,6 +75,7 @@ export function SignUpForm() {
             autoComplete="name"
             placeholder="Digite seu nome"
             disabled={isLoading}
+            className="h-10"
           />
         </Field>
 
@@ -81,6 +88,7 @@ export function SignUpForm() {
             autoComplete="email"
             placeholder="nome@exemplo.com"
             disabled={isLoading}
+            className="h-10"
           />
         </Field>
 
@@ -93,6 +101,7 @@ export function SignUpForm() {
             autoComplete="new-password"
             placeholder="Mínimo 8 caracteres"
             disabled={isLoading}
+            className="h-10"
           />
           {password.length > 0 && (
             <div className={cn(
@@ -138,7 +147,7 @@ export function SignUpForm() {
           )}
         </div>
 
-        <Button type="submit" disabled={isLoading}>
+        <Button type="submit" disabled={isLoading} className="h-10">
           {isLoading
             ? <div className="flex items-center gap-2"><Loading /><span>Criando conta...</span></div>
             : 'Criar minha conta'

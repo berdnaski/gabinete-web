@@ -98,7 +98,7 @@ export function EcosystemSection() {
             tudo no controle.
           </h2>
           <p className="text-base text-muted-foreground max-w-lg mx-auto leading-relaxed">
-            O Gabinete Digital centraliza todos os canais e fontes de dados
+            O Gabinete App centraliza todos os canais e fontes de dados
             do seu mandato em uma plataforma única.
           </p>
         </div>
@@ -165,7 +165,7 @@ export function EcosystemSection() {
             <div className="absolute -inset-5 rounded-full bg-primary/[0.08] animate-pulse" />
             <div className="absolute -inset-2.5 rounded-full bg-primary/[0.12]" />
             <div className="relative size-20 rounded-full bg-primary shadow-lg flex flex-col items-center justify-center gap-1.5">
-              <img src={logo} alt="Gabinete Digital" className="h-6 w-auto brightness-0 invert" />
+              <img src={logo} alt="Gabinete App" className="h-6 w-auto brightness-0 invert" />
             </div>
           </div>
 
@@ -195,3 +195,4 @@ export function EcosystemSection() {
     </section>
   )
 }
+

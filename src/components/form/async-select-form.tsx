@@ -154,7 +154,6 @@ export function AsyncSelectForm<T extends FieldValues>({
   return (
     <FieldContent>
       <div ref={containerRef} className="relative">
-        {/* Trigger */}
         <button
           type="button"
           disabled={disabled}
@@ -193,7 +192,6 @@ export function AsyncSelectForm<T extends FieldValues>({
               />
             </div>
 
-            {/* Scrollable options list */}
             <div ref={listRef} className="max-h-56 overflow-y-auto py-1">
               {filteredOptions.length === 0 && !loading && (
                 <p className="py-4 text-center text-sm text-muted-foreground">

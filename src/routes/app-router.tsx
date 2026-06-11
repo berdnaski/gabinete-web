@@ -5,7 +5,6 @@ import { Route, Routes } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import { Loader2 } from "lucide-react";
 
-// Public pages — small, load eagerly
 import { Login } from "@/pages/public/login";
 import { SignUp } from "@/pages/public/sign-up";
 import { ForgotPassword } from "@/pages/public/forgot-password";

@@ -1,9 +1,40 @@
 import { useGetDemandsByCabinetSlug } from "@/api/demands/hooks"
+import { UserRole, UserRoleLabel } from "@/api/users/types"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { UserAvatar } from "@/components/user-avatar"
 import { useAuth } from "@/hooks/use-auth"
 import { useCurrentMember } from "@/hooks/use-current-member"
 import { cn } from "@/lib/utils"
-import { Building2, CheckSquare, ClipboardListIcon, Flag, ExternalLink, Globe, Home, LayoutDashboard, MapPin, Newspaper, Users, BarChart3, Map, PackageIcon } from "lucide-react"
+import {
+  BarChart3,
+  Building2,
+  CheckSquare,
+  ChevronDown,
+  ClipboardListIcon,
+  ExternalLink,
+  Flag,
+  Globe,
+  Home,
+  LayoutDashboard,
+  LogOut,
+  Map,
+  MapPin,
+  Newspaper,
+  PackageIcon,
+  Settings,
+  User as UserIcon,
+  Users,
+  type LucideIcon,
+} from "lucide-react"
+import type { ReactNode } from "react"
 import { Link, useLocation } from "react-router-dom"
+import IconLogo from "../../../assets/icon.svg"
 import Logo from "../../../assets/logo.png"
 import {
   Sidebar,
@@ -15,6 +46,8 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarTrigger,
+  useSidebar,
 } from "../../ui/sidebar"
 
 function MyTasksBadge() {
@@ -32,213 +65,199 @@ function MyTasksBadge() {
   if (!currentMember || total === 0) return null
 
   return (
-    <span className="ml-auto inline-flex items-center justify-center h-4 min-w-4 px-1 rounded-full bg-primary text-primary-foreground text-2xs font-bold leading-none">
+    <span className="ml-auto inline-flex items-center justify-center h-4 min-w-4 px-1 rounded-full bg-primary text-primary-foreground text-2xs font-bold leading-none group-data-[collapsible=icon]:hidden">
       {total > 99 ? "99+" : total}
     </span>
   )
 }
 
-export function AppSidebar() {
-  const { pathname } = useLocation()
-  const { hasRoleAdmin, cabinet, user } = useAuth()
-  const isAdmin = hasRoleAdmin()
-  const isCitizen = user?.role === "CITIZEN"
+function SidebarUserCard() {
+  const { isMobile } = useSidebar()
+  const { user, logout } = useAuth()
 
-  if (isAdmin) {
-    return (
-      <Sidebar variant="inset">
-        <SidebarHeader>
-          <img src={Logo} alt="Gabinete Digital" className="w-36" />
-        </SidebarHeader>
-        <SidebarContent>
-          <SidebarGroup>
-            <SidebarGroupLabel className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground">
-              Admin
-            </SidebarGroupLabel>
-            <SidebarMenu className="space-y-0.5">
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Gabinetes" isActive={pathname === "/admin"}>
-                  <Link to="/admin">
-                    <Building2 className={cn({ "text-primary": pathname === "/admin" })} />
-                    <span>Gabinetes</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  asChild
-                  tooltip="Usuários"
-                  isActive={pathname === "/admin/users"}
-                >
-                  <Link to="/admin/users">
-                    <Users className={cn({ "text-primary": pathname === "/admin/users" })} />
-                    <span>Usuários</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  asChild
-                  tooltip="Denúncias"
-                  isActive={pathname === "/admin/denuncias"}
-                >
-                  <Link to="/admin/denuncias">
-                    <Flag className={cn({ "text-primary": pathname === "/admin/denuncias" })} />
-                    <span>Denúncias</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  asChild
-                  tooltip="Planos"
-                  isActive={pathname === "/admin/plans"}
-                >
-                  <Link to="/admin/plans">
-                    <PackageIcon className={cn({ "text-primary": pathname === "/admin/plans" })} />
-                    <span>Planos</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Mapa" isActive={pathname === "/mapa"}>
-                  <Link to="/mapa">
-                    <Map className={cn({ "text-primary": pathname === "/mapa" })} />
-                    <span>Mapa</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroup>
-        </SidebarContent>
-      </Sidebar>
-    )
-  }
+  if (!user) return null
 
   return (
-    <Sidebar variant="inset">
-      <SidebarHeader>
-        <img src={Logo} alt="Gabinete Digital" className="w-36" />
-      </SidebarHeader>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground">
-            Social
-          </SidebarGroupLabel>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Feed" isActive={pathname === "/"}>
-                <Link to="/">
-                  <Newspaper className={cn({ "text-primary": pathname === "/" })} />
-                  <span>Feed</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Mapa" isActive={pathname === "/mapa"}>
-                <Link to="/mapa">
-                  <Map className={cn({ "text-primary": pathname === "/mapa" })} />
-                  <span>Mapa</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Meu Bairro" isActive={pathname === "/my-neighborhood"}>
-                <Link to="/my-neighborhood">
-                  <MapPin className={cn({ "text-primary": pathname === "/my-neighborhood" })} />
-                  <span>Meu Bairro</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            {isCitizen && (
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Minhas Demandas" isActive={pathname === "/my-demands"}>
-                  <Link to="/my-demands">
-                    <LayoutDashboard className={cn({ "text-primary": pathname === "/my-demands" })} />
-                    <span>Minhas Demandas</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            )}
-          </SidebarMenu>
-
-          {!isCitizen && (
-            <>
-              <SidebarGroupLabel className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground">
-                Gabinete
-              </SidebarGroupLabel>
-              <SidebarMenu className="space-y-0.5">
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip="Início" isActive={pathname === "/home"}>
-                    <Link to="/home">
-                      <Home className={cn({ "text-primary": pathname === "/home" })} />
-                      <span>Início</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip="Demandas" isActive={pathname === "/demands"}>
-                    <Link to="/demands">
-                      <ClipboardListIcon className={cn({ "text-primary": pathname === "/demands" })} />
-                      <span>Demandas</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    tooltip="Minhas Tarefas"
-                    isActive={pathname === "/minhas-tarefas"}
-                  >
-                    <Link to="/minhas-tarefas" className="flex items-center gap-2 w-full">
-                      <CheckSquare
-                        className={cn({ "text-primary": pathname === "/minhas-tarefas" })}
-                      />
-                      <span>Minhas Tarefas</span>
-                      <MyTasksBadge />
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip="Equipe" isActive={pathname === "/equipe"}>
-                    <Link to="/equipe">
-                      <Users className={cn({ "text-primary": pathname === "/equipe" })} />
-                      <span>Equipe</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip="Relatórios" isActive={pathname === "/relatorios"}>
-                    <Link to="/relatorios">
-                      <BarChart3 className={cn({ "text-primary": pathname === "/relatorios" })} />
-                      <span>Relatórios</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              </SidebarMenu>
-            </>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          type="button"
+          className={cn(
+            "flex w-full items-center gap-2.5 rounded-xl border border-border/60 bg-card p-2 text-left transition-colors hover:bg-muted/40 data-[state=open]:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+            "group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:border-0 group-data-[collapsible=icon]:p-0"
           )}
+        >
+          <UserAvatar size="default" name={user.name} avatarUrl={user.avatarUrl} />
+          <div className="grid min-w-0 flex-1 leading-tight group-data-[collapsible=icon]:hidden">
+            <span className="truncate text-2xs text-muted-foreground">
+              {UserRoleLabel[user.role as UserRole]}
+            </span>
+            <span className="truncate text-sm font-medium text-foreground">{user.name}</span>
+          </div>
+          <ChevronDown className="size-3.5 shrink-0 stroke-[1.5] text-muted-foreground/70 group-data-[collapsible=icon]:hidden" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+        side={isMobile ? "bottom" : "right"}
+        align="start"
+        sideOffset={6}
+      >
+        <div className="flex items-center gap-2 px-1.5 py-1.5">
+          <UserAvatar size="default" name={user.name} avatarUrl={user.avatarUrl} />
+          <div className="grid min-w-0 flex-1 leading-tight">
+            <span className="truncate text-sm font-semibold">{user.name}</span>
+            <span className="truncate text-xs text-muted-foreground">{user.email}</span>
+          </div>
+        </div>
+        <DropdownMenuSeparator />
+        <Link to={`/profile/${user.id}`}>
+          <DropdownMenuItem className="cursor-pointer">
+            <UserIcon className="size-4" />
+            Meu Perfil
+          </DropdownMenuItem>
+        </Link>
+        <Link to="/settings">
+          <DropdownMenuItem className="cursor-pointer">
+            <Settings className="size-4" />
+            Configurações
+          </DropdownMenuItem>
+        </Link>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={logout} variant="destructive" className="cursor-pointer">
+          <LogOut className="size-4" />
+          Sair
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
 
-        </SidebarGroup>
+function NavGroup({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <SidebarGroup className="px-3 py-2 group-data-[collapsible=icon]:px-2">
+      <SidebarGroupLabel className="px-2.5 text-2xs font-semibold uppercase tracking-widest text-muted-foreground">
+        {label}
+      </SidebarGroupLabel>
+      <SidebarMenu className="gap-0.5">{children}</SidebarMenu>
+    </SidebarGroup>
+  )
+}
+
+interface NavItemProps {
+  to: string
+  label: string
+  icon: LucideIcon
+  children?: ReactNode
+}
+
+function NavItem({ to, label, icon: Icon, children }: NavItemProps) {
+  const { pathname } = useLocation()
+  const active = pathname === to
+
+  return (
+    <SidebarMenuItem>
+      <SidebarMenuButton
+        asChild
+        tooltip={label}
+        isActive={active}
+        className={cn(
+          "h-9 gap-2.5 rounded-lg px-2.5 font-normal text-muted-foreground transition-colors",
+          "[&_svg]:size-4 [&_svg]:stroke-[1.5]",
+          "hover:bg-muted hover:text-foreground",
+          "data-[active=true]:bg-primary/10 data-[active=true]:font-medium data-[active=true]:text-primary"
+        )}
+      >
+        <Link to={to}>
+          <Icon className="shrink-0" />
+          <span>{label}</span>
+          {children}
+        </Link>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
+  )
+}
+
+export function AppSidebar() {
+  const { hasRoleAdmin, cabinet, user } = useAuth()
+  const isAdmin = hasRoleAdmin()
+  const isCitizen = user?.role === UserRole.CITIZEN
+
+  return (
+    <Sidebar variant="inset" collapsible="icon">
+      <SidebarHeader className="gap-0 p-0">
+        <div className="flex items-center justify-between gap-2 border-b border-border/50 px-4 py-3 group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:px-2">
+          <img src={Logo} alt="Gabinete App" className="w-32 group-data-[collapsible=icon]:hidden" />
+          <img src={IconLogo} alt="" className="hidden size-7 group-data-[collapsible=icon]:block" />
+          <SidebarTrigger className="text-muted-foreground/70 hover:text-foreground [&_svg]:stroke-[1.5]" />
+        </div>
+        <div className="px-3 pt-3 group-data-[collapsible=icon]:px-2">
+          <SidebarUserCard />
+        </div>
+      </SidebarHeader>
+
+      <SidebarContent className="py-1">
+        {isAdmin ? (
+          <NavGroup label="Administração">
+            <NavItem to="/admin" label="Gabinetes" icon={Building2} />
+            <NavItem to="/admin/users" label="Usuários" icon={Users} />
+            <NavItem to="/admin/denuncias" label="Denúncias" icon={Flag} />
+            <NavItem to="/admin/plans" label="Planos" icon={PackageIcon} />
+            <NavItem to="/mapa" label="Mapa" icon={Map} />
+          </NavGroup>
+        ) : (
+          <>
+            <NavGroup label="Principal">
+              <NavItem to="/" label="Feed" icon={Newspaper} />
+              <NavItem to="/mapa" label="Mapa" icon={Map} />
+              <NavItem to="/my-neighborhood" label="Meu Bairro" icon={MapPin} />
+              {isCitizen && (
+                <NavItem to="/my-demands" label="Minhas Demandas" icon={LayoutDashboard} />
+              )}
+            </NavGroup>
+
+            {!isCitizen && (
+              <NavGroup label="Gabinete">
+                <NavItem to="/home" label="Início" icon={Home} />
+                <NavItem to="/demands" label="Demandas" icon={ClipboardListIcon} />
+                <NavItem to="/minhas-tarefas" label="Minhas Tarefas" icon={CheckSquare}>
+                  <MyTasksBadge />
+                </NavItem>
+                <NavItem to="/equipe" label="Equipe" icon={Users} />
+                <NavItem to="/relatorios" label="Relatórios" icon={BarChart3} />
+              </NavGroup>
+            )}
+          </>
+        )}
+
+        <NavGroup label="Conta">
+          <NavItem to="/settings" label="Configurações" icon={Settings} />
+        </NavGroup>
       </SidebarContent>
 
-      {cabinet?.slug && (
-        <SidebarFooter className="border-t border-border">
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip={cabinet.name ?? "Perfil público"}>
-                <Link to={`/${cabinet.slug}`} target="_blank" rel="noopener noreferrer">
-                  <Globe className="text-muted-foreground" />
-                  <span className="truncate">{cabinet.name ?? "Ver perfil"}</span>
-                  <ExternalLink className="ml-auto size-3 shrink-0 text-muted-foreground/50" />
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
+      {!isAdmin && cabinet?.slug && (
+        <SidebarFooter className="p-3 group-data-[collapsible=icon]:p-2">
+          <Link
+            to={`/${cabinet.slug}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            title={cabinet.name ?? "Perfil público"}
+            className={cn(
+              "flex items-center gap-2.5 rounded-xl border border-border/60 bg-card p-2 transition-colors hover:border-primary/40 hover:bg-primary/5",
+              "group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:border-0 group-data-[collapsible=icon]:p-1"
+            )}
+          >
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <Globe className="size-4 stroke-[1.5]" />
+            </span>
+            <div className="grid min-w-0 flex-1 leading-tight group-data-[collapsible=icon]:hidden">
+              <span className="truncate text-sm font-medium text-primary">Perfil público</span>
+              <span className="truncate text-xs text-muted-foreground">
+                {cabinet.name ?? "Ver perfil"}
+              </span>
+            </div>
+            <ExternalLink className="size-3.5 shrink-0 text-muted-foreground/60 group-data-[collapsible=icon]:hidden" />
+          </Link>
         </SidebarFooter>
       )}
     </Sidebar>

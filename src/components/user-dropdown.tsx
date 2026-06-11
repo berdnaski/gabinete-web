@@ -1,7 +1,6 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { useAuth } from "@/hooks/use-auth";
-import { ChevronDown, LogOut, Settings, User } from "lucide-react";
-import { Button } from "./ui/button";
+import { LogOut, Settings, User } from "lucide-react";
 import { UserRole, UserRoleLabel } from "@/api/users/types";
 import { Link } from "react-router-dom";
 import { UserAvatar } from "./user-avatar";
@@ -11,19 +10,17 @@ export function UserDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
+        <button
           type="button"
-          variant="ghost"
           aria-label="Menu do perfil"
-          className="flex items-center gap-1 p-1.5 rounded-full hover:bg-muted transition-colors focus:outline-none shrink-0"
+          className="shrink-0 rounded-xl shadow-sm transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <UserAvatar
             size="default"
             name={user?.name}
             avatarUrl={user?.avatarUrl}
           />
-          <ChevronDown className="size-3.5 text-muted-foreground" />
-        </Button>
+        </button>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="w-64">

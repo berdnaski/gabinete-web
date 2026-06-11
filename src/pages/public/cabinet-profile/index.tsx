@@ -35,7 +35,6 @@ import { Link, useParams } from "react-router-dom"
 import Logo from "@/assets/logo.png"
 import { PublicDemandForm } from "./public-demand-form"
 
-// ─── Accountability bar ───────────────────────────────────────────────────────
 
 function AccountabilityBar({
   metrics,
@@ -173,7 +172,7 @@ function ProfileHeader({ accent }: { accent: string }) {
     <header className="fixed top-0 inset-x-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border/40">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
         <Link to="/" className="shrink-0">
-          <img src={Logo} alt="Gabinete Digital" className="w-24 sm:w-32" />
+          <img src={Logo} alt="Gabinete App" className="w-24 sm:w-32" />
         </Link>
 
         {isAuthenticated ? (
@@ -626,3 +625,4 @@ export function PublicCabinetProfile() {
     </>
   )
 }
+

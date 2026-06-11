@@ -8,6 +8,16 @@ import {
 import type { CabinetInvitation, CabinetMember } from "@/api/cabinets/types"
 import { InviteMemberDialog } from "@/components/invite-member-dialog"
 import { Loading } from "@/components/loading"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -71,7 +81,7 @@ function MemberRow({ member, isCurrentUser, isOwner, cabinetSlug }: MemberRowPro
   const navigate = useNavigate()
   const config = ROLE_CONFIG[member.role]
   const Icon = config.icon
-  const [confirmRemove, setConfirmRemove] = useState(false)
+  const [removeDialogOpen, setRemoveDialogOpen] = useState(false)
 
   const { mutate: removeMember, isPending: isRemoving } = useRemoveMember(cabinetSlug)
   const { mutate: updateRole, isPending: isUpdatingRole } = useUpdateMemberRole(cabinetSlug)
@@ -79,12 +89,11 @@ function MemberRow({ member, isCurrentUser, isOwner, cabinetSlug }: MemberRowPro
   const newRole = member.role === "OWNER" ? "STAFF" : "OWNER"
 
   function handleRemove() {
-    if (!confirmRemove) {
-      setConfirmRemove(true)
-      return
-    }
     removeMember(member.userId, {
-      onSuccess: () => toast.success(`${member.userName} foi removido da equipe.`),
+      onSuccess: () => {
+        toast.success(`${member.userName} foi removido da equipe.`)
+        setRemoveDialogOpen(false)
+      },
       onError: () => toast.error("Erro ao remover membro."),
     })
   }
@@ -137,7 +146,7 @@ function MemberRow({ member, isCurrentUser, isOwner, cabinetSlug }: MemberRowPro
         )}
       </div>
 
-      <DropdownMenu onOpenChange={(open) => { if (!open) setConfirmRemove(false) }}>
+      <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
@@ -167,21 +176,42 @@ function MemberRow({ member, isCurrentUser, isOwner, cabinetSlug }: MemberRowPro
                 Tornar {newRole === "OWNER" ? "Responsável" : "Membro"}
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={handleRemove}
+                onClick={() => setRemoveDialogOpen(true)}
                 disabled={isRemoving}
-                className={cn(
-                  confirmRemove
-                    ? "text-destructive focus:text-destructive focus:bg-destructive/10"
-                    : "",
-                )}
+                variant="destructive"
               >
                 <Trash2 className="size-3.5" />
-                {confirmRemove ? "Confirmar remoção" : "Remover da equipe"}
+                Remover da equipe
               </DropdownMenuItem>
             </>
           )}
         </DropdownMenuContent>
       </DropdownMenu>
+
+      <AlertDialog open={removeDialogOpen} onOpenChange={setRemoveDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remover membro da equipe?</AlertDialogTitle>
+            <AlertDialogDescription>
+              <strong>{member.userName}</strong> perderá imediatamente o acesso ao painel do
+              gabinete e às demandas atribuídas a ele. Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isRemoving}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault()
+                handleRemove()
+              }}
+              disabled={isRemoving}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isRemoving ? "Removendo..." : "Remover"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

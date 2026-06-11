@@ -127,12 +127,12 @@ export function NeighborhoodSettingsCard() {
 
   return (
     <>
-      <Card className="bg-card rounded-xl border border-border shadow-sm animate-in fade-in duration-300">
-        <CardHeader className="px-6 pt-5 pb-4 border-b border-border">
+      <Card className="animate-in fade-in duration-300">
+        <CardHeader className="border-b border-border/60 px-5">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <MapPin className="size-4 text-muted-foreground" />
-              <CardTitle className="text-base font-semibold text-foreground">Meus Bairros</CardTitle>
+              <MapPin className="size-4 stroke-[1.5] text-muted-foreground" />
+              <CardTitle className="text-sm font-semibold text-foreground">Meus Bairros</CardTitle>
             </div>
             {neighborhoods.length < 3 && (
               <Button size="sm" variant="outline" className="gap-1.5 h-7 text-xs" onClick={() => setOpen(true)}>
@@ -146,7 +146,7 @@ export function NeighborhoodSettingsCard() {
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="px-6 py-5">
+        <CardContent className="px-5">
           {isLoading ? (
             <div className="flex justify-center py-8">
               <Loader2 className="size-4 animate-spin text-muted-foreground" />

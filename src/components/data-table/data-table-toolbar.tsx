@@ -62,10 +62,8 @@ export function DataTableToolbar<TData>({
     setAddedFilters((prev) => prev.filter((id) => id !== fieldId))
   }
 
-  // filters already visible in the toolbar
   const visibleFilterIds = new Set(addedFilters)
 
-  // filters available to add from the dropdown (not yet in toolbar)
   const availableFilterFields = filterFields.filter(
     (f) => !visibleFilterIds.has(f.id)
   )

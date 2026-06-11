@@ -1,6 +1,10 @@
 import { Link } from "react-router-dom";
+import { useSeo } from "@/hooks/use-seo";
+import { getPageSeo } from "@/seo.config";
 
 export function TermsOfUsePage() {
+  useSeo(getPageSeo("termsOfUse"));
+
   return (
     <div className="min-h-screen bg-white flex items-center justify-center p-6">
       <div className="w-full max-w-3xl space-y-8">

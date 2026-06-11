@@ -44,12 +44,10 @@ export function CabinetBrandingCard() {
 
   const [accentColor, setAccentColor] = useState(cabinet?.accentColor ?? "#0058F3")
 
-  // banner
   const [selectedBanner, setSelectedBanner] = useState<File | null>(null)
   const [bannerPreview, setBannerPreview] = useState<string | null>(null)
   const bannerInputRef = useRef<HTMLInputElement>(null)
 
-  // logo
   const [selectedLogo, setSelectedLogo] = useState<File | null>(null)
   const [logoPreview, setLogoPreview] = useState<string | null>(null)
   const logoInputRef = useRef<HTMLInputElement>(null)
@@ -123,7 +121,7 @@ export function CabinetBrandingCard() {
     : `https://gabineteapp.com.br/${cabinet?.slug}`
 
   const widgetCode = cabinet
-    ? `<script src="${window.location.origin}/api/cabinets/${cabinet.slug}/widget.js"></script>`
+    ? `<script src="${import.meta.env.VITE_API_URL}/cabinets/${cabinet.slug}/widget.js"></script>`
     : ""
 
   const copyWidget = () => {
@@ -135,7 +133,7 @@ export function CabinetBrandingCard() {
 
   if (isLoading) {
     return (
-      <Card className="bg-card rounded-xl border border-border shadow-sm">
+      <Card>
         <CardContent className="flex items-center justify-center py-20">
           <Loader2 className="size-5 text-muted-foreground/30 animate-spin" />
         </CardContent>
@@ -148,10 +146,10 @@ export function CabinetBrandingCard() {
   const isSubmitting = isPending
 
   return (
-    <Card className="bg-card rounded-xl border border-border shadow-sm animate-in fade-in duration-300">
-      <CardHeader className="px-6 pt-5 pb-4 border-b border-border">
+    <Card className="animate-in fade-in duration-300">
+      <CardHeader className="border-b border-border/60 px-5">
         <div className="flex items-center gap-2">
-          <CardTitle className="text-base font-semibold text-foreground">
+          <CardTitle className="text-sm font-semibold text-foreground">
             Identidade Visual
           </CardTitle>
           <span className="bg-muted text-muted-foreground text-2xs font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0">
@@ -163,9 +161,8 @@ export function CabinetBrandingCard() {
         </CardDescription>
       </CardHeader>
 
-      <CardContent className="px-6 py-5 space-y-8">
+      <CardContent className="px-5 space-y-8">
 
-        {/* ── Logo ── */}
         <FieldGroup>
           <div className="flex items-center gap-2 mb-3">
             <ImageIcon className="size-4 text-muted-foreground" />
@@ -173,7 +170,6 @@ export function CabinetBrandingCard() {
           </div>
 
           <div className="flex items-start gap-4">
-            {/* Preview */}
             <div className="relative size-20 rounded-xl overflow-hidden border border-border bg-muted/30 shrink-0 flex items-center justify-center">
               {logoPreview || cabinet.logoUrl ? (
                 <img
@@ -199,7 +195,7 @@ export function CabinetBrandingCard() {
 
             <div className="flex flex-col gap-2 flex-1">
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Substitui o logo "Gabinete Digital" no cabeçalho do seu perfil público. Se não configurado, o logo padrão do sistema é exibido.
+                Substitui o logo "Gabinete App" no cabeçalho do seu perfil público. Se não configurado, o logo padrão do sistema é exibido.
               </p>
               <p className="text-xs text-muted-foreground">
                 Recomendado: formato horizontal, fundo transparente (PNG). Máx. 5 MB.
@@ -228,7 +224,6 @@ export function CabinetBrandingCard() {
           />
         </FieldGroup>
 
-        {/* ── Accent color ── */}
         <FieldGroup>
           <div className="flex items-center gap-2 mb-3">
             <Palette className="size-4 text-muted-foreground" />
@@ -273,7 +268,6 @@ export function CabinetBrandingCard() {
           </p>
         </FieldGroup>
 
-        {/* ── Banner ── */}
         <FieldGroup>
           <div className="flex items-center gap-2 mb-3">
             <Image className="size-4 text-muted-foreground" />
@@ -332,7 +326,6 @@ export function CabinetBrandingCard() {
           </p>
         </FieldGroup>
 
-        {/* ── QR Code ── */}
         <FieldGroup>
           <div className="flex items-center gap-2 mb-3">
             <QrCode className="size-4 text-muted-foreground" />
@@ -363,7 +356,6 @@ export function CabinetBrandingCard() {
           </div>
         </FieldGroup>
 
-        {/* ── Widget embed ── */}
         <FeatureGate feature={FEATURES.WIDGET} upgradePrompt upgradeClassName="mt-2">
           <FieldGroup>
             <div className="flex items-center gap-2 mb-3">
@@ -400,7 +392,7 @@ export function CabinetBrandingCard() {
         </FeatureGate>
       </CardContent>
 
-      <CardFooter className="px-6 py-4 border-t border-border flex items-center justify-between">
+      <CardFooter className="items-center justify-between border-t border-border/60 bg-transparent px-5 py-3">
         {isOwner ? (
           <Button
             type="button"
@@ -422,3 +414,4 @@ export function CabinetBrandingCard() {
     </Card>
   )
 }
+
