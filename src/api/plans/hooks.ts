@@ -99,6 +99,24 @@ export function useAdminCabinetSubscriptionHistory(cabinetId: string | null) {
   })
 }
 
+export function useAdminUpdateCabinetSubscriptionLimits() {
+  return useMutation({
+    mutationFn: ({
+      cabinetId,
+      data,
+    }: {
+      cabinetId: string
+      data: { priceInCents?: number | null; maxMembers?: number | null; maxDemands?: number | null; maxStorageBytes?: number | null }
+    }) => PlansApi.updateCabinetSubscriptionLimits(cabinetId, data),
+    onSuccess: (_, { cabinetId }) => {
+      queryClient.invalidateQueries({ queryKey: ["admin-cabinet-subscription", cabinetId] })
+      queryClient.invalidateQueries({ queryKey: ["admin-cabinet-subscriptions-summary"] })
+      toast.success("Limites atualizados com sucesso")
+    },
+    onError: () => toast.error("Erro ao atualizar limites"),
+  })
+}
+
 export function useAdminUpsertCabinetSubscription() {
   return useMutation({
     mutationFn: ({ cabinetId, planId }: { cabinetId: string; planId: string }) =>

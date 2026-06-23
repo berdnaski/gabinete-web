@@ -45,6 +45,10 @@ export interface CabinetSubscription {
   canceledAt: string | null
   createdAt: string
   plan: Plan
+  priceInCents: number | null
+  maxMembers: number | null
+  maxDemands: number | null
+  maxStorageBytes: number | null
 }
 
 export interface CabinetOverride {

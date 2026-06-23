@@ -7,8 +7,12 @@ import { CabinetEditSheet } from "./cabinet-edit-sheet"
 import { CabinetPlansSheet } from "./cabinet-plans-sheet"
 import { CabinetEnableButton, CabinetDisableButton } from "./cabinet-action-buttons"
 
+function formatPrice(cents: number) {
+  return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(cents / 100)
+}
+
 export function createCabinetsColumns(
-  subscriptionMap: Map<string, string>,
+  subscriptionMap: Map<string, { planName: string; priceInCents: number }>,
 ): ColumnDef<Cabinet>[] {
   return [
     {
@@ -50,11 +54,16 @@ export function createCabinetsColumns(
     {
       id: "plan",
       header: "Plano",
-      size: 130,
+      size: 160,
       cell: ({ row }) => {
-        const planName = subscriptionMap.get(row.original.id)
-        if (!planName) return <span className="text-xs text-muted-foreground/50">—</span>
-        return <span className="text-sm text-muted-foreground">{planName}</span>
+        const sub = subscriptionMap.get(row.original.id)
+        if (!sub) return <span className="text-xs text-muted-foreground/50">—</span>
+        return (
+          <div className="flex flex-col gap-0.5">
+            <span className="text-sm text-foreground">{sub.planName}</span>
+            <span className="text-xs text-muted-foreground font-mono">{formatPrice(sub.priceInCents)}</span>
+          </div>
+        )
       },
     },
     {

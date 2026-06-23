@@ -31,7 +31,7 @@ export function CabinetsTable() {
   const { data: subscriptionsSummary = [] } = useAdminCabinetSubscriptionsSummary()
 
   const subscriptionMap = useMemo(
-    () => new Map(subscriptionsSummary.map((s) => [s.cabinetId, s.planName])),
+    () => new Map(subscriptionsSummary.map((s) => [s.cabinetId, { planName: s.planName, priceInCents: s.priceInCents }])),
     [subscriptionsSummary],
   )
 
