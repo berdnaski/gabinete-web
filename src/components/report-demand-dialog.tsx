@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Loader2 } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
+import { getApiErrorMessage } from "@/lib/utils"
 
 interface ReportDemandDialogProps {
   demandId: string
@@ -36,15 +37,8 @@ export function ReportDemandDialog({ demandId, open, onOpenChange }: ReportDeman
           setReason("")
           onOpenChange(false)
         },
-        onError: (err: any) => {
-          const status = err?.response?.status
-          if (status === 409) {
-            toast.error("Você já denunciou esta demanda.")
-          } else if (status === 403) {
-            toast.error("Esta demanda foi revisada e não aceita novas denúncias.")
-          } else {
-            toast.error("Erro ao registrar denúncia. Tente novamente.")
-          }
+        onError: (err: unknown) => {
+          toast.error(getApiErrorMessage(err, "Erro ao registrar denúncia. Tente novamente."))
         },
       },
     )

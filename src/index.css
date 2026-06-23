@@ -33,6 +33,61 @@
   transform: translateY(-2px);
 }
 
+/* ── Problem section animations ── */
+@keyframes lp-msg-in {
+  0%   { opacity: 0; transform: translateY(8px) scale(0.96); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes lp-msg-bounce {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-2px); }
+}
+@keyframes lp-badge-pop {
+  0%   { transform: scale(0.5); opacity: 0; }
+  60%  { transform: scale(1.15); }
+  100% { transform: scale(1);   opacity: 1; }
+}
+@keyframes lp-card-slide {
+  0%   { opacity: 0; transform: translateX(-14px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+@keyframes lp-bar-grow {
+  0%   { width: 0; }
+  100% { width: var(--tw, 100%); }
+}
+@keyframes lp-pulse-ring {
+  0%   { box-shadow: 0 0 0 0 rgba(34,197,94,0.4); }
+  70%  { box-shadow: 0 0 0 8px rgba(34,197,94,0); }
+  100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+}
+@keyframes lp-blink-cursor {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+@keyframes lp-shake {
+  0%,100% { transform: translateX(0); }
+  20%     { transform: translateX(-3px); }
+  40%     { transform: translateX(3px); }
+  60%     { transform: translateX(-2px); }
+  80%     { transform: translateX(2px); }
+}
+@keyframes lp-status-cycle {
+  0%,30%  { opacity: 1; }
+  33%,99% { opacity: 0; }
+  100%    { opacity: 1; }
+}
+@keyframes lp-check-draw {
+  0%   { stroke-dashoffset: 20; opacity: 0; }
+  40%  { opacity: 1; }
+  100% { stroke-dashoffset: 0; }
+}
+@keyframes lp-notification-slide {
+  0%   { transform: translateY(-100%) translateX(0); opacity: 0; }
+  15%  { transform: translateY(0) translateX(0);    opacity: 1; }
+  80%  { transform: translateY(0) translateX(0);    opacity: 1; }
+  100% { transform: translateY(0) translateX(8px);  opacity: 0; }
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

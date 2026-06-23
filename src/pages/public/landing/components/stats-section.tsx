@@ -1,178 +1,68 @@
-import { useState, useEffect, useRef } from "react"
-import { TrendingUp, CheckCircle2, Star } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useInView } from "../hooks/use-in-view"
 
-function useCountUp(target: number, duration: number, active: boolean) {
-  const [value, setValue] = useState(0)
-  useEffect(() => {
-    if (!active) return
-    const t0 = Date.now()
-    const tick = () => {
-      const p = Math.min((Date.now() - t0) / duration, 1)
-      const eased = 1 - Math.pow(1 - p, 3)
-      setValue(Math.floor(eased * target))
-      if (p < 1) requestAnimationFrame(tick)
-    }
-    requestAnimationFrame(tick)
-  }, [target, duration, active])
-  return value
-}
+const STEPS = [
+  {
+    step: "01",
+    title: "Cadastre o gabinete em 15 minutos",
+    description: "Crie a conta, adicione a equipe e ative o portal público com o link do seu gabinete. Sem TI, sem instalação.",
+  },
+  {
+    step: "02",
+    title: "Cidadãos abrem demandas pelo portal",
+    description: "Cada solicitação chega organizada, com categoria e endereço. A equipe atribui um responsável direto no kanban.",
+  },
+  {
+    step: "03",
+    title: "Resolva e prove com dados",
+    description: "Cada resolução vira registro. O relatório mensal é gerado automaticamente. Pronto para a assessoria de imprensa.",
+  },
+]
 
 export function StatsSection() {
-  const [active, setActive] = useState(false)
-  const ref = useRef<HTMLElement>(null)
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setActive(true) },
-      { threshold: 0.15 },
-    )
-    if (ref.current) observer.observe(ref.current)
-    return () => observer.disconnect()
-  }, [])
-
-  const demands = useCountUp(1245, 1800, active)
-  const rate = useCountUp(88, 1400, active)
-  const satisfaction = useCountUp(48, 1200, active)
+  const { ref, visible } = useInView()
 
   return (
-    <section ref={ref} className="py-16 sm:py-28 bg-muted/20" id="impacto">
-      <div className="max-w-6xl mx-auto px-5 sm:px-8">
-        <div className="text-center mb-14">
-          <div className="inline-flex items-center gap-2 border border-border rounded-full px-3.5 py-1.5 mb-6 bg-background">
-            <span className="size-1.5 rounded-full bg-primary" />
-            <span className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground">
-              Impacto em números
-            </span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground mb-4 leading-[1.1]">
-            Prova de que funciona.
+    <section className="py-24 sm:py-32 bg-background border-t border-border" id="como-funciona-steps">
+      <div ref={ref} className="max-w-5xl mx-auto px-5 sm:px-8">
+        <div
+          className={cn(
+            "mb-16 transition-all duration-500",
+            visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
+          )}
+        >
+          <p className="text-xs font-bold uppercase tracking-[0.15em] text-primary mb-4">Como funciona</p>
+          <h2 className="text-4xl sm:text-5xl font-black tracking-tight text-foreground leading-[1.07] max-w-sm">
+            Três passos. Nenhum mistério.
           </h2>
-          <p className="text-base text-muted-foreground max-w-sm mx-auto leading-relaxed">
-            Dados reais de gabinetes que usam a plataforma hoje.
-          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div
-            className={cn(
-              "rounded-2xl border border-border bg-background p-5 sm:p-8 flex flex-col gap-6 shadow-sm transition-all duration-700",
-              active ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
-            )}
-          >
-            <div className="flex items-start justify-between">
-              <p className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground">
-                Demandas Resolvidas
-              </p>
-              <span className="inline-flex items-center gap-1 text-2xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5">
-                <TrendingUp className="size-3" />
-                +12%
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6">
+          {STEPS.map(({ step, title, description }, i) => (
+            <div
+              key={step}
+              className={cn(
+                "flex flex-col gap-6 transition-all duration-500",
+                visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6",
+              )}
+              style={{ transitionDelay: `${i * 110}ms` }}
+            >
+              <span
+                className="font-black leading-none select-none tabular-nums text-foreground"
+                style={{ fontSize: "5rem", opacity: 0.06 }}
+              >
+                {step}
               </span>
-            </div>
-            <div className="flex items-end gap-2 leading-none">
-              <span className="text-5xl sm:text-6xl font-bold text-foreground tabular-nums">
-                {demands.toLocaleString("pt-BR")}
-              </span>
-            </div>
-            <div className="flex flex-col gap-2 mt-auto">
-              <div className="h-2 rounded-full bg-muted overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-primary transition-all duration-[1800ms] ease-out"
-                  style={{ width: active ? "82%" : "0%" }}
-                />
-              </div>
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground">Meta anual</span>
-                <span className="font-semibold text-foreground">82% concluída</span>
-              </div>
-            </div>
-          </div>
-
-          <div
-            className={cn(
-              "rounded-2xl border border-border bg-background p-5 sm:p-8 flex flex-col gap-6 shadow-sm transition-all duration-700 delay-100",
-              active ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
-            )}
-          >
-            <div className="flex items-start justify-between">
-              <p className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground">
-                Taxa de Resolução
-              </p>
-              <span className="inline-flex items-center gap-1 text-2xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5">
-                <CheckCircle2 className="size-3" />
-                Meta
-              </span>
-            </div>
-            <div className="flex items-end gap-1.5 leading-none">
-              <span className="text-5xl sm:text-6xl font-bold text-foreground tabular-nums">{rate}</span>
-              <span className="text-2xl font-semibold text-muted-foreground mb-1">%</span>
-            </div>
-            <div className="flex flex-col gap-3 mt-auto">
-              <div className="flex items-center gap-3">
-                <span className="text-xs text-muted-foreground w-24 shrink-0">Plataforma</span>
-                <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
-                  <div
-                    className="h-full rounded-full bg-primary transition-all duration-[1400ms] ease-out"
-                    style={{ width: active ? "88%" : "0%" }}
-                  />
+              <div className="flex flex-col gap-2 -mt-10">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="size-2 rounded-full bg-primary shrink-0" />
+                  <div className="h-px flex-1 bg-border" />
                 </div>
-                <span className="text-xs font-bold text-foreground w-8 text-right">88%</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="text-xs text-muted-foreground w-24 shrink-0">Média do setor</span>
-                <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
-                  <div
-                    className="h-full rounded-full bg-muted-foreground/40 transition-all duration-[1200ms] ease-out"
-                    style={{ width: active ? "71%" : "0%" }}
-                  />
-                </div>
-                <span className="text-xs font-medium text-muted-foreground w-8 text-right">71%</span>
+                <h3 className="text-base font-bold text-foreground">{title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
               </div>
             </div>
-          </div>
-
-          <div
-            className={cn(
-              "rounded-2xl border border-border bg-background p-5 sm:p-8 flex flex-col gap-6 shadow-sm transition-all duration-700 delay-200",
-              active ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
-            )}
-          >
-            <div className="flex items-start justify-between">
-              <p className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground">
-                Satisfação Cidadã
-              </p>
-              <span className="text-xs text-muted-foreground">4.2k avaliações</span>
-            </div>
-            <div className="flex items-end gap-1.5 leading-none">
-              <span className="text-5xl sm:text-6xl font-bold text-foreground tabular-nums">
-                {(satisfaction / 10).toFixed(1)}
-              </span>
-              <span className="text-2xl font-semibold text-muted-foreground mb-1">/5</span>
-            </div>
-            <div className="flex items-center gap-1 mt-auto">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <Star
-                  key={star}
-                  className={cn(
-                    "size-7 text-amber-400 fill-amber-400 transition-opacity duration-300",
-                    !active && "opacity-0",
-                    active && star === 5 && "opacity-55",
-                  )}
-                  style={{ transitionDelay: `${700 + (star - 1) * 80}ms` }}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-5 flex items-center justify-between px-1">
-          <span className="text-xs text-muted-foreground">
-            Dados coletados dos gabinetes ativos na plataforma
-          </span>
-          <div className="flex items-center gap-1.5">
-            <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-xs text-muted-foreground">Ao vivo</span>
-          </div>
+          ))}
         </div>
       </div>
     </section>

@@ -1,8 +1,8 @@
-import Logo from "@/assets/logo.png"
+import Logo from "@/assets/logo-new.png"
 import { useAcceptInvitation, useGetInvitationByToken } from "@/api/cabinets/hooks"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/hooks/use-auth"
-import { cn } from "@/lib/utils"
+import { cn, getApiErrorMessage } from "@/lib/utils"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import {
@@ -19,6 +19,7 @@ import {
 import { useState } from "react"
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom"
 import { toast } from "sonner"
+import axios from "axios"
 
 const ROLE_LABELS = {
   OWNER: { label: "Responsável", icon: Crown, color: "text-amber-600", bg: "bg-amber-50 dark:bg-amber-950/30" },
@@ -46,9 +47,8 @@ export function AcceptInvite() {
           toast.success("Bem-vindo ao gabinete!")
         }, 1800)
       },
-      onError: (err: any) => {
-        const msg = err?.response?.data?.message ?? "Erro ao aceitar convite."
-        toast.error(msg)
+      onError: (err: unknown) => {
+        toast.error(getApiErrorMessage(err, "Erro ao aceitar convite."))
       },
     })
   }
@@ -107,9 +107,10 @@ function LoadingState() {
   )
 }
 
-function ErrorState({ error }: { error: any }) {
-  const isExpired = error?.response?.status === 400
-  const isNotFound = error?.response?.status === 404
+function ErrorState({ error }: { error: unknown }) {
+  const status = axios.isAxiosError(error) ? error.response?.status : undefined
+  const isExpired = status === 400
+  const isNotFound = status === 404
 
   return (
     <div className="flex flex-col items-center gap-4 py-4 text-center">

@@ -73,7 +73,7 @@ export function trackEvent(
 }
 
 /** Track "Começar grátis" CTA clicks with source context */
-export function trackCtaClick(location: "hero" | "cta_section" | "header" | "footer") {
+export function trackCtaClick(location: "hero" | "hero_waitlist" | "cta_section" | "cta_bottom_waitlist" | "header" | "footer") {
   trackEvent("cta_click", {
     event_category: "conversion",
     event_label: "Começar grátis",

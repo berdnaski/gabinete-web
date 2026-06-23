@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import Logo from "@/assets/logo.png";
+import Logo from "@/assets/logo-new.png";
 
 interface SplashScreenProps {
   onFinish: () => void;

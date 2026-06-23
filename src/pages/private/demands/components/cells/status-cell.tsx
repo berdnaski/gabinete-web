@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { CreateResultDialog } from "@/components/create-result-dialog"
 import { cn } from "@/lib/utils"
+import { toast } from "sonner"
 import type { Row } from "@tanstack/react-table"
 import { DEMAND_STATUS_CONFIG, STATUS_OPTIONS } from "../demand-utils"
 
@@ -65,6 +66,16 @@ export function StatusCell({ row }: { row: Row<Demand> }) {
           demand={demand}
           open={showCreateResult}
           onOpenChange={setShowCreateResult}
+          onCreated={() => {
+            updateStatus(
+              { id: demand.id, status: "RESOLVED" },
+              {
+                onSuccess: () => toast.success("Demanda finalizada!"),
+                onError: () =>
+                  toast.error("Resultado salvo, mas não foi possível finalizar. Atualize o status manualmente."),
+              },
+            )
+          }}
         />
       )}
     </>

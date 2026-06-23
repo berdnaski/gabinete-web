@@ -224,6 +224,14 @@ export function AppRouter() {
         />
       </Route>
 
+      {/* Landing page — dev preview only (production uses lp. subdomain) */}
+      {import.meta.env.DEV && (
+        <Route
+          path="/landing"
+          element={<Suspense fallback={<PageLoader />}><LandingPage /></Suspense>}
+        />
+      )}
+
       {/* Public cabinet profile — must be last so static routes take priority */}
       <Route
         path="/:slug"

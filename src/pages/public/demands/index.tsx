@@ -13,7 +13,7 @@ import { DemandsForm } from "@/pages/private/demands/components/demands-form";
 import { getFirstLettersFromNames } from "@/utils/get-first-letters-from-names";
 import { ChevronDown, LogOut } from "lucide-react";
 import { Link } from "react-router-dom";
-import Logo from "../../../assets/logo.png";
+import Logo from "../../../assets/logo-new.png";
 
 function PublicHeader() {
   const { isAuthenticated, user, logout } = useAuth();

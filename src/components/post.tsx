@@ -1,7 +1,7 @@
 import { useLikeDemand, useUnlinkDemand } from "@/api/demands/hooks"
 import type { Demand } from "@/api/demands/types"
 import { ReportDemandDialog } from "@/components/report-demand-dialog"
-import { Building2, ExternalLinkIcon, MapPinIcon, MessageCircle, MoreHorizontal, FlagIcon, Share2, ThumbsUp, Unlink, UserCheck } from "lucide-react"
+import { Building2, ExternalLinkIcon, MapPinIcon, MessageCircle, MoreHorizontal, FlagIcon, Share2, Star, ThumbsUp, Unlink, UserCheck } from "lucide-react"
 import type { ComponentProps } from "react"
 import { useEffect, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
@@ -205,6 +205,10 @@ export function Post({ demand, className, hideComment = false, showStatus = fals
         </div>
       )}
 
+      {user?.id && demand.reporterId === user.id && (
+        <SurveyInviteBanner demand={demand} />
+      )}
+
       {(likeCount > 0 || demand.commentsCount > 0) && (
         <div className="flex items-center gap-3 px-4 pb-2 text-xs text-muted-foreground">
           {likeCount > 0 && (
@@ -336,6 +340,41 @@ export function Post({ demand, className, hideComment = false, showStatus = fals
         </>
       )}
     </article>
+  )
+}
+
+function SurveyInviteBanner({ demand }: { demand: Demand }) {
+  if (demand.status !== "RESOLVED" || !demand.surveyToken) return null
+
+  if (demand.surveySubmittedAt) {
+    return (
+      <div className="mx-4 mb-3 flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 dark:border-emerald-800 dark:bg-emerald-950/30">
+        <Star className="size-3.5 shrink-0 fill-amber-400 text-amber-400" />
+        <p className="text-xs font-medium text-emerald-700 dark:text-emerald-300">
+          Você avaliou este atendimento
+          {demand.surveyRating ? ` com nota ${demand.surveyRating}/5` : ""}
+        </p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="mx-4 mb-3 flex items-center justify-between gap-3 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2.5">
+      <div className="flex min-w-0 items-center gap-2.5">
+        <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/10">
+          <Star className="size-3.5 text-primary" />
+        </span>
+        <div className="min-w-0">
+          <p className="text-xs font-semibold text-foreground">Sua demanda foi resolvida!</p>
+          <p className="text-xs text-muted-foreground">Conte como foi o atendimento do gabinete.</p>
+        </div>
+      </div>
+      <Button asChild size="sm" className="h-7 shrink-0 gap-1.5 text-xs" onClick={(e) => e.stopPropagation()}>
+        <Link to={`/pesquisa/${demand.surveyToken}`}>
+          Avaliar
+        </Link>
+      </Button>
+    </div>
   )
 }
 

@@ -1,15 +1,14 @@
 import { useState, useEffect } from "react"
-import { MessageCircle, Menu, X } from "lucide-react"
+import { Menu, X } from "lucide-react"
 import { cn } from "@/lib/utils"
-import logo from "@/assets/logo.png"
-import { APP_URL, WHATSAPP_URL } from "../constants"
+import logo from "@/assets/logo-new.png"
+import { WHATSAPP_URL } from "../constants"
 import { trackWhatsappClick } from "@/lib/analytics"
 
 const NAV_LINKS = [
-  { label: "Início", href: "#inicio" },
-  { label: "Como funciona", href: "#como-funciona" },
   { label: "Funcionalidades", href: "#funcionalidades" },
-  { label: "Gabinetes", href: "#gabinetes" },
+  { label: "Como funciona", href: "#como-funciona-steps" },
+  { label: "Depoimentos", href: "#depoimentos" },
   { label: "FAQ", href: "#faq" },
 ]
 
@@ -23,66 +22,64 @@ export function LandingHeader() {
     return () => window.removeEventListener("scroll", fn)
   }, [])
 
+  function scrollToWaitlist() {
+    document.getElementById("inicio")?.scrollIntoView({ behavior: "smooth" })
+    setOpen(false)
+  }
+
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm transition-shadow duration-200",
-        scrolled ? "shadow-sm" : "border-b border-border",
+        "fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm transition-all duration-200",
+        scrolled ? "shadow-sm border-b border-border" : "border-b border-transparent",
       )}
     >
-      <div className="max-w-7xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
-        <img src={logo} alt="Gabinete App" className="h-7 sm:h-8 w-auto shrink-0" />
+      <div className="max-w-5xl mx-auto px-5 sm:px-8 h-18 flex items-center justify-between gap-6">
+        <img src={logo} alt="Gabinete App" className="h-12 w-auto shrink-0" />
 
-        <nav className="hidden md:flex items-center gap-7">
+        <nav className="hidden lg:flex items-center gap-5 flex-1">
           {NAV_LINKS.map((link) => (
             <a
               key={link.label}
               href={link.href}
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-150 whitespace-nowrap"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap"
             >
               {link.label}
             </a>
           ))}
         </nav>
 
-        <div className="hidden md:flex items-center gap-1.5 shrink-0">
-          <a
-            href={`${APP_URL}/login`}
-            className="cursor-pointer text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-2 rounded-lg hover:bg-muted"
-          >
-            Entrar
-          </a>
+        <div className="hidden lg:flex items-center gap-2 shrink-0">
           <a
             href={WHATSAPP_URL}
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => trackWhatsappClick("header")}
-            className="cursor-pointer inline-flex items-center gap-2 border border-border rounded-lg px-4 py-2 text-sm font-semibold text-foreground hover:bg-muted transition-colors"
+            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-2 rounded-lg hover:bg-muted whitespace-nowrap"
           >
-            <MessageCircle className="size-4 text-muted-foreground" />
             Falar com o CEO
           </a>
-        </div>
-
-        <div className="flex md:hidden items-center gap-1">
-          <a
-            href={`${APP_URL}/login`}
-            className="cursor-pointer text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-2"
-          >
-            Entrar
-          </a>
           <button
-            onClick={() => setOpen((v) => !v)}
-            className="cursor-pointer p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-            aria-label={open ? "Fechar menu" : "Abrir menu"}
+            type="button"
+            onClick={scrollToWaitlist}
+            className="h-9 rounded-lg px-4 text-sm font-semibold text-primary-foreground bg-primary hover:opacity-90 transition-opacity whitespace-nowrap"
           >
-            {open ? <X className="size-5" /> : <Menu className="size-5" />}
+            Lista de espera
           </button>
         </div>
+
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          className="lg:hidden p-2 rounded-lg text-muted-foreground hover:bg-muted transition-colors"
+          aria-label={open ? "Fechar menu" : "Abrir menu"}
+        >
+          {open ? <X className="size-5" /> : <Menu className="size-5" />}
+        </button>
       </div>
 
       {open && (
-        <div className="md:hidden border-t border-border bg-background">
+        <div className="lg:hidden border-t border-border bg-background">
           <nav className="flex flex-col px-5 py-3">
             {NAV_LINKS.map((link) => (
               <a
@@ -94,17 +91,14 @@ export function LandingHeader() {
                 {link.label}
               </a>
             ))}
-            <div className="pt-4 pb-2">
-              <a
-                href={WHATSAPP_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => { setOpen(false); trackWhatsappClick("header_mobile") }}
-                className="cursor-pointer w-full inline-flex items-center justify-center gap-2 border border-border rounded-lg px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-muted transition-colors"
+            <div className="flex flex-col gap-2 pt-4 pb-2">
+              <button
+                type="button"
+                onClick={scrollToWaitlist}
+                className="w-full h-10 rounded-lg text-sm font-semibold text-primary-foreground bg-primary hover:opacity-90 transition-opacity"
               >
-                <MessageCircle className="size-4 text-muted-foreground" />
-                Falar com o CEO
-              </a>
+                Entrar na lista de espera
+              </button>
             </div>
           </nav>
         </div>
@@ -112,4 +106,3 @@ export function LandingHeader() {
     </header>
   )
 }
-

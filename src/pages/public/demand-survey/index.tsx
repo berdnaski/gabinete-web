@@ -1,11 +1,12 @@
 import { DemandsApi } from "@/api/demands"
+import { queryClient } from "@/api/queryClient"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { CheckCircle2, Loader2, Star } from "lucide-react"
 import { useState } from "react"
 import { useParams, Link } from "react-router-dom"
-import Logo from "@/assets/logo.png"
+import Logo from "@/assets/logo-new.png"
 
 export function DemandSurveyPage() {
   const { token } = useParams() as { token: string }
@@ -23,7 +24,12 @@ export function DemandSurveyPage() {
 
   const { mutateAsync: submit, isPending } = useMutation({
     mutationFn: () => DemandsApi.submitSurvey(token, rating, comment || undefined),
-    onSuccess: () => setSubmitted(true),
+    onSuccess: () => {
+      setSubmitted(true)
+      queryClient.invalidateQueries({ queryKey: ["demands"] })
+      queryClient.invalidateQueries({ queryKey: ["demands-infinite"] })
+      queryClient.invalidateQueries({ queryKey: ["my-demands"] })
+    },
   })
 
   if (isLoading) {
@@ -67,11 +73,16 @@ export function DemandSurveyPage() {
                 <span className="font-medium text-foreground">{survey.cabinetName}</span>{" "}
                 continue melhorando o atendimento.
               </p>
-              {survey.cabinetSlug && (
-                <Button asChild variant="outline" size="sm" className="mt-2">
-                  <Link to={`/${survey.cabinetSlug}`}>Ver perfil do gabinete</Link>
+              <div className="flex items-center justify-center gap-2 mt-2">
+                {survey.cabinetSlug && (
+                  <Button asChild variant="outline" size="sm">
+                    <Link to={`/${survey.cabinetSlug}`}>Ver perfil do gabinete</Link>
+                  </Button>
+                )}
+                <Button asChild size="sm">
+                  <Link to="/">Voltar ao início</Link>
                 </Button>
-              )}
+              </div>
             </div>
           ) : (
             <div className="space-y-6">

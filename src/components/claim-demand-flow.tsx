@@ -12,7 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { cn } from "@/lib/utils"
+import { cn, getApiErrorMessage } from "@/lib/utils"
 import { getFirstLettersFromNames } from "@/utils/get-first-letters-from-names"
 import { useAuth } from "@/hooks/use-auth"
 import { Building2, CheckCircle2, Loader2, ShieldAlert, UserCheck } from "lucide-react"
@@ -107,12 +107,8 @@ export function ClaimDemandFlow({ demand, open, onOpenChange }: ClaimDemandFlowP
         setClaimedId(demand.id)
         setStep("assign")
       },
-      onError: (err: any) => {
-        if (err?.status === 403) {
-          toast.error(err.message ?? "Limite de demandas atingido. Entre em contato com um Consultor para fazer upgrade.")
-        } else {
-          toast.error("Erro ao vincular demanda ao gabinete")
-        }
+      onError: (err: unknown) => {
+        toast.error(getApiErrorMessage(err, "Erro ao vincular demanda ao gabinete"))
       },
     })
   }

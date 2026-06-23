@@ -1,5 +1,5 @@
 import { apiClient } from "..";
-import type { Cabinet, CabinetInvitation, CabinetInvitationDetails, CabinetMember, CabinetMetrics, CabinetTrendDetailedPoint, CabinetTrendPoint } from "./types";
+import type { Cabinet, CabinetInvitation, CabinetInvitationDetails, CabinetMember, CabinetMetrics, CabinetSection, CabinetTrendDetailedPoint, CabinetTrendPoint } from "./types";
 import type { CabinetUsage } from "@/api/plans/types";
 
 const baseURL = "/cabinets";
@@ -116,6 +116,7 @@ export const CabinetsApi = {
     avatarFile?: File,
     bannerFile?: File,
     logoFile?: File,
+    biographyPhotoFile?: File,
   ): Promise<Cabinet> => {
     const formData = new FormData();
     if (data.name) formData.append("name", data.name);
@@ -128,9 +129,17 @@ export const CabinetsApi = {
     if (data.facebookUrl !== undefined) formData.append("facebookUrl", data.facebookUrl ?? "");
     if (data.websiteUrl !== undefined) formData.append("websiteUrl", data.websiteUrl ?? "");
     if (data.twitterUrl !== undefined) formData.append("twitterUrl", data.twitterUrl ?? "");
+    if (data.whatsappUrl !== undefined) formData.append("whatsappUrl", data.whatsappUrl ?? "");
+    if (data.youtubeUrl !== undefined) formData.append("youtubeUrl", data.youtubeUrl ?? "");
+    if (data.tiktokUrl !== undefined) formData.append("tiktokUrl", data.tiktokUrl ?? "");
+    if (data.heroTitle !== undefined) formData.append("heroTitle", data.heroTitle ?? "");
+    if (data.heroSubtitle !== undefined) formData.append("heroSubtitle", data.heroSubtitle ?? "");
+    if (data.heroVideoUrl !== undefined) formData.append("heroVideoUrl", data.heroVideoUrl ?? "");
+    if (data.biographyContent !== undefined) formData.append("biographyContent", data.biographyContent ?? "");
     if (avatarFile) formData.append("avatar", avatarFile);
     if (bannerFile) formData.append("banner", bannerFile);
     if (logoFile) formData.append("logo", logoFile);
+    if (biographyPhotoFile) formData.append("biographyPhoto", biographyPhotoFile);
 
     const response = await apiClient.patch<Cabinet>(`${baseURL}/${slug}`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
@@ -142,4 +151,15 @@ export const CabinetsApi = {
     const response = await apiClient.get<CabinetUsage>(`/cabinets/${slug}/usage`);
     return response.data;
   },
+
+  getSections: async (slug: string): Promise<CabinetSection[]> => {
+    const response = await apiClient.get<CabinetSection[]>(`/cabinets/${slug}/sections`);
+    return response.data;
+  },
+
+  updateSections: async (slug: string, sections: CabinetSection[]): Promise<CabinetSection[]> => {
+    const response = await apiClient.put<CabinetSection[]>(`/cabinets/${slug}/sections`, { sections });
+    return response.data;
+  },
+
 };

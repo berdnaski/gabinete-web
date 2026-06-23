@@ -23,6 +23,7 @@ import {
   TrendingUp,
 } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
+import { toast } from "sonner"
 
 const PRIORITY_STRIPE: Record<string, string> = {
   URGENT: "bg-red-500",
@@ -429,6 +430,7 @@ export function MyTasks() {
   const [progressDemand, setProgressDemand] = useState<Demand | null>(null)
   const [resultTargetDemand, setResultTargetDemand] = useState<Demand | null>(null)
   const [view, setView] = useState<"list" | "kanban">("list")
+  const { mutate: updateProgressAfterResult } = useUpdateDemandProgress()
 
   useEffect(() => {
     setTitle({ title: "Minhas Tarefas", description: "Demandas atribuídas a você" })
@@ -570,6 +572,16 @@ export function MyTasks() {
           demand={resultTargetDemand}
           open={!!resultTargetDemand}
           onOpenChange={(open) => !open && setResultTargetDemand(null)}
+          onCreated={() => {
+            updateProgressAfterResult(
+              { id: resultTargetDemand.id, status: DemandStatus.RESOLVED },
+              {
+                onSuccess: () => toast.success("Demanda finalizada!"),
+                onError: () =>
+                  toast.error("Resultado salvo, mas não foi possível finalizar. Atualize o status manualmente."),
+              },
+            )
+          }}
         />
       )}
     </>

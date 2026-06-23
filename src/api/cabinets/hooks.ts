@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CabinetsApi } from ".";
-import type { Cabinet } from "./types";
+import type { Cabinet, CabinetSection } from "./types";
 import { queryClient } from "../queryClient";
 
 export function useGetCabinets() {
@@ -74,13 +74,15 @@ export function useUpdateCabinet() {
       file,
       bannerFile,
       logoFile,
+      biographyPhotoFile,
     }: {
       slug: string;
       data: Partial<Cabinet>;
       file?: File;
       bannerFile?: File;
       logoFile?: File;
-    }) => CabinetsApi.update(slug, data, file, bannerFile, logoFile),
+      biographyPhotoFile?: File;
+    }) => CabinetsApi.update(slug, data, file, bannerFile, logoFile, biographyPhotoFile),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["cabinet", variables.slug] });
       queryClient.invalidateQueries({ queryKey: ["cabinets"] });
@@ -167,3 +169,23 @@ export function useCabinetUsage(slug: string | undefined) {
     staleTime: 30 * 1000,
   })
 }
+
+export function useGetCabinetSections(slug: string | undefined) {
+  return useQuery({
+    queryKey: ["cabinet-sections", slug],
+    queryFn: () => CabinetsApi.getSections(slug!),
+    enabled: !!slug,
+  });
+}
+
+export function useUpdateCabinetSections() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ slug, sections }: { slug: string; sections: CabinetSection[] }) =>
+      CabinetsApi.updateSections(slug, sections),
+    onSuccess: (_, variables) => {
+      qc.invalidateQueries({ queryKey: ["cabinet-sections", variables.slug] });
+    },
+  });
+}
+

@@ -11,7 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { useAuth } from "@/hooks/use-auth"
-import { cn, formatBytes } from "@/lib/utils"
+import { cn, formatBytes, getApiErrorMessage } from "@/lib/utils"
 import { FileTextIcon, ImageIcon, Loader2, X } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
@@ -25,9 +25,10 @@ interface CreateResultDialogProps {
   demand: Demand
   open: boolean
   onOpenChange: (open: boolean) => void
+  onCreated?: () => void
 }
 
-export function CreateResultDialog({ demand, open, onOpenChange }: CreateResultDialogProps) {
+export function CreateResultDialog({ demand, open, onOpenChange, onCreated }: CreateResultDialogProps) {
   const { cabinet } = useAuth()
   const { mutate, isPending } = useCreateResult()
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -98,13 +99,10 @@ export function CreateResultDialog({ demand, open, onOpenChange }: CreateResultD
         onSuccess: () => {
           toast.success("Resultado registrado com sucesso")
           onOpenChange(false)
+          onCreated?.()
         },
-        onError: (err: any) => {
-          if (err?.status === 403) {
-            toast.error(err.message ?? "Limite de armazenamento atingido. Entre em contato com um Consultor para fazer upgrade.")
-          } else {
-            toast.error("Erro ao registrar resultado")
-          }
+        onError: (err: unknown) => {
+          toast.error(getApiErrorMessage(err, "Erro ao registrar resultado"))
         },
       },
     )
@@ -128,7 +126,7 @@ export function CreateResultDialog({ demand, open, onOpenChange }: CreateResultD
         <div className="flex-1 overflow-y-auto">
           <form id="create-result-form" onSubmit={handleSubmit} className="px-5 py-4 flex flex-col gap-4">
 
-            {/* Title */}
+            
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-semibold text-foreground">
                 O que foi feito?
@@ -144,7 +142,7 @@ export function CreateResultDialog({ demand, open, onOpenChange }: CreateResultD
               />
             </div>
 
-            {/* Description */}
+            
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-semibold text-foreground">
                 Descreva com mais detalhes
@@ -166,7 +164,7 @@ export function CreateResultDialog({ demand, open, onOpenChange }: CreateResultD
               )}
             </div>
 
-            {/* Images */}
+            
             <div className="flex flex-col gap-2">
               <div className="flex items-center justify-between">
                 <label className="text-xs font-semibold text-foreground">
@@ -234,7 +232,7 @@ export function CreateResultDialog({ demand, open, onOpenChange }: CreateResultD
               />
             </div>
 
-            {/* Protocol */}
+            
             <div className="flex flex-col gap-2">
               <label className="text-xs font-semibold text-foreground">
                 Documento oficial

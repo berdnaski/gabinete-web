@@ -7,28 +7,28 @@ export type FaqItem = { q: string; a: string }
 
 export const FAQ_ITEMS: FaqItem[] = [
   {
-    q: "Quanto tempo leva para configurar o gabinete?",
-    a: "A configuração inicial leva menos de 15 minutos. Você cadastra os membros da equipe, define as categorias de demanda e já está pronto para receber os primeiros chamados.",
+    q: "Quando a plataforma vai ser lançada?",
+    a: "A beta fechada começa em 2025 com um grupo pequeno de gabinetes. Quem entra na lista de espera agora é notificado primeiro e tem acesso gratuito nos primeiros meses.",
   },
   {
-    q: "O sistema funciona para qualquer cargo eletivo?",
-    a: "Sim. Vereadores, deputados estaduais e federais, senadores e prefeituras usam a plataforma. O fluxo é adaptável ao tamanho e perfil de cada gabinete.",
+    q: "O que está incluído no acesso da beta?",
+    a: "Acesso completo à plataforma, suporte direto com o time e influência real sobre o que priorizamos. Os primeiros gabinetes moldam o produto.",
   },
   {
-    q: "Os cidadãos precisam instalar algum aplicativo?",
-    a: "Não. Os cidadãos abrem demandas por link público, WhatsApp ou e-mail. Não é necessário baixar nada ou criar conta.",
+    q: "O cidadão precisa instalar alguma coisa?",
+    a: "Não. O portal público funciona pelo navegador. Para registrar uma demanda, o cidadão só precisa do link do gabinete. Sem cadastro, sem app.",
   },
   {
-    q: "Como funciona o suporte?",
-    a: "Oferecemos suporte por chat e e-mail durante horário comercial. Gabinetes nos planos avançados têm acesso a um gerente de sucesso dedicado.",
+    q: "Funciona para qualquer cargo eletivo?",
+    a: "Sim. O fluxo é adaptável para vereadores, deputados estaduais e federais e senadores, independente do tamanho da equipe.",
   },
   {
-    q: "Os dados são seguros e privados?",
-    a: "Sim. Toda a plataforma segue a LGPD. Os dados ficam em servidores no Brasil, com criptografia em trânsito e em repouso. Você tem total controle sobre os dados do seu gabinete.",
+    q: "Como os dados ficam armazenados?",
+    a: "A plataforma segue a LGPD. Dados armazenados no Brasil, criptografados em trânsito e em repouso. Cada gabinete tem seus dados completamente isolados dos demais.",
   },
   {
-    q: "Existe período de teste gratuito?",
-    a: "Sim, 14 dias grátis com acesso completo a todas as funcionalidades. Sem cartão de crédito exigido para começar.",
+    q: "Quanto vai custar depois da beta?",
+    a: "Ainda definindo a precificação com base nos primeiros usuários. Quem entrar na beta terá condições especiais garantidas.",
   },
 ]
 
@@ -37,53 +37,63 @@ export function FAQSection() {
   const { ref, visible } = useInView()
 
   return (
-    <section className="py-16 sm:py-28 bg-muted/20" id="faq">
-      <div ref={ref} className="max-w-3xl mx-auto px-5 sm:px-8">
-        <div
-          className={cn(
-            "text-center mb-14 transition-all duration-700",
-            visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
-          )}
-        >
-          <div className="inline-flex items-center gap-2 border border-border rounded-full px-3.5 py-1.5 mb-6 bg-background">
-            <span className="size-1.5 rounded-full bg-primary" />
-            <span className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground">
-              FAQ
-            </span>
+    <section className="py-24 sm:py-32 bg-background border-t border-border" id="faq">
+      <div ref={ref} className="max-w-5xl mx-auto px-5 sm:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-12 lg:gap-24">
+          <div
+            className={cn(
+              "flex flex-col gap-4 lg:sticky lg:top-28 self-start transition-all duration-500",
+              visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
+            )}
+          >
+            <p className="text-xs font-bold uppercase tracking-[0.15em] text-primary">FAQ</p>
+            <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-foreground leading-[1.07]">
+              Dúvidas frequentes.
+            </h2>
+            <p className="text-sm text-muted-foreground leading-relaxed mt-1">
+              Não encontrou o que precisava? Fale pelo WhatsApp. Respondemos no mesmo dia.
+            </p>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground leading-[1.1]">
-            Perguntas frequentes.
-          </h2>
-        </div>
 
-        <div className="divide-y divide-border rounded-2xl border border-border overflow-hidden bg-background shadow-sm">
-          {FAQ_ITEMS.map((item, i) => (
-            <div key={i}>
-              <button
-                onClick={() => setOpenIdx(openIdx === i ? null : i)}
-                className={cn(
-                  "w-full flex items-center justify-between gap-4 px-5 py-4 text-left transition-colors duration-150",
-                  openIdx === i ? "bg-muted/30" : "hover:bg-muted/20",
-                )}
-              >
-                <span className="text-sm font-medium text-foreground">{item.q}</span>
-                <ChevronDown
+          <div
+            className={cn(
+              "flex flex-col transition-all duration-500 delay-100",
+              visible ? "opacity-100" : "opacity-0",
+            )}
+          >
+            {FAQ_ITEMS.map((item, i) => (
+              <div key={i} className="border-t border-border/50 last:border-b last:border-border/50">
+                <button
+                  type="button"
+                  onClick={() => setOpenIdx(openIdx === i ? null : i)}
+                  className="flex w-full items-start gap-4 py-6 text-left group"
+                  aria-expanded={openIdx === i}
+                >
+                  <span className="flex-1 text-sm font-semibold text-foreground group-hover:text-foreground/75 transition-colors leading-snug">
+                    {item.q}
+                  </span>
+                  <ChevronDown
+                    className={cn(
+                      "shrink-0 size-4 text-muted-foreground/40 transition-transform duration-200 mt-0.5",
+                      openIdx === i && "rotate-180 text-primary",
+                    )}
+                  />
+                </button>
+                <div
                   className={cn(
-                    "size-4 text-muted-foreground shrink-0 transition-transform duration-200",
-                    openIdx === i && "rotate-180",
+                    "grid transition-all duration-300 ease-out",
+                    openIdx === i ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
                   )}
-                />
-              </button>
-              <div
-                className={cn(
-                  "overflow-hidden transition-all duration-200 ease-out",
-                  openIdx === i ? "max-h-48" : "max-h-0",
-                )}
-              >
-                <p className="px-5 pb-5 pt-1 text-sm text-muted-foreground leading-relaxed">{item.a}</p>
+                >
+                  <div className="overflow-hidden">
+                    <p className="pb-6 text-sm text-muted-foreground leading-[1.85]">
+                      {item.a}
+                    </p>
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </section>

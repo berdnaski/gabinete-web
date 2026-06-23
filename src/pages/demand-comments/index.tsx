@@ -9,7 +9,7 @@ import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import { useAuth } from "@/hooks/use-auth"
 import { cn } from "@/lib/utils"
-import { Building2, CheckCircle2, MessageCircle, MessageCircleIcon, Send, TrendingUp } from "lucide-react"
+import { Building2, CheckCircle2, MessageCircle, MessageCircleIcon, Send, Star, TrendingUp } from "lucide-react"
 import { ResultEntry } from "./components/result-entry"
 import { useRef, useState } from "react"
 import { Link, useParams } from "react-router-dom"
@@ -127,6 +127,15 @@ export function DemandComments() {
 
             {isMyDemand && (
               <div className="flex items-center gap-2">
+                {demand.surveySubmittedAt && demand.surveyRating != null && (
+                  <span
+                    className="inline-flex h-7 items-center gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-2.5 text-xs font-medium text-amber-700 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-400"
+                    title="Avaliação do cidadão na pesquisa de satisfação"
+                  >
+                    <Star className="size-3.5 fill-amber-400 text-amber-400" />
+                    {demand.surveyRating}/5
+                  </span>
+                )}
                 {demand.guestPhone && (
                   <a
                     href={`https://wa.me/${demand.guestPhone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá! Estamos entrando em contato sobre sua demanda "${demand.title}". `)}`}

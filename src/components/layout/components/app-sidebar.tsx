@@ -35,7 +35,7 @@ import {
 import type { ReactNode } from "react"
 import { Link, useLocation } from "react-router-dom"
 import IconLogo from "../../../assets/icon.svg"
-import Logo from "../../../assets/logo.png"
+import Logo from "../../../assets/logo-new.png"
 import {
   Sidebar,
   SidebarContent,
@@ -186,7 +186,7 @@ export function AppSidebar() {
   return (
     <Sidebar variant="inset" collapsible="icon">
       <SidebarHeader className="gap-0 p-0">
-        <div className="flex items-center justify-between gap-2 border-b border-border/50 px-4 py-3 group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:px-2">
+        <div className="flex items-center justify-between gap-2 px-4 py-3 group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:px-2">
           <img src={Logo} alt="Gabinete App" className="w-32 group-data-[collapsible=icon]:hidden" />
           <img src={IconLogo} alt="" className="hidden size-7 group-data-[collapsible=icon]:block" />
           <SidebarTrigger className="text-muted-foreground/70 hover:text-foreground [&_svg]:stroke-[1.5]" />

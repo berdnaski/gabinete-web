@@ -1,628 +1,346 @@
-import type { CabinetMetrics, Cabinet } from "@/api/cabinets/types"
-import { useGetCabinetBySlug, useGetCabinetMembers, useGetCabinetMetrics } from "@/api/cabinets/hooks"
-import { useGetDemandsByCabinetSlug } from "@/api/demands/hooks"
-import { Loading } from "@/components/loading"
-import { Post } from "@/components/post"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
+import { useParams, Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import {
+  useGetCabinetBySlug,
+  useGetCabinetMetrics,
+  useGetCabinetSections,
+} from "@/api/cabinets/hooks";
+import { Button } from "@/components/ui/button";
+import { Building2, ChevronDown, LogIn, LogOut, Settings } from "lucide-react";
+import { PublicDemandForm } from "./public-demand-form";
+import Logo from "@/assets/logo-new.png";
+import { useAuth } from "@/hooks/use-auth";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { useAuth } from "@/hooks/use-auth"
-import { cn } from "@/lib/utils"
-import { getFirstLettersFromNames } from "@/utils/get-first-letters-from-names"
-import {
-  Building2,
-  ChevronDown,
-  ExternalLink,
-  Facebook,
-  FileText,
-  Instagram,
-  LogIn,
-  LogOut,
-  Mail,
-  MessageSquarePlus,
-  Settings,
-  ShieldCheck,
-  Twitter,
-} from "lucide-react"
-import { useState } from "react"
-import { Link, useParams } from "react-router-dom"
-import Logo from "@/assets/logo.png"
-import { PublicDemandForm } from "./public-demand-form"
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
 
-
-function AccountabilityBar({
-  metrics,
-  accent,
-}: {
-  metrics: CabinetMetrics | undefined
-  accent: string
-}) {
-  if (!metrics?.statusCounts) return null
-
-  const {
-    RESOLVED = 0,
-    IN_PROGRESS = 0,
-    IN_ANALYSIS = 0,
-    SUBMITTED = 0,
-    REJECTED = 0,
-    CANCELED = 0,
-  } = metrics.statusCounts
-
-  const total = RESOLVED + IN_PROGRESS + IN_ANALYSIS + SUBMITTED + REJECTED + CANCELED
-  if (total === 0) return null
-
-  const working = IN_PROGRESS + IN_ANALYSIS
-  const resolvedPct = (RESOLVED / total) * 100
-  const workingPct = (working / total) * 100
-
-  const resolvedColor =
-    resolvedPct >= 60 ? "#059669" : resolvedPct >= 30 ? "#d97706" : "#94a3b8"
-
-  return (
-    <div className="mt-5 pt-5 border-t border-border/40">
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-2xs font-semibold text-muted-foreground/70 uppercase tracking-widest">
-          Resolutividade do mandato
-        </span>
-        <span className="text-xs font-bold tabular-nums" style={{ color: resolvedColor }}>
-          {Math.round(resolvedPct)}% concluídas
-        </span>
-      </div>
-
-      <div className="relative h-2 w-full rounded-full bg-slate-100 dark:bg-muted overflow-hidden">
-        {RESOLVED > 0 && (
-          <div
-            className="absolute left-0 top-0 h-full transition-all duration-700"
-            style={{ width: `${resolvedPct}%`, backgroundColor: accent }}
-          />
-        )}
-        {working > 0 && (
-          <div
-            className="absolute top-0 h-full bg-amber-400 transition-all duration-700"
-            style={{ left: `${resolvedPct}%`, width: `${workingPct}%` }}
-          />
-        )}
-      </div>
-
-      <div className="flex items-center gap-5 mt-2.5">
-        <LegendDot color={accent} label={`${RESOLVED} resolvidas`} />
-        <LegendDot className="bg-amber-400" label={`${working} em andamento`} />
-        <LegendDot
-          className="bg-slate-200 dark:bg-muted-foreground/30"
-          label={`${SUBMITTED + REJECTED + CANCELED} outras`}
-        />
-      </div>
-    </div>
-  )
-}
-
-function LegendDot({
-  className,
-  color,
-  label,
-}: {
-  className?: string
-  color?: string
-  label: string
-}) {
-  return (
-    <span className="flex items-center gap-1.5 text-2xs text-muted-foreground">
-      <span
-        className={cn("size-1.5 rounded-full shrink-0", className)}
-        style={color ? { backgroundColor: color } : undefined}
-      />
-      {label}
-    </span>
-  )
-}
-
-// ─── Stats ────────────────────────────────────────────────────────────────────
-
-function StatItem({ value, label }: { value: number; label: string }) {
-  return (
-    <div className="flex-1 text-center py-1">
-      <p className="text-xl font-bold tabular-nums text-foreground leading-none">
-        {value.toLocaleString("pt-BR")}
-      </p>
-      <p className="text-xs text-muted-foreground mt-1">{label}</p>
-    </div>
-  )
-}
-
-function StatDivider() {
-  return <div className="w-px h-8 bg-border/50 shrink-0" />
-}
-
-// ─── Transparency score badge ─────────────────────────────────────────────────
-
-function TransparencyBadge({ score, accent }: { score: number; accent: string }) {
-  if (score === 0) return null
-  return (
-    <div
-      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-semibold"
-      style={{ borderColor: `${accent}40`, color: accent, backgroundColor: `${accent}10` }}
-    >
-      <ShieldCheck className="size-3.5 shrink-0" />
-      {score}% de resolutividade
-    </div>
-  )
-}
+// Sections
+import { HeroSection } from "./sections/hero-section";
+import { BiographySection } from "./sections/biography-section";
+import { StatsSection } from "./sections/stats-section";
+import { ResultsSection } from "./sections/results-section";
+import { DemandsCtaSection } from "./sections/demands-cta-section";
+import { ContactSection } from "./sections/contact-section";
+import { TestimonialsSection } from "./sections/testimonials-section";
+import { PrioritiesSection } from "./sections/priorities-section";
+import { FaqSection } from "./sections/faq-section";
+import { TimelineSection } from "./sections/timeline-section";
+import { GallerySection } from "./sections/gallery-section";
+import type { CabinetSection } from "@/api/cabinets/types";
 
 // ─── Header ───────────────────────────────────────────────────────────────────
 
-function ProfileHeader({ accent }: { accent: string }) {
-  const { isAuthenticated, user, logout } = useAuth()
+function ProfileHeader({ accent, cabinetName }: { accent: string; cabinetName?: string }) {
+  const { isAuthenticated, user, logout } = useAuth();
+  const [scrolled, setScrolled] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const initials = user?.name ? user.name.substring(0, 2).toUpperCase() : "U";
 
-  const initials = user?.name
-    ? user.name
-        .split(" ")
-        .slice(0, 2)
-        .map((w) => w[0])
-        .join("")
-        .toUpperCase()
-    : "U"
+  useEffect(() => {
+    function onScroll() {
+      const y = window.scrollY;
+      setScrolled(y > 40);
+      const docH = document.documentElement.scrollHeight - window.innerHeight;
+      setScrollProgress(docH > 0 ? Math.min((y / docH) * 100, 100) : 0);
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
-    <header className="fixed top-0 inset-x-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border/40">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-        <Link to="/" className="shrink-0">
-          <img src={Logo} alt="Gabinete App" className="w-24 sm:w-32" />
-        </Link>
+    <header
+      className={cn(
+        "fixed top-0 inset-x-0 z-50 transition-all duration-300",
+        scrolled
+          ? "bg-background/95 backdrop-blur-md border-b border-border/40 shadow-sm"
+          : "bg-transparent border-b border-transparent",
+      )}
+    >
+      {/* Scroll progress bar */}
+      <div
+        className="absolute bottom-0 left-0 h-0.5 transition-all duration-100"
+        style={{ width: `${scrollProgress}%`, backgroundColor: accent }}
+      />
 
-        {isAuthenticated ? (
-          <div className="flex items-center gap-2">
-            <Button asChild variant="ghost" size="sm" className="text-xs hidden sm:flex">
-              <Link to="/home">Ir para o app</Link>
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button
-                  type="button"
-                  className="flex items-center gap-1 p-1.5 rounded-full hover:bg-muted transition-colors focus:outline-none"
-                >
-                  <Avatar size="default">
-                    <AvatarImage src={user?.avatarUrl ?? undefined} />
-                    <AvatarFallback
-                      className="text-white font-semibold text-xs"
-                      style={{ backgroundColor: accent }}
-                    >
-                      {initials}
-                    </AvatarFallback>
-                  </Avatar>
-                  <ChevronDown className="size-3.5 text-muted-foreground" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48 mt-1 rounded-xl shadow-md">
-                <div className="px-3 py-2.5 border-b border-border/50">
-                  <p className="text-sm font-semibold truncate">{user?.name}</p>
-                  <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
-                </div>
-                <div className="p-1">
-                  <DropdownMenuItem asChild className="gap-2 rounded-lg">
-                    <Link to="/settings">
-                      <Settings className="size-4" />
-                      Configurações
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={logout}
-                    className="gap-2 rounded-lg text-red-500 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950/30"
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+        {/* Left */}
+        <div className="flex items-center gap-3 min-w-0">
+          <Link to="/" className="shrink-0">
+            <img
+              src={Logo}
+              alt="Gabinete App"
+              className={cn("transition-all duration-300", scrolled ? "w-24" : "w-28")}
+            />
+          </Link>
+          {cabinetName && scrolled && (
+            <div className="hidden sm:flex items-center gap-2 text-sm font-semibold text-foreground min-w-0">
+              <span className="text-border">·</span>
+              <span className="truncate">{cabinetName}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Right */}
+        <div className="flex items-center gap-2">
+          {isAuthenticated ? (
+            <>
+              <Button asChild variant="ghost" size="sm" className="hidden sm:flex text-xs font-medium">
+                <Link to="/home">Painel</Link>
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    className="flex items-center gap-1.5 rounded-full pl-1 pr-2 py-1 hover:bg-muted transition-colors focus:outline-none border border-border/50"
                   >
-                    <LogOut className="size-4" />
-                    Sair
-                  </DropdownMenuItem>
-                </div>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        ) : (
-          <div className="flex items-center gap-1.5">
-            <Button asChild variant="ghost" size="sm" className="text-xs gap-1.5">
-              <Link to="/login">
-                <LogIn className="size-3.5" />
-                Entrar
-              </Link>
-            </Button>
-            <Button
-              asChild
-              size="sm"
-              className="text-xs hidden sm:flex"
-              style={{ backgroundColor: accent }}
-            >
-              <Link to="/sign-up">Criar conta</Link>
-            </Button>
-          </div>
-        )}
+                    <Avatar size="sm">
+                      <AvatarImage src={user?.avatarUrl ?? undefined} />
+                      <AvatarFallback
+                        className="text-white text-xs font-semibold"
+                        style={{ backgroundColor: accent }}
+                      >
+                        {initials}
+                      </AvatarFallback>
+                    </Avatar>
+                    <ChevronDown className="size-3 text-muted-foreground" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48 mt-1 rounded-xl shadow-lg">
+                  <div className="px-3 py-2.5 border-b border-border/50">
+                    <p className="text-sm font-semibold truncate">{user?.name}</p>
+                    <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+                  </div>
+                  <div className="p-1">
+                    <DropdownMenuItem asChild className="gap-2 rounded-lg">
+                      <Link to="/settings">
+                        <Settings className="size-4" />
+                        Configurações
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={logout} className="gap-2 rounded-lg text-red-500">
+                      <LogOut className="size-4" />
+                      Sair
+                    </DropdownMenuItem>
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          ) : (
+            <>
+              <Button
+                asChild
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  "gap-1.5 text-sm font-medium transition-colors",
+                  !scrolled && "text-white hover:text-white hover:bg-white/10",
+                )}
+              >
+                <Link to="/login">
+                  <LogIn className="size-4" />
+                  Entrar
+                </Link>
+              </Button>
+              <Button
+                asChild
+                size="sm"
+                className="text-sm font-bold text-white shadow-md hover:scale-105 transition-transform"
+                style={{ backgroundColor: accent }}
+              >
+                <Link to="/sign-up">Criar conta</Link>
+              </Button>
+            </>
+          )}
+        </div>
       </div>
     </header>
-  )
+  );
 }
 
-// ─── Banner ───────────────────────────────────────────────────────────────────
+// ─── Skeleton ─────────────────────────────────────────────────────────────────
 
-function CabinetBanner({ cabinet, accent }: { cabinet: Cabinet; accent: string }) {
-  if (cabinet.bannerUrl) {
-    return (
-      <div className="relative w-full h-44 sm:h-56 md:h-72 lg:h-80 overflow-hidden">
-        <img
-          src={cabinet.bannerUrl}
-          alt={`Banner de ${cabinet.name}`}
-          className="w-full h-full object-cover object-center"
-        />
-        <div
-          className="absolute inset-0"
-          style={{
-            background: "linear-gradient(to bottom, transparent 60%, rgba(0,0,0,0.3) 100%)",
-          }}
-        />
-      </div>
-    )
-  }
-
+function PageSkeleton() {
   return (
-    <div
-      className="relative w-full h-44 sm:h-56 md:h-72 lg:h-80 overflow-hidden"
-      style={{
-        background: `linear-gradient(145deg, ${accent}dd 0%, ${accent} 60%, ${accent}bb 100%)`,
-      }}
-    >
-      <svg
-        className="absolute inset-0 w-full h-full"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-hidden="true"
-      >
-        <defs>
-          <pattern
-            id="diag"
-            x="0"
-            y="0"
-            width="48"
-            height="48"
-            patternUnits="userSpaceOnUse"
-            patternTransform="rotate(30)"
-          >
-            <line
-              x1="0"
-              y1="0"
-              x2="0"
-              y2="48"
-              stroke="white"
-              strokeWidth="0.5"
-              strokeOpacity="0.12"
-            />
-          </pattern>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#diag)" />
-      </svg>
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(ellipse 55% 70% at 25% 60%, rgba(255,255,255,0.07) 0%, transparent 70%)",
-        }}
-      />
+    <div className="min-h-screen bg-background">
+      <div className="h-16 border-b border-border/40" />
+      <div className="h-[92vh] bg-muted animate-pulse" />
+      <div className="max-w-5xl mx-auto px-4 py-20 flex flex-col gap-6">
+        <div className="h-8 w-56 rounded-xl bg-muted animate-pulse" />
+        <div className="h-4 w-full max-w-lg rounded-lg bg-muted/70 animate-pulse" />
+        <div className="h-4 w-full max-w-md rounded-lg bg-muted/70 animate-pulse" />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="h-28 rounded-2xl bg-muted/60 animate-pulse" />
+          ))}
+        </div>
+      </div>
     </div>
-  )
+  );
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export function PublicCabinetProfile() {
-  const { slug } = useParams() as { slug: string }
-  const { data: cabinet, isLoading } = useGetCabinetBySlug(slug)
-  const { data: metrics } = useGetCabinetMetrics(slug)
-  const { data: members } = useGetCabinetMembers(slug)
-  const { data: demandsData, isLoading: isLoadingDemands } = useGetDemandsByCabinetSlug({
-    slug,
-    page: 1,
-    limit: 20,
-  })
+  const { slug } = useParams() as { slug: string };
+  const { data: cabinet, isLoading: isCabinetLoading } = useGetCabinetBySlug(slug);
+  const { data: metrics } = useGetCabinetMetrics(slug);
+  const { data: sectionsData = [], isLoading: isSectionsLoading } = useGetCabinetSections(slug);
+  const [demandFormOpen, setDemandFormOpen] = useState(false);
 
-  const [demandFormOpen, setDemandFormOpen] = useState(false)
+  // SEO
+  useEffect(() => {
+    if (!cabinet) return;
+    const prev = document.title;
+    document.title = `${cabinet.name} · Gabinete Digital`;
+    const description =
+      cabinet.tagline || cabinet.description || `Página oficial do gabinete ${cabinet.name}.`;
+    const tags: { selector: string; attr: string; key: string; content: string }[] = [
+      { selector: 'meta[name="description"]', attr: "name", key: "description", content: description },
+      { selector: 'meta[property="og:title"]', attr: "property", key: "og:title", content: `${cabinet.name} · Gabinete Digital` },
+      { selector: 'meta[property="og:description"]', attr: "property", key: "og:description", content: description },
+    ];
+    for (const tag of tags) {
+      let el = document.head.querySelector<HTMLMetaElement>(tag.selector);
+      if (!el) {
+        el = document.createElement("meta");
+        el.setAttribute(tag.attr, tag.key);
+        document.head.appendChild(el);
+      }
+      el.content = tag.content;
+    }
+    return () => { document.title = prev; };
+  }, [cabinet]);
 
-  const demands = demandsData?.items ?? []
-  const membersList = members ?? []
-  const accent = cabinet?.accentColor ?? "#0058F3"
-
-  if (isLoading) {
-    return (
-      <>
-        <ProfileHeader accent={accent} />
-        <div className="flex justify-center items-center min-h-screen">
-          <Loading className="text-primary size-6" />
-        </div>
-      </>
-    )
-  }
+  if (isCabinetLoading || isSectionsLoading) return <PageSkeleton />;
 
   if (!cabinet) {
     return (
-      <>
-        <ProfileHeader accent={accent} />
-        <div className="max-w-2xl mx-auto flex flex-col items-center justify-center min-h-screen gap-4 px-4 text-center">
-          <div className="size-14 rounded-2xl bg-muted flex items-center justify-center">
-            <Building2 className="size-7 text-muted-foreground" />
-          </div>
-          <div>
-            <h1 className="text-lg font-bold text-foreground">Gabinete não encontrado</h1>
-            <p className="text-sm text-muted-foreground mt-1.5">
-              O gabinete{" "}
-              <span className="font-mono bg-muted px-1.5 py-0.5 rounded text-xs">@{slug}</span>{" "}
-              não existe ou foi desativado.
-            </p>
-          </div>
-          <Button asChild variant="outline" size="sm">
-            <Link to="/gabinetes">Ver todos os gabinetes</Link>
-          </Button>
+      <div className="flex flex-col items-center justify-center min-h-screen gap-5 px-4 text-center">
+        <div className="size-16 rounded-3xl bg-muted flex items-center justify-center">
+          <Building2 className="size-8 text-muted-foreground" />
         </div>
-      </>
-    )
+        <div>
+          <h1 className="text-2xl font-bold">Gabinete não encontrado</h1>
+          <p className="text-muted-foreground mt-2 max-w-sm mx-auto">
+            A página que você tentou acessar não existe ou está indisponível.
+          </p>
+        </div>
+        <Button asChild size="lg">
+          <Link to="/">Voltar para o início</Link>
+        </Button>
+      </div>
+    );
   }
 
-  const totalDemands = metrics?.total ?? cabinet.demand_count ?? 0
-  const resolvedCount = metrics?.statusCounts?.RESOLVED ?? cabinet.resolved_count ?? 0
-  const inProgressCount = metrics?.statusCounts?.IN_PROGRESS ?? cabinet.in_progress_count ?? 0
-  const score = cabinet.transparencyScore ?? 0
+  const accent = cabinet.accentColor || "#2563EB";
+  const score = cabinet.transparencyScore ?? 0;
+  const sections = [...sectionsData]
+    .filter((s) => s.enabled)
+    .sort((a, b) => a.sortOrder - b.sortOrder);
+
+  function renderSection(section: CabinetSection) {
+    switch (section.type) {
+      case "HERO":
+        return <HeroSection key={section.id} cabinet={cabinet!} section={section} accent={accent} onOpenForm={() => setDemandFormOpen(true)} />;
+      case "BIOGRAPHY":
+        return <BiographySection key={section.id} cabinet={cabinet!} section={section} accent={accent} />;
+      case "PRIORITIES":
+        return <PrioritiesSection key={section.id} section={section} accent={accent} />;
+      case "STATS":
+        return <StatsSection key={section.id} metrics={metrics} section={section} accent={accent} score={score} />;
+      case "DEMANDS_CTA":
+        return <DemandsCtaSection key={section.id} section={section} accent={accent} onOpenForm={() => setDemandFormOpen(true)} />;
+      case "RESULTS":
+        return <ResultsSection key={section.id} slug={cabinet!.slug} section={section} accent={accent} />;
+      case "TIMELINE":
+        return <TimelineSection key={section.id} section={section} accent={accent} />;
+      case "GALLERY":
+        return <GallerySection key={section.id} section={section} accent={accent} />;
+      case "FAQ":
+        return <FaqSection key={section.id} section={section} accent={accent} />;
+      case "CONTACT":
+        return <ContactSection key={section.id} cabinet={cabinet!} section={section} accent={accent} />;
+      case "TESTIMONIALS":
+        return <TestimonialsSection key={section.id} slug={cabinet!.slug} section={section} accent={accent} />;
+      default:
+        return null;
+    }
+  }
 
   return (
-    <>
-      <ProfileHeader accent={accent} />
+    <div className="min-h-screen bg-background font-sans">
+      <ProfileHeader accent={accent} cabinetName={cabinet.name} />
 
-      <div className="min-h-screen bg-muted/20 pt-14">
-        {/* ── Banner ── */}
-        <CabinetBanner cabinet={cabinet} accent={accent} />
-
-        <div className="max-w-3xl mx-auto px-4 sm:px-6">
-          {/* ── Avatar + CTA row ── */}
-          <div className="flex items-end justify-between -mt-12 sm:-mt-14 md:-mt-16 mb-4">
-            <Avatar className="size-24 sm:size-28 shrink-0 ring-[3px] ring-background shadow-xl">
-              <AvatarImage src={cabinet.logoUrl ?? cabinet.avatarUrl ?? undefined} className={cabinet.logoUrl ? "object-contain p-1 bg-white" : "object-cover"} />
-              <AvatarFallback
-                className="text-white font-bold text-2xl sm:text-3xl"
-                style={{ backgroundColor: accent }}
-              >
-                {getFirstLettersFromNames(cabinet.name)}
-              </AvatarFallback>
-            </Avatar>
-
-            <div className="mb-1.5 flex items-center gap-2">
-              <Button
-                size="sm"
-                onClick={() => setDemandFormOpen(true)}
-                className="text-xs font-semibold gap-1.5"
-                style={{ backgroundColor: accent, borderColor: accent }}
-              >
-                <MessageSquarePlus className="size-3.5" />
-                Enviar demanda
-              </Button>
-            </div>
-          </div>
-
-          {/* ── Profile card ── */}
-          <div className="bg-background rounded-2xl border border-border/40 shadow-sm px-5 sm:px-6 pb-6 pt-5">
+      <main className="pt-16 flex flex-col">
+        {sections.length > 0 ? (
+          sections.map(renderSection)
+        ) : (
+          <div className="flex flex-col items-center justify-center py-40 text-center gap-4 px-4">
+            <Building2 className="size-12 text-muted-foreground/30" />
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight leading-tight">
-                {cabinet.name}
-              </h1>
-              <p className="text-sm text-muted-foreground font-mono mt-0.5 tracking-tight">
-                @{cabinet.slug}
+              <p className="text-lg font-semibold text-foreground">Página em construção</p>
+              <p className="text-sm text-muted-foreground mt-1 max-w-xs mx-auto">
+                Este gabinete ainda não configurou sua página pública.
               </p>
-              {cabinet.tagline && (
-                <p className="text-sm font-medium mt-1.5" style={{ color: accent }}>
-                  {cabinet.tagline}
-                </p>
-              )}
             </div>
+          </div>
+        )}
+      </main>
 
-            {cabinet.description && (
-              <p className="text-sm text-foreground/75 mt-3 leading-relaxed">
-                {cabinet.description}
-              </p>
-            )}
-
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-3">
-              {cabinet.email && (
-                <a
-                  href={`mailto:${cabinet.email}`}
-                  className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <Mail className="size-3.5 shrink-0" />
-                  {cabinet.email}
-                </a>
-              )}
-              {cabinet.websiteUrl && (
-                <a
-                  href={cabinet.websiteUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <ExternalLink className="size-3.5 shrink-0" />
-                  Site oficial
-                </a>
-              )}
-              <TransparencyBadge score={score} accent={accent} />
-            </div>
-
-            {(cabinet.instagramUrl || cabinet.facebookUrl || cabinet.twitterUrl) && (
-              <div className="flex items-center gap-2 mt-2">
-                {cabinet.instagramUrl && (
-                  <a
-                    href={cabinet.instagramUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="size-7 rounded-full flex items-center justify-center border border-border/60 text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
-                    aria-label="Instagram"
-                  >
-                    <Instagram className="size-3.5" />
-                  </a>
+      {/* Footer */}
+      <footer className="border-t border-border/60 bg-background px-4 py-14">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8">
+            {/* Cabinet identity */}
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2.5">
+                {cabinet.avatarUrl && (
+                  <img src={cabinet.avatarUrl} alt="" className="size-7 rounded-lg object-cover" />
                 )}
-                {cabinet.facebookUrl && (
-                  <a
-                    href={cabinet.facebookUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="size-7 rounded-full flex items-center justify-center border border-border/60 text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
-                    aria-label="Facebook"
-                  >
-                    <Facebook className="size-3.5" />
-                  </a>
-                )}
-                {cabinet.twitterUrl && (
-                  <a
-                    href={cabinet.twitterUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="size-7 rounded-full flex items-center justify-center border border-border/60 text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
-                    aria-label="X / Twitter"
-                  >
-                    <Twitter className="size-3.5" />
-                  </a>
-                )}
+                <span className="text-sm font-bold text-foreground">{cabinet.name}</span>
               </div>
-            )}
+              <p className="text-xs text-muted-foreground leading-relaxed max-w-xs">
+                Página oficial gerenciada pelo Gabinete Digital — plataforma de transparência e participação cidadã.
+              </p>
+            </div>
 
-            <AccountabilityBar metrics={metrics} accent={accent} />
-
-            <div className="flex items-center mt-5 pt-5 border-t border-border/40">
-              <StatItem value={totalDemands} label="Demandas" />
-              <StatDivider />
-              <StatItem value={resolvedCount} label="Resolvidas" />
-              <StatDivider />
-              <StatItem value={inProgressCount} label="Em progresso" />
-              <StatDivider />
-              <StatItem value={membersList.length} label="Membros" />
+            {/* Platform link */}
+            <div className="flex flex-col items-start sm:items-end gap-2 shrink-0">
+              <Link to="/" className="opacity-50 hover:opacity-100 transition-opacity">
+                <img src={Logo} alt="Gabinete Digital" className="w-22" />
+              </Link>
+              <span className="text-xs text-muted-foreground">
+                &copy; {new Date().getFullYear()} Gabinete Digital
+              </span>
             </div>
           </div>
 
-          {/* ── Team ── */}
-          {membersList.length > 0 && (
-            <div className="mt-2.5 bg-background rounded-2xl border border-border/40 shadow-sm px-5 sm:px-6 py-4">
-              <p className="text-2xs font-semibold text-muted-foreground/70 uppercase tracking-widest mb-3">
-                Equipe
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {membersList.slice(0, 10).map((member) => (
-                  <div
-                    key={member.id}
-                    className={cn(
-                      "flex items-center gap-1.5 pl-1.5 pr-3 py-1 rounded-full border",
-                      member.role === "OWNER"
-                        ? "border-border/50 bg-muted/20"
-                        : "border-border/40 bg-muted/10",
-                    )}
-                    style={
-                      member.role === "OWNER"
-                        ? { borderColor: `${accent}30`, backgroundColor: `${accent}08` }
-                        : undefined
-                    }
-                  >
-                    <Avatar className="size-5 shrink-0">
-                      <AvatarImage src={member.userAvatarUrl ?? undefined} />
-                      <AvatarFallback
-                        className={cn("text-2xs font-bold")}
-                        style={
-                          member.role === "OWNER"
-                            ? { backgroundColor: accent, color: "#fff" }
-                            : undefined
-                        }
-                      >
-                        {getFirstLettersFromNames(member.userName)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="text-xs font-medium text-foreground/80 truncate max-w-25">
-                      {member.userName}
-                    </span>
-                    {member.role === "OWNER" && (
-                      <span
-                        className="text-2xs font-semibold shrink-0"
-                        style={{ color: accent }}
-                      >
-                        responsável
-                      </span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* ── Demands feed ── */}
-          <div className="mt-2.5 mb-16">
-            <div className="bg-background rounded-2xl border border-border/40 shadow-sm">
-              <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-border/40">
-                <div className="flex items-center gap-2">
-                  <h2 className="text-sm font-semibold text-foreground">Demandas públicas</h2>
-                  {!isLoadingDemands && (
-                    <span className="text-2xs font-semibold text-muted-foreground bg-muted rounded-full px-2 py-0.5 tabular-nums">
-                      {demandsData?.meta?.total ?? demands.length}
-                    </span>
-                  )}
-                </div>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="text-xs gap-1.5 h-7 px-3"
-                  onClick={() => setDemandFormOpen(true)}
-                >
-                  <MessageSquarePlus className="size-3" />
-                  Nova demanda
-                </Button>
-              </div>
-
-              <div className="p-4 sm:p-5">
-                {isLoadingDemands ? (
-                  <div className="flex justify-center py-10">
-                    <Loading className="text-primary size-5" />
-                  </div>
-                ) : demands.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-12 gap-3 text-center">
-                    <div className="size-12 rounded-full bg-muted flex items-center justify-center">
-                      <FileText className="size-5 text-muted-foreground" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-foreground">Sem demandas públicas</p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Este gabinete ainda não registrou demandas.
-                      </p>
-                    </div>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="text-xs mt-1"
-                      onClick={() => setDemandFormOpen(true)}
-                    >
-                      Registrar primeira demanda
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="flex flex-col gap-2.5">
-                    {demands.map((demand) => (
-                      <Post key={demand.id} demand={demand} showStatus />
-                    ))}
-                  </div>
-                )}
-              </div>
+          {/* Divider + bottom row */}
+          <div className="mt-10 pt-6 border-t border-border/40 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <p className="text-xs text-muted-foreground/60">
+              As informações e demandas exibidas são de responsabilidade do gabinete.
+            </p>
+            <div className="flex items-center gap-4 text-xs text-muted-foreground/60">
+              <Link to="/termos-de-uso" className="hover:text-foreground transition-colors">Termos de uso</Link>
+              <Link to="/politica-de-privacidade" className="hover:text-foreground transition-colors">Privacidade</Link>
             </div>
           </div>
         </div>
-      </div>
+      </footer>
 
-      {/* ── Demand form modal ── */}
       <PublicDemandForm
         open={demandFormOpen}
         onOpenChange={setDemandFormOpen}
         cabinet={cabinet}
         accent={accent}
       />
-    </>
-  )
+    </div>
+  );
 }
-

@@ -129,17 +129,6 @@ export function PersonalInfoCard() {
                   />
 
                   <div className="flex flex-col items-center gap-1.5 w-full">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="h-7 gap-1.5 text-xs"
-                      onClick={() => fileInputRef.current?.click()}
-                    >
-                      <Camera className="size-3.5" />
-                      Alterar foto
-                    </Button>
-
                     {hasAvatar && !removeAvatar && (
                       <Button
                         type="button"

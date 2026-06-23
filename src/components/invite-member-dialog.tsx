@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useAuth } from "@/hooks/use-auth"
-import { cn } from "@/lib/utils"
+import { cn, getApiErrorMessage } from "@/lib/utils"
 import { Crown, Shield } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
@@ -41,10 +41,8 @@ export function InviteMemberDialog({ open, onOpenChange }: InviteMemberDialogPro
           setRole("STAFF")
           onOpenChange(false)
         },
-        onError: (err: any) => {
-          const raw = err?.response?.data?.message ?? err?.message
-          const msg = (Array.isArray(raw) ? raw[0] : raw) || "Erro ao enviar convite. Tente novamente."
-          toast.error(msg)
+        onError: (err: unknown) => {
+          toast.error(getApiErrorMessage(err, "Erro ao enviar convite. Tente novamente."))
         },
       },
     )

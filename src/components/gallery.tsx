@@ -171,51 +171,57 @@ function GalleryGrid({ images, onOpen, className }: GalleryGridProps) {
   if (count === 1) {
     return (
       <div className={cn("w-full max-h-80 overflow-hidden", className)}>
-        <GridImage {...shared} index={0} className="w-full h-80" />
+        <GridImage {...shared} index={0} className="w-full max-h-80 aspect-video sm:aspect-auto sm:h-80" />
       </div>
     );
   }
 
   if (count === 2) {
     return (
-      <div className={cn("grid grid-cols-2 gap-1 rounded-lg overflow-hidden", className)}>
-        <GridImage {...shared} index={0} className="h-56" />
-        <GridImage {...shared} index={1} className="h-56" />
+      <div className={cn("grid grid-cols-2 gap-1 rounded-lg overflow-hidden h-40 sm:h-56", className)}>
+        <GridImage {...shared} index={0} className="h-full" />
+        <GridImage {...shared} index={1} className="h-full" />
       </div>
     );
   }
 
   if (count === 3) {
     return (
-      <div className={cn("grid grid-cols-2 gap-1 rounded-lg overflow-hidden", className)}>
-        <GridImage {...shared} index={0} className="row-span-2 h-56" />
-        <GridImage {...shared} index={1} className="h-28" />
-        <GridImage {...shared} index={2} className="h-28" />
+      <div className={cn("grid grid-cols-2 gap-1 rounded-lg overflow-hidden h-40 sm:h-56", className)}>
+        <GridImage {...shared} index={0} className="h-full" />
+        <div className="grid grid-rows-2 gap-1 h-full">
+          <GridImage {...shared} index={1} className="h-full" />
+          <GridImage {...shared} index={2} className="h-full" />
+        </div>
       </div>
     );
   }
 
   if (count === 4) {
     return (
-      <div className={cn("grid grid-cols-2 gap-1 rounded-lg overflow-hidden", className)}>
-        <GridImage {...shared} index={0} className="h-28" />
-        <GridImage {...shared} index={1} className="h-28" />
-        <GridImage {...shared} index={2} className="h-28" />
-        <GridImage {...shared} index={3} className="h-28" />
+      <div className={cn("grid grid-cols-2 gap-1 rounded-lg overflow-hidden h-40 sm:h-56", className)}>
+        <div className="grid grid-rows-2 gap-1 h-full">
+          <GridImage {...shared} index={0} className="h-full" />
+          <GridImage {...shared} index={1} className="h-full" />
+        </div>
+        <div className="grid grid-rows-2 gap-1 h-full">
+          <GridImage {...shared} index={2} className="h-full" />
+          <GridImage {...shared} index={3} className="h-full" />
+        </div>
       </div>
     );
   }
 
   return (
-    <div className={cn("grid grid-cols-2 gap-1 rounded-lg overflow-hidden", className)}>
-      <div className="grid grid-rows-2 gap-1">
-        <GridImage {...shared} index={0} className="h-28" />
-        <GridImage {...shared} index={1} className="h-28" />
+    <div className={cn("grid grid-cols-2 gap-1 rounded-lg overflow-hidden h-48 sm:h-[228px]", className)}>
+      <div className="grid grid-rows-2 gap-1 h-full">
+        <GridImage {...shared} index={0} className="h-full" />
+        <GridImage {...shared} index={1} className="h-full" />
       </div>
-      <div className="grid grid-rows-3 gap-1">
-        <GridImage {...shared} index={2} className="h-18" />
-        <GridImage {...shared} index={3} className="h-18" />
-        <GridImage {...shared} index={4} className="h-18" />
+      <div className="grid grid-rows-3 gap-1 h-full">
+        <GridImage {...shared} index={2} className="h-full" />
+        <GridImage {...shared} index={3} className="h-full" />
+        <GridImage {...shared} index={4} className="h-full" />
       </div>
     </div>
   );

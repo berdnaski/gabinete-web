@@ -6,6 +6,7 @@ import { CabinetInfoCard } from "./components/cabinet-info-card";
 import { CabinetBrandingCard } from "./components/cabinet-branding-card";
 import { SecurityCard } from "./components/security-card";
 import { NeighborhoodSettingsCard } from "./components/neighborhood-settings-card";
+import { CabinetPageBuilder } from "./components/cabinet-page-builder";
 import { useAuth } from "@/hooks/use-auth";
 import { User, Building2, Monitor, MapPin } from "lucide-react";
 import { UserRole } from "@/api/users/types";
@@ -19,6 +20,7 @@ const TAB_ICONS: Record<string, React.ElementType> = {
   cabinet: Building2,
   location: MapPin,
   system: Monitor,
+  "page-builder": Monitor,
 };
 
 export function Settings() {
@@ -35,7 +37,10 @@ export function Settings() {
   const tabs = useMemo(() => [
     { value: "profile", label: "Meu Perfil" },
     { value: "location", label: "Localização" },
-    ...(user?.isCabinetMember ? [{ value: "cabinet", label: "Meu Gabinete" }] : []),
+    ...(user?.isCabinetMember ? [
+      { value: "cabinet", label: "Meu Gabinete" },
+      { value: "page-builder", label: "Página Pública" }
+    ] : []),
   ], [user?.isCabinetMember]);
 
   return (
@@ -115,6 +120,10 @@ export function Settings() {
                 )}
                 <CabinetInfoCard />
                 <CabinetBrandingCard />
+              </TabsContent>
+
+              <TabsContent value="page-builder" className="space-y-4 outline-none focus-visible:ring-0 mt-0">
+                <CabinetPageBuilder />
               </TabsContent>
             </main>
           </div>

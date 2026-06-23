@@ -13,7 +13,15 @@ export interface Cabinet {
   facebookUrl?: string | null;
   websiteUrl?: string | null;
   twitterUrl?: string | null;
+  whatsappUrl?: string | null;
+  youtubeUrl?: string | null;
+  tiktokUrl?: string | null;
   email?: string;
+  heroTitle?: string | null;
+  heroSubtitle?: string | null;
+  heroVideoUrl?: string | null;
+  biographyContent?: string | null;
+  biographyPhotoUrl?: string | null;
   score: number;
   demand_count: number;
   in_progress_count: number;
@@ -76,4 +84,90 @@ export interface CabinetInvitationDetails {
   role: "OWNER" | "STAFF";
   cabinetName: string;
   expiresAt: string;
+}
+
+export type CabinetSectionType =
+  | 'HERO'
+  | 'BIOGRAPHY'
+  | 'PRIORITIES'
+  | 'STATS'
+  | 'RESULTS'
+  | 'TESTIMONIALS'
+  | 'NEWS'
+  | 'GALLERY'
+  | 'FAQ'
+  | 'ACTION_MAP'
+  | 'TIMELINE'
+  | 'DEMANDS_CTA'
+  | 'CONTACT';
+
+export interface CabinetSection {
+  id: string;
+  cabinetId: string;
+  type: CabinetSectionType;
+  title: string | null;
+  subtitle: string | null;
+  enabled: boolean;
+  sortOrder: number;
+  config: Record<string, any> | null;
+}
+
+export interface HeroSlide {
+  url: string;
+  caption?: string;
+}
+
+export interface HeroSectionConfig {
+  primaryCtaLabel?: string;
+  secondaryCtaLabel?: string;
+  showStats?: boolean;
+  slides?: HeroSlide[];
+}
+
+export interface FaqItem {
+  question: string;
+  answer: string;
+}
+
+export interface FaqSectionConfig {
+  items: FaqItem[];
+}
+
+export interface TimelineItem {
+  date: string;
+  title: string;
+  description?: string;
+}
+
+export interface TimelineSectionConfig {
+  items: TimelineItem[];
+}
+
+export interface PriorityItem {
+  title: string;
+  description?: string;
+}
+
+export interface PrioritiesSectionConfig {
+  items: PriorityItem[];
+}
+
+export interface GalleryImage {
+  url: string;
+  caption?: string;
+}
+
+export interface GallerySectionConfig {
+  images: GalleryImage[];
+}
+
+export interface TestimonialItem {
+  authorName: string;
+  authorRole?: string;
+  text: string;
+  rating: number;
+}
+
+export interface TestimonialsSectionConfig {
+  items: TestimonialItem[];
 }

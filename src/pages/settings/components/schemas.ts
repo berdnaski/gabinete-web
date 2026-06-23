@@ -26,6 +26,13 @@ export const cabinetInfoSchema = z.object({
   facebookUrl: optionalUrl,
   websiteUrl: optionalUrl,
   twitterUrl: optionalUrl,
+  whatsappUrl: optionalUrl,
+  youtubeUrl: optionalUrl,
+  tiktokUrl: optionalUrl,
+  heroTitle: z.string().max(120, "Máximo 120 caracteres").optional(),
+  heroSubtitle: z.string().max(300, "Máximo 300 caracteres").optional(),
+  heroVideoUrl: optionalUrl,
+  biographyContent: z.string().max(5000, "Máximo 5000 caracteres").optional(),
 });
 
 export interface CabinetInfoData {
@@ -38,6 +45,13 @@ export interface CabinetInfoData {
   facebookUrl?: string;
   websiteUrl?: string;
   twitterUrl?: string;
+  whatsappUrl?: string;
+  youtubeUrl?: string;
+  tiktokUrl?: string;
+  heroTitle?: string;
+  heroSubtitle?: string;
+  heroVideoUrl?: string;
+  biographyContent?: string;
 }
 
 export const changePasswordSchema = z.object({

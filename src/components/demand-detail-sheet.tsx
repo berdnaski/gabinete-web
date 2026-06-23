@@ -1,6 +1,6 @@
 import type { Demand } from "@/api/demands/types"
 import { useDeleteResult, useGetDemandResults, useUploadResultProtocol } from "@/api/results/hooks"
-import { useUnlinkDemand } from "@/api/demands/hooks"
+import { useUnlinkDemand, useUpdateDemandProgress } from "@/api/demands/hooks"
 import type { Result, ResultType } from "@/api/results/types"
 import { CreateResultDialog } from "./create-result-dialog"
 import { DemandStatusBadge } from "./demand-status-badge"
@@ -18,7 +18,7 @@ import {
 
 import { useAuth } from "@/hooks/use-auth"
 import { useCurrentMember } from "@/hooks/use-current-member"
-import { cn, formatBytes } from "@/lib/utils"
+import { cn, formatBytes, getApiErrorMessage } from "@/lib/utils"
 import { getFirstLettersFromNames } from "@/utils/get-first-letters-from-names"
 import { formatDateToNow } from "@/utils/date"
 import {
@@ -74,8 +74,10 @@ export function DemandDetailSheet({
   const { currentMember } = useCurrentMember()
   const [progressOpen, setProgressOpen] = useState(false)
   const [resultOpen, setResultOpen] = useState(false)
+  const [resolveAfterResult, setResolveAfterResult] = useState(false)
   const [unlinkConfirm, setUnlinkConfirm] = useState(false)
   const { mutate: unlinkDemand, isPending: isUnlinking } = useUnlinkDemand()
+  const { mutate: updateProgress } = useUpdateDemandProgress()
 
   const {
     data: resultsData,
@@ -346,7 +348,10 @@ export function DemandDetailSheet({
           hasResults={results.length > 0}
           open={progressOpen}
           onOpenChange={setProgressOpen}
-          onNeedsResults={() => setResultOpen(true)}
+          onNeedsResults={() => {
+            setResolveAfterResult(true)
+            setResultOpen(true)
+          }}
           onSuccess={() => onOpenChange(false)}
         />
       )}
@@ -355,7 +360,25 @@ export function DemandDetailSheet({
         <CreateResultDialog
           demand={demand}
           open={resultOpen}
-          onOpenChange={setResultOpen}
+          onOpenChange={(open) => {
+            setResultOpen(open)
+            if (!open) setResolveAfterResult(false)
+          }}
+          onCreated={() => {
+            if (!resolveAfterResult) return
+            setResolveAfterResult(false)
+            updateProgress(
+              { id: demand.id, status: "RESOLVED" },
+              {
+                onSuccess: () => {
+                  toast.success("Demanda finalizada!")
+                  onOpenChange(false)
+                },
+                onError: () =>
+                  toast.error("Resultado salvo, mas não foi possível finalizar. Atualize o status manualmente."),
+              },
+            )
+          }}
         />
       )}
 
@@ -458,12 +481,8 @@ function ResultCard({ result, canDelete }: { result: Result; canDelete?: boolean
       { id: result.id, file },
       {
         onSuccess: () => toast.success("Protocolo anexado com sucesso"),
-        onError: (err: any) => {
-          if (err?.status === 403) {
-            toast.error(err.message ?? "Limite de armazenamento atingido. Entre em contato com um Consultor para fazer upgrade.")
-          } else {
-            toast.error("Erro ao anexar protocolo")
-          }
+        onError: (err: unknown) => {
+          toast.error(getApiErrorMessage(err, "Erro ao anexar protocolo"))
         },
       },
     )
