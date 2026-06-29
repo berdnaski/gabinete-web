@@ -1,10 +1,12 @@
 import { FEATURES } from "@/api/plans/features"
 import { FeatureGate } from "@/components/feature-gate"
+import { RequireActiveSubscription } from "@/components/require-active-subscription"
 import { useGetCabinetReport } from "@/api/demands/hooks"
 import type { CabinetReport, DemandStatus as DemandStatusType } from "@/api/demands/types"
 import { DemandStatus } from "@/api/demands/types"
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart"
 import { useAuth } from "@/hooks/use-auth"
+import { useCabinetFeatures } from "@/hooks/use-cabinet-features"
 import { usePageTitle } from "@/hooks/use-page-title"
 import { cn } from "@/lib/utils"
 import { format, subDays, subMonths, subYears, parseISO } from "date-fns"
@@ -131,6 +133,7 @@ function exportCSV(report: CabinetReport, cabinetName: string) {
 export function Reports() {
   const { setTitle } = usePageTitle()
   const { cabinet } = useAuth()
+  const { plans } = useCabinetFeatures()
 
   useEffect(() => {
     setTitle({ title: "Relatórios" })
@@ -142,7 +145,7 @@ export function Reports() {
     slug: cabinet?.slug ?? "",
     startDate: dates.startDate,
     endDate: dates.endDate,
-    enabled: !!cabinet?.slug,
+    enabled: !!cabinet?.slug && (plans?.subscription.hasActiveSubscription ?? false),
   })
 
   const trendData = useMemo(() => {
@@ -154,315 +157,317 @@ export function Reports() {
   }, [report])
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8 space-y-8" id="report-print-root">
-      <div className="report-print-header hidden items-center justify-between pb-4 border-b border-border mb-6">
-        <div>
-          <h1 className="text-lg font-bold text-foreground">{cabinet?.name ?? "Gabinete"}</h1>
-          <p className="text-xs text-muted-foreground">Relatório de Demandas</p>
-        </div>
-        {report && (
-          <p className="text-xs text-muted-foreground">
-            {formatPeriodLabel(report.period.start, report.period.end)}
-          </p>
-        )}
-      </div>
-
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-semibold text-foreground">Relatórios</h1>
+    <RequireActiveSubscription>
+      <div className="max-w-4xl mx-auto px-4 py-8 space-y-8" id="report-print-root">
+        <div className="report-print-header hidden items-center justify-between pb-4 border-b border-border mb-6">
+          <div>
+            <h1 className="text-lg font-bold text-foreground">{cabinet?.name ?? "Gabinete"}</h1>
+            <p className="text-xs text-muted-foreground">Relatório de Demandas</p>
+          </div>
           {report && (
-            <p className="text-xs text-muted-foreground mt-0.5">
+            <p className="text-xs text-muted-foreground">
               {formatPeriodLabel(report.period.start, report.period.end)}
             </p>
           )}
         </div>
-        {report && (
-          <div className="report-controls flex items-center gap-2">
-            <FeatureGate feature={FEATURES.CSV_EXPORT}>
+
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-xl font-semibold text-foreground">Relatórios</h1>
+            {report && (
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {formatPeriodLabel(report.period.start, report.period.end)}
+              </p>
+            )}
+          </div>
+          {report && (
+            <div className="report-controls flex items-center gap-2">
+              <FeatureGate feature={FEATURES.CSV_EXPORT}>
+                <button
+                  onClick={() => exportCSV(report, cabinet?.name ?? "gabinete")}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted/60 transition-colors shrink-0"
+                >
+                  <Download className="size-3.5" />
+                  CSV
+                </button>
+              </FeatureGate>
               <button
-                onClick={() => exportCSV(report, cabinet?.name ?? "gabinete")}
+                onClick={() => window.print()}
                 className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted/60 transition-colors shrink-0"
               >
-                <Download className="size-3.5" />
-                CSV
+                <FileDown className="size-3.5" />
+                PDF
               </button>
-            </FeatureGate>
+            </div>
+          )}
+        </div>
+
+        <div className="report-controls inline-flex items-center rounded-lg border border-border bg-muted/30 p-0.5 gap-0.5">
+          {PERIODS.map(p => (
             <button
-              onClick={() => window.print()}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted/60 transition-colors shrink-0"
+              key={p.key}
+              onClick={() => setPeriod(p.key)}
+              className={cn(
+                "rounded-md px-3 py-1.5 text-xs font-medium transition-all",
+                period === p.key
+                  ? "bg-background text-foreground shadow-sm border border-border/60"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
             >
-              <FileDown className="size-3.5" />
-              PDF
+              {p.label}
             </button>
+          ))}
+        </div>
+
+        {isLoading && (
+          <div className="flex items-center justify-center py-24">
+            <Loader2 className="size-5 animate-spin text-muted-foreground" />
           </div>
         )}
-      </div>
 
-      <div className="report-controls inline-flex items-center rounded-lg border border-border bg-muted/30 p-0.5 gap-0.5">
-        {PERIODS.map(p => (
-          <button
-            key={p.key}
-            onClick={() => setPeriod(p.key)}
-            className={cn(
-              "rounded-md px-3 py-1.5 text-xs font-medium transition-all",
-              period === p.key
-                ? "bg-background text-foreground shadow-sm border border-border/60"
-                : "text-muted-foreground hover:text-foreground",
-            )}
-          >
-            {p.label}
-          </button>
-        ))}
-      </div>
+        {report && !isLoading && (
+          <div className="space-y-6">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-border rounded-xl overflow-hidden border border-border">
+              <KpiCard label="Recebidas" value={report.summary.totalInPeriod} />
+              <KpiCard
+                label="Resolvidas"
+                value={report.summary.resolvedInPeriod}
+                sub={report.summary.resolutionRate > 0 ? `${report.summary.resolutionRate}% do total` : undefined}
+                accent="emerald"
+              />
+              <KpiCard
+                label="Em aberto"
+                value={report.summary.openCount}
+                accent={report.summary.openCount > 0 ? "amber" : undefined}
+              />
+              <KpiCard
+                label="Resultados"
+                value={report.resultsInPeriod}
+                icon={<CheckCircle2 className="size-3.5 text-emerald-500" />}
+              />
+            </div>
 
-      {isLoading && (
-        <div className="flex items-center justify-center py-24">
-          <Loader2 className="size-5 animate-spin text-muted-foreground" />
-        </div>
-      )}
-
-      {report && !isLoading && (
-        <div className="space-y-6">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-border rounded-xl overflow-hidden border border-border">
-            <KpiCard label="Recebidas" value={report.summary.totalInPeriod} />
-            <KpiCard
-              label="Resolvidas"
-              value={report.summary.resolvedInPeriod}
-              sub={report.summary.resolutionRate > 0 ? `${report.summary.resolutionRate}% do total` : undefined}
-              accent="emerald"
-            />
-            <KpiCard
-              label="Em aberto"
-              value={report.summary.openCount}
-              accent={report.summary.openCount > 0 ? "amber" : undefined}
-            />
-            <KpiCard
-              label="Resultados"
-              value={report.resultsInPeriod}
-              icon={<CheckCircle2 className="size-3.5 text-emerald-500" />}
-            />
-          </div>
-
-          {report.byStatus.length > 0 && (
-            <ReportSection number="01" title="Distribuição por status">
-              <div className="space-y-2.5">
-                {report.byStatus
-                  .sort((a, b) => b.count - a.count)
-                  .map((s, i) => {
-                    const cfg = STATUS_CONFIG[s.status]
-                    return (
-                      <DistBar
-                        key={s.status}
-                        label={cfg?.label ?? s.status}
-                        count={s.count}
-                        percentage={s.percentage}
-                        color={cfg?.bg ?? "bg-muted-foreground/40"}
-                        total={report.summary.totalInPeriod}
-                        index={i}
-                      />
-                    )
-                  })}
-              </div>
-            </ReportSection>
-          )}
-
-          {report.byPriority.length > 0 && (
-            <ReportSection number="02" title="Distribuição por prioridade">
-              <div className="space-y-2.5">
-                {report.byPriority
-                  .sort((a, b) => b.count - a.count)
-                  .map((p, i) => {
-                    const cfg = PRIORITY_CONFIG[p.priority]
-                    return (
-                      <DistBar
-                        key={p.priority}
-                        label={cfg?.label ?? p.priority}
-                        count={p.count}
-                        percentage={p.percentage}
-                        color={cfg?.bg ?? "bg-muted-foreground/40"}
-                        total={report.summary.totalInPeriod}
-                        index={i}
-                      />
-                    )
-                  })}
-              </div>
-            </ReportSection>
-          )}
-
-          {report.byCategory.length > 0 && (
-            <ReportSection number="03" title="Por categoria">
-              <div className="space-y-2">
-                {report.byCategory.map((c, i) => (
-                  <div key={c.id} className="flex items-center gap-3">
-                    <span className="text-xs tabular-nums text-muted-foreground/50 w-4 shrink-0">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between gap-2 mb-1">
-                        <span className="text-sm text-foreground truncate">{c.name}</span>
-                        <span className="text-xs tabular-nums text-muted-foreground shrink-0">
-                          {c.count} · {c.percentage}%
-                        </span>
-                      </div>
-                      <div className="h-2 rounded-full bg-muted overflow-hidden">
-                        <motion.div
-                          className="h-full rounded-full bg-primary/70"
-                          initial={{ width: 0 }}
-                          animate={{ width: `${c.percentage}%` }}
-                          transition={{ duration: 0.55, ease: "easeOut", delay: 0.1 + i * 0.04 }}
+            {report.byStatus.length > 0 && (
+              <ReportSection number="01" title="Distribuição por status">
+                <div className="space-y-2.5">
+                  {report.byStatus
+                    .sort((a, b) => b.count - a.count)
+                    .map((s, i) => {
+                      const cfg = STATUS_CONFIG[s.status]
+                      return (
+                        <DistBar
+                          key={s.status}
+                          label={cfg?.label ?? s.status}
+                          count={s.count}
+                          percentage={s.percentage}
+                          color={cfg?.bg ?? "bg-muted-foreground/40"}
+                          total={report.summary.totalInPeriod}
+                          index={i}
                         />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </ReportSection>
-          )}
+                      )
+                    })}
+                </div>
+              </ReportSection>
+            )}
 
-          {report.byNeighborhood.length > 0 && (
-            <ReportSection number="04" title="Bairros com mais demandas">
-              <div className="space-y-1.5">
-                {report.byNeighborhood.map((n, i) => {
-                  const max = report.byNeighborhood[0].count
-                  const pct = Math.round((n.count / max) * 100)
-                  return (
-                    <div key={n.neighborhood} className="flex items-center gap-3">
+            {report.byPriority.length > 0 && (
+              <ReportSection number="02" title="Distribuição por prioridade">
+                <div className="space-y-2.5">
+                  {report.byPriority
+                    .sort((a, b) => b.count - a.count)
+                    .map((p, i) => {
+                      const cfg = PRIORITY_CONFIG[p.priority]
+                      return (
+                        <DistBar
+                          key={p.priority}
+                          label={cfg?.label ?? p.priority}
+                          count={p.count}
+                          percentage={p.percentage}
+                          color={cfg?.bg ?? "bg-muted-foreground/40"}
+                          total={report.summary.totalInPeriod}
+                          index={i}
+                        />
+                      )
+                    })}
+                </div>
+              </ReportSection>
+            )}
+
+            {report.byCategory.length > 0 && (
+              <ReportSection number="03" title="Por categoria">
+                <div className="space-y-2">
+                  {report.byCategory.map((c, i) => (
+                    <div key={c.id} className="flex items-center gap-3">
                       <span className="text-xs tabular-nums text-muted-foreground/50 w-4 shrink-0">
                         {String(i + 1).padStart(2, "0")}
                       </span>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2 mb-1">
-                          <span className="text-sm text-foreground truncate">{n.neighborhood}</span>
-                          <span className="text-xs tabular-nums text-muted-foreground shrink-0">{n.count}</span>
+                          <span className="text-sm text-foreground truncate">{c.name}</span>
+                          <span className="text-xs tabular-nums text-muted-foreground shrink-0">
+                            {c.count} · {c.percentage}%
+                          </span>
                         </div>
-                        <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                        <div className="h-2 rounded-full bg-muted overflow-hidden">
                           <motion.div
-                            className="h-full rounded-full bg-muted-foreground/30"
+                            className="h-full rounded-full bg-primary/70"
                             initial={{ width: 0 }}
-                            animate={{ width: `${pct}%` }}
+                            animate={{ width: `${c.percentage}%` }}
                             transition={{ duration: 0.55, ease: "easeOut", delay: 0.1 + i * 0.04 }}
                           />
                         </div>
                       </div>
                     </div>
-                  )
-                })}
-              </div>
-            </ReportSection>
-          )}
+                  ))}
+                </div>
+              </ReportSection>
+            )}
 
-          {trendData.length > 0 && (
-            <ReportSection number="05" title="Volume ao longo do tempo" icon={<BarChart3 className="size-3.5" />}>
-              <div className="flex items-center gap-4 mb-4">
-                <LegendDot color="bg-primary" label="Recebidas" />
-                <LegendDot color="bg-emerald-500" label="Resolvidas" />
-              </div>
+            {report.byNeighborhood.length > 0 && (
+              <ReportSection number="04" title="Bairros com mais demandas">
+                <div className="space-y-1.5">
+                  {report.byNeighborhood.map((n, i) => {
+                    const max = report.byNeighborhood[0].count
+                    const pct = Math.round((n.count / max) * 100)
+                    return (
+                      <div key={n.neighborhood} className="flex items-center gap-3">
+                        <span className="text-xs tabular-nums text-muted-foreground/50 w-4 shrink-0">
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-2 mb-1">
+                            <span className="text-sm text-foreground truncate">{n.neighborhood}</span>
+                            <span className="text-xs tabular-nums text-muted-foreground shrink-0">{n.count}</span>
+                          </div>
+                          <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                            <motion.div
+                              className="h-full rounded-full bg-muted-foreground/30"
+                              initial={{ width: 0 }}
+                              animate={{ width: `${pct}%` }}
+                              transition={{ duration: 0.55, ease: "easeOut", delay: 0.1 + i * 0.04 }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </ReportSection>
+            )}
 
-              <div className="report-chart-screen">
-                <ChartContainer
-                  config={{
-                    created:  { label: "Recebidas",  color: "#0058F3" },
-                    resolved: { label: "Resolvidas", color: "#22c55e" },
-                  }}
-                  className="h-64 w-full"
-                >
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={trendData} margin={{ top: 8, right: 4, left: -24, bottom: 0 }}>
-                      <defs>
-                        <linearGradient id="grad-created" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%"  stopColor="#0058F3" stopOpacity={0.22} />
-                          <stop offset="85%" stopColor="#0058F3" stopOpacity={0.02} />
-                        </linearGradient>
-                        <linearGradient id="grad-resolved" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%"  stopColor="#22c55e" stopOpacity={0.22} />
-                          <stop offset="85%" stopColor="#22c55e" stopOpacity={0.02} />
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid vertical={false} strokeDasharray="3 6" stroke="hsl(var(--border))" strokeOpacity={0.7} />
-                      <XAxis
-                        dataKey="label"
-                        tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
-                        axisLine={false}
-                        tickLine={false}
-                        interval="preserveStartEnd"
-                      />
-                      <YAxis
-                        tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
-                        axisLine={false}
-                        tickLine={false}
-                        allowDecimals={false}
-                        width={28}
-                      />
-                      <ChartTooltip
-                        cursor={{ stroke: "hsl(var(--border))", strokeWidth: 1, strokeDasharray: "4 4" }}
-                        content={({ active, payload, label }) => {
-                          if (!active || !payload?.length) return null
-                          return (
-                            <div className="rounded-xl border border-border/60 bg-background/98 px-3.5 py-3 shadow-lg shadow-black/8 min-w-40 space-y-2.5">
-                              <p className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground">{label}</p>
-                              <div className="h-px bg-border/50" />
-                              {payload.map((p, i) => (
-                                <div key={i} className="flex items-center justify-between gap-6">
-                                  <div className="flex items-center gap-2">
-                                    <span className="size-2 rounded-full shrink-0" style={{ background: p.color }} />
-                                    <span className="text-xs text-muted-foreground">{p.name}</span>
+            {trendData.length > 0 && (
+              <ReportSection number="05" title="Volume ao longo do tempo" icon={<BarChart3 className="size-3.5" />}>
+                <div className="flex items-center gap-4 mb-4">
+                  <LegendDot color="bg-primary" label="Recebidas" />
+                  <LegendDot color="bg-emerald-500" label="Resolvidas" />
+                </div>
+
+                <div className="report-chart-screen">
+                  <ChartContainer
+                    config={{
+                      created:  { label: "Recebidas",  color: "#0058F3" },
+                      resolved: { label: "Resolvidas", color: "#22c55e" },
+                    }}
+                    className="h-64 w-full"
+                  >
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={trendData} margin={{ top: 8, right: 4, left: -24, bottom: 0 }}>
+                        <defs>
+                          <linearGradient id="grad-created" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%"  stopColor="#0058F3" stopOpacity={0.22} />
+                            <stop offset="85%" stopColor="#0058F3" stopOpacity={0.02} />
+                          </linearGradient>
+                          <linearGradient id="grad-resolved" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%"  stopColor="#22c55e" stopOpacity={0.22} />
+                            <stop offset="85%" stopColor="#22c55e" stopOpacity={0.02} />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid vertical={false} strokeDasharray="3 6" stroke="hsl(var(--border))" strokeOpacity={0.7} />
+                        <XAxis
+                          dataKey="label"
+                          tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                          axisLine={false}
+                          tickLine={false}
+                          interval="preserveStartEnd"
+                        />
+                        <YAxis
+                          tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                          axisLine={false}
+                          tickLine={false}
+                          allowDecimals={false}
+                          width={28}
+                        />
+                        <ChartTooltip
+                          cursor={{ stroke: "hsl(var(--border))", strokeWidth: 1, strokeDasharray: "4 4" }}
+                          content={({ active, payload, label }) => {
+                            if (!active || !payload?.length) return null
+                            return (
+                              <div className="rounded-xl border border-border/60 bg-background/98 px-3.5 py-3 shadow-lg shadow-black/8 min-w-40 space-y-2.5">
+                                <p className="text-2xs font-semibold uppercase tracking-widest text-muted-foreground">{label}</p>
+                                <div className="h-px bg-border/50" />
+                                {payload.map((p, i) => (
+                                  <div key={i} className="flex items-center justify-between gap-6">
+                                    <div className="flex items-center gap-2">
+                                      <span className="size-2 rounded-full shrink-0" style={{ background: p.color }} />
+                                      <span className="text-xs text-muted-foreground">{p.name}</span>
+                                    </div>
+                                    <span className="font-mono text-sm font-bold tabular-nums text-foreground">{p.value}</span>
                                   </div>
-                                  <span className="font-mono text-sm font-bold tabular-nums text-foreground">{p.value}</span>
-                                </div>
-                              ))}
-                            </div>
-                          )
-                        }}
-                      />
-                      <Area type="monotone" dataKey="created" name="Recebidas" stroke="#0058F3" strokeWidth={2.5} fill="url(#grad-created)" dot={false} activeDot={{ r: 5, fill: "#0058F3", stroke: "white", strokeWidth: 2 }} animationDuration={900} animationEasing="ease-out" />
-                      <Area type="monotone" dataKey="resolved" name="Resolvidas" stroke="#22c55e" strokeWidth={2.5} fill="url(#grad-resolved)" dot={false} activeDot={{ r: 5, fill: "#22c55e", stroke: "white", strokeWidth: 2 }} animationDuration={900} animationBegin={150} animationEasing="ease-out" />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </ChartContainer>
-              </div>
+                                ))}
+                              </div>
+                            )
+                          }}
+                        />
+                        <Area type="monotone" dataKey="created" name="Recebidas" stroke="#0058F3" strokeWidth={2.5} fill="url(#grad-created)" dot={false} activeDot={{ r: 5, fill: "#0058F3", stroke: "white", strokeWidth: 2 }} animationDuration={900} animationEasing="ease-out" />
+                        <Area type="monotone" dataKey="resolved" name="Resolvidas" stroke="#22c55e" strokeWidth={2.5} fill="url(#grad-resolved)" dot={false} activeDot={{ r: 5, fill: "#22c55e", stroke: "white", strokeWidth: 2 }} animationDuration={900} animationBegin={150} animationEasing="ease-out" />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </ChartContainer>
+                </div>
 
-              <div className="report-trend-print hidden">
-                <table className="w-full text-xs border-collapse">
-                  <thead>
-                    <tr className="border-b border-border">
-                      <th className="text-left py-1.5 text-muted-foreground font-medium">Data</th>
-                      <th className="text-right py-1.5 text-muted-foreground font-medium">Recebidas</th>
-                      <th className="text-right py-1.5 text-muted-foreground font-medium">Resolvidas</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {trendData.filter(d => d.created > 0 || d.resolved > 0).map((d, i) => (
-                      <tr key={i} className="border-b border-border/40">
-                        <td className="py-1 text-foreground">{d.label}</td>
-                        <td className="py-1 text-right tabular-nums font-medium" style={{ color: "#0058F3" }}>{d.created}</td>
-                        <td className="py-1 text-right tabular-nums font-medium" style={{ color: "#22c55e" }}>{d.resolved}</td>
+                <div className="report-trend-print hidden">
+                  <table className="w-full text-xs border-collapse">
+                    <thead>
+                      <tr className="border-b border-border">
+                        <th className="text-left py-1.5 text-muted-foreground font-medium">Data</th>
+                        <th className="text-right py-1.5 text-muted-foreground font-medium">Recebidas</th>
+                        <th className="text-right py-1.5 text-muted-foreground font-medium">Resolvidas</th>
                       </tr>
-                    ))}
-                  </tbody>
-                  <tfoot>
-                    <tr className="border-t border-border">
-                      <td className="py-1.5 font-semibold text-foreground">Total</td>
-                      <td className="py-1.5 text-right tabular-nums font-bold" style={{ color: "#0058F3" }}>
-                        {trendData.reduce((s, d) => s + d.created, 0)}
-                      </td>
-                      <td className="py-1.5 text-right tabular-nums font-bold" style={{ color: "#22c55e" }}>
-                        {trendData.reduce((s, d) => s + d.resolved, 0)}
-                      </td>
-                    </tr>
-                  </tfoot>
-                </table>
-              </div>
-            </ReportSection>
-          )}
+                    </thead>
+                    <tbody>
+                      {trendData.filter(d => d.created > 0 || d.resolved > 0).map((d, i) => (
+                        <tr key={i} className="border-b border-border/40">
+                          <td className="py-1 text-foreground">{d.label}</td>
+                          <td className="py-1 text-right tabular-nums font-medium" style={{ color: "#0058F3" }}>{d.created}</td>
+                          <td className="py-1 text-right tabular-nums font-medium" style={{ color: "#22c55e" }}>{d.resolved}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <tfoot>
+                      <tr className="border-t border-border">
+                        <td className="py-1.5 font-semibold text-foreground">Total</td>
+                        <td className="py-1.5 text-right tabular-nums font-bold" style={{ color: "#0058F3" }}>
+                          {trendData.reduce((s, d) => s + d.created, 0)}
+                        </td>
+                        <td className="py-1.5 text-right tabular-nums font-bold" style={{ color: "#22c55e" }}>
+                          {trendData.reduce((s, d) => s + d.resolved, 0)}
+                        </td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              </ReportSection>
+            )}
 
-          {report.summary.totalInPeriod === 0 && (
-            <div className="rounded-xl border border-border bg-muted/20 px-6 py-12 text-center">
-              <p className="text-sm text-muted-foreground">Nenhuma demanda no período selecionado.</p>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
+            {report.summary.totalInPeriod === 0 && (
+              <div className="rounded-xl border border-border bg-muted/20 px-6 py-12 text-center">
+                <p className="text-sm text-muted-foreground">Nenhuma demanda no período selecionado.</p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </RequireActiveSubscription>
   )
 }
 

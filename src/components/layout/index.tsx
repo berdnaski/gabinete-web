@@ -6,6 +6,7 @@ import { Header } from "./components/header";
 import { CitizenHeader } from "./components/citizen-header";
 import { ConsentOverlay } from "../auth/consent-overlay"
 import { NeighborhoodOnboardingModal } from "./components/neighborhood-onboarding-modal";
+import { SubscriptionStatusBanner } from "../subscription-status-banner";
 
 import { UserRole } from "@/api/users/types";
 
@@ -33,6 +34,7 @@ export function Layout() {
         <SidebarInset className="sm:border sm:border-muted sm:shadow-2xl">
           <Header />
           <div className="p-3 sm:p-6">
+            <SubscriptionStatusBanner />
             <Outlet />
           </div>
         </SidebarInset>

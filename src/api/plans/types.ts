@@ -63,6 +63,11 @@ export interface CabinetOverride {
   feature: FeatureItem
 }
 
+export interface CabinetSubscriptionStatus {
+  hasActiveSubscription: boolean
+  currentPeriodEnd: string | null
+}
+
 export interface CabinetEntitlements {
   features: string[]
   limits: {
@@ -70,6 +75,7 @@ export interface CabinetEntitlements {
     maxDemands: number | null
     maxStorageBytes: number | null
   }
+  subscription: CabinetSubscriptionStatus
 }
 
 export interface CabinetUsage {
