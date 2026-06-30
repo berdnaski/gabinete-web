@@ -68,6 +68,7 @@ interface CabinetContentDraft {
   biographyContent: string | null;
   bannerFile: File | null;
   photoFile: File | null;
+  logoFile: File | null;
   heroTitle: string | null;
   heroSubtitle: string | null;
   accentColor: string | null;
@@ -80,6 +81,7 @@ const EMPTY_DRAFT: CabinetContentDraft = {
   biographyContent: null,
   bannerFile: null,
   photoFile: null,
+  logoFile: null,
   heroTitle: null,
   heroSubtitle: null,
   accentColor: null,
@@ -265,7 +267,7 @@ export function CabinetPageBuilder() {
       if (draft.tiktokUrl !== null) cabinetData.tiktokUrl = draft.tiktokUrl;
 
       const hasCabinetChanges =
-        Object.keys(cabinetData).length > 0 || draft.bannerFile || draft.photoFile;
+        Object.keys(cabinetData).length > 0 || draft.bannerFile || draft.photoFile || draft.logoFile;
 
       if (hasCabinetChanges) {
         await updateCabinet({
@@ -273,6 +275,7 @@ export function CabinetPageBuilder() {
           data: cabinetData,
           bannerFile: draft.bannerFile ?? undefined,
           biographyPhotoFile: draft.photoFile ?? undefined,
+          logoFile: draft.logoFile ?? undefined,
         });
       }
 
@@ -693,6 +696,15 @@ function SectionBody({
       const heroSlides = (config.slides as HeroSlide[]) ?? [];
       return (
         <>
+          <EditorGroup label="Logo do gabinete">
+            <ImagePicker
+              aspect="logo"
+              currentUrl={cabinet.logoUrl}
+              file={draft.logoFile}
+              hint="Substitui o logo padrão no cabeçalho do perfil público · recomendado 320×120 px (horizontal), fundo transparente (PNG) · máx 5 MB"
+              onSelect={(file) => onUpdateDraft({ logoFile: file })}
+            />
+          </EditorGroup>
           <EditorGroup label="Imagem principal da capa">
             <ImagePicker
               aspect="banner"
@@ -1607,7 +1619,7 @@ function ImagePicker({
   hint,
   onSelect,
 }: {
-  aspect: "banner" | "square";
+  aspect: "banner" | "square" | "logo";
   currentUrl?: string | null;
   file: File | null;
   hint: string;
@@ -1644,12 +1656,16 @@ function ImagePicker({
         className={cn(
           "group relative flex items-center justify-center overflow-hidden rounded-xl border-2 border-dashed transition-all hover:border-primary/40 hover:bg-muted/40",
           displayUrl ? "border-border/60 bg-muted/10" : "border-border/50 bg-muted/20",
-          aspect === "banner" ? "aspect-[3/1] w-full" : "size-32",
+          aspect === "banner" ? "aspect-[3/1] w-full" : aspect === "logo" ? "size-20" : "size-32",
         )}
       >
         {displayUrl ? (
           <>
-            <img src={displayUrl} alt="" className="absolute inset-0 size-full object-cover" />
+            <img
+              src={displayUrl}
+              alt=""
+              className={cn("absolute inset-0 size-full", aspect === "logo" ? "object-contain p-2" : "object-cover")}
+            />
             <span className="relative z-10 flex items-center gap-1.5 rounded-lg bg-black/60 px-3 py-1.5 text-xs font-medium text-white opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
               <Upload className="size-3" />
               Trocar imagem

@@ -36,7 +36,15 @@ import type { CabinetSection } from "@/api/cabinets/types";
 
 // ─── Header ───────────────────────────────────────────────────────────────────
 
-function ProfileHeader({ accent, cabinetName }: { accent: string; cabinetName?: string }) {
+function ProfileHeader({
+  accent,
+  cabinetName,
+  logoUrl,
+}: {
+  accent: string;
+  cabinetName?: string;
+  logoUrl?: string | null;
+}) {
   const { isAuthenticated, user, logout } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -73,9 +81,12 @@ function ProfileHeader({ accent, cabinetName }: { accent: string; cabinetName?: 
         <div className="flex items-center gap-3 min-w-0">
           <Link to="/" className="shrink-0">
             <img
-              src={Logo}
-              alt="Gabinete App"
-              className={cn("transition-all duration-300", scrolled ? "w-24" : "w-28")}
+              src={logoUrl || Logo}
+              alt={logoUrl ? cabinetName : "Gabinete App"}
+              className={cn(
+                "transition-all duration-300 object-contain",
+                scrolled ? "w-24 h-9" : "w-28 h-10",
+              )}
             />
           </Link>
           {cabinetName && scrolled && (
@@ -288,7 +299,7 @@ export function PublicCabinetProfile() {
 
   return (
     <div className="min-h-screen bg-background font-sans">
-      <ProfileHeader accent={accent} cabinetName={cabinet.name} />
+      <ProfileHeader accent={accent} cabinetName={cabinet.name} logoUrl={cabinet.logoUrl} />
 
       <main className="pt-16 flex flex-col">
         {sections.length > 0 ? (
