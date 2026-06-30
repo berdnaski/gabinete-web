@@ -11,7 +11,9 @@ export function SubscriptionStatusBanner() {
   const { plans, isLoading } = useCabinetFeatures()
 
   if (!user?.isCabinetMember || !cabinet || isLoading || !plans) return null
-
+  console.log({
+    plans
+  })
   const { hasActiveSubscription, currentPeriodEnd } = plans.subscription
 
   if (!hasActiveSubscription) {
