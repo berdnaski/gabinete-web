@@ -11,7 +11,7 @@ export function RequireActiveSubscription({ children }: Props) {
   const { plans, isLoading } = useCabinetFeatures()
 
   if (isLoading) return <>{children}</>
-
+  console.log({plans})
   if (plans && !plans.subscription.hasActiveSubscription) {
     return (
       <div className="flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-border bg-muted/30 p-12 text-center max-w-md mx-auto mt-8">
