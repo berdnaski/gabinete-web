@@ -1,8 +1,8 @@
 import { FEATURES } from "@/api/plans/features"
 import { FeatureGate } from "@/components/feature-gate"
-import { useState } from "react"
-import { QRCodeSVG } from "qrcode.react"
-import { QrCode, Code2, Copy, Check, Loader2 } from "lucide-react"
+import { useRef, useState } from "react"
+import { QRCodeCanvas, QRCodeSVG } from "qrcode.react"
+import { QrCode, Code2, Copy, Check, Download, Loader2 } from "lucide-react"
 import { useGetCabinets } from "@/api/cabinets/hooks"
 import { Label } from "@/components/ui/label"
 import { Field, FieldGroup } from "@/components/ui/field"
@@ -19,6 +19,7 @@ export function CabinetSharingCard() {
   const cabinet = cabinets?.[0]
 
   const [copied, setCopied] = useState(false)
+  const downloadCanvasRef = useRef<HTMLCanvasElement>(null)
 
   const publicUrl = typeof window !== "undefined"
     ? `${window.location.origin}/${cabinet?.slug}`
@@ -33,6 +34,15 @@ export function CabinetSharingCard() {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     })
+  }
+
+  const downloadQrCode = () => {
+    const canvas = downloadCanvasRef.current
+    if (!canvas || !cabinet) return
+    const link = document.createElement("a")
+    link.href = canvas.toDataURL("image/png")
+    link.download = `qrcode-${cabinet.slug}.png`
+    link.click()
   }
 
   if (isLoading) {
@@ -73,6 +83,15 @@ export function CabinetSharingCard() {
                 bgColor="#ffffff"
                 level="M"
               />
+              <QRCodeCanvas
+                ref={downloadCanvasRef}
+                value={publicUrl}
+                size={1024}
+                fgColor={cabinet.accentColor ?? "#0058F3"}
+                bgColor="#ffffff"
+                level="M"
+                className="hidden"
+              />
             </div>
             <div className="flex flex-col gap-2 pt-1">
               <p className="text-sm text-muted-foreground leading-relaxed">
@@ -85,6 +104,14 @@ export function CabinetSharingCard() {
                   {publicUrl}
                 </div>
               </Field>
+              <button
+                type="button"
+                onClick={downloadQrCode}
+                className="flex items-center gap-1.5 w-fit text-xs font-medium bg-background border border-border rounded-md px-2.5 py-1.5 hover:bg-muted transition-colors"
+              >
+                <Download className="size-3" />
+                Baixar QR Code
+              </button>
             </div>
           </div>
         </FieldGroup>
