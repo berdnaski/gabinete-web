@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils"
+import { WHATSAPP_URL } from "@/pages/public/landing/constants"
 import { AlertTriangle, PhoneCall, XCircle } from "lucide-react"
 
 interface Props {
@@ -69,7 +70,9 @@ export function PlanLimitBanner({ current, max, label, warnThreshold = 0.8, form
             </p>
           </div>
           <a
-            href="mailto:comercial@gabinete.app"
+            href={WHATSAPP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
             className={cn(
               "shrink-0 inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium border transition-colors",
               isExceeded

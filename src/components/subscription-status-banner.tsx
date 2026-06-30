@@ -1,6 +1,7 @@
 import { useAuth } from "@/hooks/use-auth"
 import { useCabinetFeatures } from "@/hooks/use-cabinet-features"
 import { cn } from "@/lib/utils"
+import { WHATSAPP_URL } from "@/pages/public/landing/constants"
 import { AlertTriangle, PhoneCall, XCircle } from "lucide-react"
 
 const WARNING_WINDOW_DAYS = 7
@@ -29,7 +30,9 @@ export function SubscriptionStatusBanner() {
           </p>
         </div>
         <a
-          href="mailto:comercial@gabinete.app"
+          href={WHATSAPP_URL}
+          target="_blank"
+          rel="noopener noreferrer"
           className="shrink-0 inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium border transition-colors border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/20"
         >
           <PhoneCall className="size-3" />
@@ -68,7 +71,9 @@ export function SubscriptionStatusBanner() {
             </p>
           </div>
           <a
-            href="mailto:comercial@gabinete.app"
+            href={WHATSAPP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
             className="shrink-0 inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium border transition-colors border-amber-300 bg-amber-100 text-amber-800 hover:bg-amber-200 dark:border-amber-700 dark:bg-amber-900/40 dark:text-amber-300 dark:hover:bg-amber-900/60"
           >
             <PhoneCall className="size-3" />

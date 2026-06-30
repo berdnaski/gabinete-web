@@ -3,7 +3,7 @@ import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Tabs as TabsPrimitive } from "radix-ui";
 import { PersonalInfoCard } from "./components/personal-info-card";
 import { CabinetInfoCard } from "./components/cabinet-info-card";
-import { CabinetBrandingCard } from "./components/cabinet-branding-card";
+import { CabinetSharingCard } from "./components/cabinet-sharing-card";
 import { SecurityCard } from "./components/security-card";
 import { NeighborhoodSettingsCard } from "./components/neighborhood-settings-card";
 import { CabinetPageBuilder } from "./components/cabinet-page-builder";
@@ -119,7 +119,7 @@ export function Settings() {
                   </div>
                 )}
                 <CabinetInfoCard />
-                <CabinetBrandingCard />
+                <CabinetSharingCard />
               </TabsContent>
 
               <TabsContent value="page-builder" className="space-y-4 outline-none focus-visible:ring-0 mt-0">

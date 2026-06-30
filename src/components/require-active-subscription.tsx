@@ -1,4 +1,5 @@
 import { useCabinetFeatures } from "@/hooks/use-cabinet-features"
+import { WHATSAPP_URL } from "@/pages/public/landing/constants"
 import { PhoneCall, ShieldAlert } from "lucide-react"
 import type { ReactNode } from "react"
 
@@ -26,7 +27,9 @@ export function RequireActiveSubscription({ children }: Props) {
           </p>
         </div>
         <a
-          href="mailto:comercial@gabinete.app"
+          href={WHATSAPP_URL}
+          target="_blank"
+          rel="noopener noreferrer"
           className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium border transition-colors border-border bg-background text-foreground hover:bg-muted mt-1"
         >
           <PhoneCall className="size-3" />
