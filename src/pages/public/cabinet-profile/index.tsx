@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import {
   useGetCabinetBySlug,
@@ -189,12 +189,24 @@ function PageSkeleton() {
 
 export function PublicCabinetProfile() {
   const { slug } = useParams() as { slug: string };
+  const [searchParams, setSearchParams] = useSearchParams();
   const { data: cabinet, isLoading: isCabinetLoading } = useGetCabinetBySlug(slug);
   const { data: metrics } = useGetCabinetMetrics(slug);
   const { data: sectionsData = [], isLoading: isSectionsLoading } = useGetCabinetSections(slug);
-  const [demandFormOpen, setDemandFormOpen] = useState(false);
+  const [demandFormOpen, setDemandFormOpen] = useState(
+    () => searchParams.get("nova-demanda") === "1",
+  );
 
-  // SEO
+  useEffect(() => {
+    if (isSectionsLoading || searchParams.get("nova-demanda") !== "1") return;
+
+    document.getElementById("demands-cta")?.scrollIntoView({ behavior: "smooth", block: "start" });
+
+    const next = new URLSearchParams(searchParams);
+    next.delete("nova-demanda");
+    setSearchParams(next, { replace: true });
+  }, [isSectionsLoading, searchParams, setSearchParams]);
+
   useEffect(() => {
     if (!cabinet) return;
     const prev = document.title;
